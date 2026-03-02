@@ -14,12 +14,27 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DATATRACKER_BASE = "https://datatracker.ietf.org"
-RFC_EDITOR_BASE = "https://www.rfc-editor.org/rfc"
+RFC_TEXT_BASE = "https://www.ietf.org/rfc"  # rfc-editor.org has Cloudflare bot protection
 CACHE_DIR = Path(os.getenv("RFC_CACHE_DIR", "./cache"))
+
+# rfc-editor.org blocks the default httpx user-agent (403).
+_HEADERS = {
+    "User-Agent": "RFCListen/0.1 (https://github.com/rfclisten; educational project)",
+}
 
 
 def _ensure_cache():
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _client(**kwargs) -> httpx.AsyncClient:
+    """Create a pre-configured async HTTP client."""
+    return httpx.AsyncClient(
+        headers=_HEADERS,
+        follow_redirects=True,
+        timeout=kwargs.pop("timeout", 15.0),
+        **kwargs,
+    )
 
 
 async def get_rfc_list(page: int = 1, limit: int = 50, search: str = "") -> dict:
@@ -39,7 +54,7 @@ async def get_rfc_list(page: int = 1, limit: int = 50, search: str = "") -> dict
         params["name__icontains"] = search
 
     url = f"{DATATRACKER_BASE}/api/v1/doc/document/"
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with _client() as client:
         response = await client.get(url, params=params)
         response.raise_for_status()
         data = response.json()
@@ -50,7 +65,7 @@ async def get_rfc_list(page: int = 1, limit: int = 50, search: str = "") -> dict
             "name": doc.get("name", ""),
             "title": doc.get("title", ""),
             "abstract": doc.get("abstract", ""),
-            "status": doc.get("std_level", ""),
+            "status": _clean_status(doc.get("std_level", "")),
             "published": doc.get("time", ""),
         }
         for doc in data.get("objects", [])
@@ -73,7 +88,7 @@ async def get_rfc_metadata(rfc_number: int) -> dict:
     Uses the /doc/rfcXXXX/doc.json simplified endpoint.
     """
     url = f"{DATATRACKER_BASE}/doc/rfc{rfc_number}/doc.json"
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with _client() as client:
         response = await client.get(url)
         if response.status_code == 404:
             return {}
@@ -94,8 +109,8 @@ async def get_rfc_text(rfc_number: int) -> str:
     if cache_path.exists():
         return cache_path.read_text(encoding="utf-8", errors="replace")
 
-    url = f"{RFC_EDITOR_BASE}/rfc{rfc_number}.txt"
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    url = f"{RFC_TEXT_BASE}/rfc{rfc_number}.txt"
+    async with _client(timeout=30.0) as client:
         response = await client.get(url)
         response.raise_for_status()
         text = response.text
@@ -110,3 +125,25 @@ def _extract_rfc_number(name: str) -> int | None:
     """Extract the integer RFC number from a name like 'rfc793'."""
     match = re.search(r"rfc(\d+)", name, re.IGNORECASE)
     return int(match.group(1)) if match else None
+
+
+# Map IETF Datatracker slug → human-readable label
+_STATUS_MAP = {
+    "ps": "Proposed Standard",
+    "ds": "Draft Standard",
+    "std": "Internet Standard",
+    "bcp": "Best Current Practice",
+    "inf": "Informational",
+    "exp": "Experimental",
+    "hist": "Historic",
+    "unkn": "Unknown",
+}
+
+
+def _clean_status(raw: str) -> str:
+    """Convert API resource URIs like '/api/v1/name/stdlevelname/ps/' to labels."""
+    if not raw:
+        return ""
+    # Extract the slug from URIs like /api/v1/name/stdlevelname/ps/
+    slug = raw.rstrip("/").rsplit("/", 1)[-1].lower()
+    return _STATUS_MAP.get(slug, slug.upper())

@@ -2,17 +2,18 @@
  * app.js — RFCListen Frontend Application
  *
  * Architecture:
- *   state.js-style single state object + pure render functions
- *   player.js-style Player class wrapping Web Speech API
+ *   Single state object + pure render functions
+ *   Player class wrapping Web Speech API
  *
- * Modules in this file (kept in one file for Phase 0 simplicity):
+ * Sections:
  *   1. Config
- *   2. State
+ *   2. State (with localStorage persistence + recently played)
  *   3. Player (Web Speech API wrapper)
  *   4. API client
  *   5. Render helpers
- *   6. Event wiring
- *   7. Init
+ *   6. Event wiring (including keyboard shortcuts)
+ *   7. Data loaders
+ *   8. Init
  */
 
 'use strict';
@@ -21,6 +22,8 @@
 
 const API_BASE = 'http://localhost:3000/api';
 const STORAGE_KEY = 'rfclisten_state';
+const RECENTS_KEY = 'rfclisten_recents';
+const MAX_RECENTS = 10;
 
 // ── 2. State ──────────────────────────────────────────────────────────────────
 
@@ -37,14 +40,16 @@ let state = {
   isPlaying: false,
   playbackRate: 1.0,
   selectedVoiceURI: '',
+
+  recentRFCs: [],         // [{ rfcNumber, title, lastPlayed: ISO string }]
 };
 
 function setState(patch) {
   state = { ...state, ...patch };
-  saveToStorage();
+  _persistState();
 }
 
-function saveToStorage() {
+function _persistState() {
   try {
     const persist = {
       currentRFC: state.currentRFC,
@@ -56,13 +61,40 @@ function saveToStorage() {
   } catch (_) { /* ignore */ }
 }
 
+function _persistRecents() {
+  try {
+    localStorage.setItem(RECENTS_KEY, JSON.stringify(state.recentRFCs));
+  } catch (_) { /* ignore */ }
+}
+
 function loadFromStorage() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    const saved = JSON.parse(raw);
-    state = { ...state, ...saved };
+    if (raw) {
+      const saved = JSON.parse(raw);
+      state = { ...state, ...saved };
+    }
+    const recentsRaw = localStorage.getItem(RECENTS_KEY);
+    if (recentsRaw) {
+      state.recentRFCs = JSON.parse(recentsRaw);
+    }
   } catch (_) { /* ignore */ }
+}
+
+function addToRecents(rfcNumber, title) {
+  // Remove if already exists
+  state.recentRFCs = state.recentRFCs.filter(r => r.rfcNumber !== rfcNumber);
+  // Push to front
+  state.recentRFCs.unshift({
+    rfcNumber,
+    title,
+    lastPlayed: new Date().toISOString(),
+  });
+  // Cap at MAX_RECENTS
+  if (state.recentRFCs.length > MAX_RECENTS) {
+    state.recentRFCs = state.recentRFCs.slice(0, MAX_RECENTS);
+  }
+  _persistRecents();
 }
 
 // ── 3. Player (Web Speech API) ────────────────────────────────────────────────
@@ -72,7 +104,6 @@ class Player {
     this._utterance = null;
     this._sectionQueue = [];
     this._currentIdx = 0;
-    this._onSectionChange = null;
   }
 
   /** Load sections and optionally start from a given index. */
@@ -133,17 +164,21 @@ class Player {
 
   setRate(rate) {
     setState({ playbackRate: rate });
-    // Will apply on next utterance
+    document.getElementById('speed-select').value = String(rate);
   }
 
   setVoice(uri) {
     setState({ selectedVoiceURI: uri });
   }
 
+  get currentIdx() { return this._currentIdx; }
+  get totalSections() { return this._sectionQueue.length; }
+
   _speakSection(idx) {
     if (idx >= this._sectionQueue.length) {
       setState({ isPlaying: false });
       renderPlayerState();
+      showToast('Finished reading this RFC.', 'success');
       return;
     }
 
@@ -152,6 +187,7 @@ class Player {
     setState({ currentSectionIdx: idx });
     renderActiveSectionHighlight(idx);
     scrollToSection(idx);
+    renderSectionProgress();
 
     const utterance = new SpeechSynthesisUtterance(section.content);
     utterance.rate = state.playbackRate;
@@ -167,8 +203,13 @@ class Player {
     };
 
     utterance.onerror = (e) => {
-      console.warn('TTS error:', e.error);
-      this._speakSection(idx + 1);
+      if (e.error !== 'interrupted') {
+        console.warn('TTS error:', e.error);
+      }
+      // Only advance on non-interrupted errors
+      if (e.error !== 'interrupted' && e.error !== 'canceled') {
+        this._speakSection(idx + 1);
+      }
     };
 
     this._utterance = utterance;
@@ -210,12 +251,31 @@ function renderRFCList(rfcs) {
       role="option"
       data-rfc="${rfc.rfcNumber}"
       tabindex="0"
-      aria-label="RFC ${rfc.rfcNumber}: ${rfc.title}"
+      aria-label="RFC ${rfc.rfcNumber}: ${escHtml(rfc.title)}"
     >
       <span class="rfc-item-number">RFC ${rfc.rfcNumber}</span>
       <span class="rfc-item-title">${escHtml(rfc.title)}</span>
-      <span class="rfc-item-meta">${rfc.status || ''} ${rfc.published ? '· ' + rfc.published.slice(0, 10) : ''}</span>
+      <span class="rfc-item-meta">${escHtml(rfc.status || '')} ${rfc.published ? '· ' + rfc.published.slice(0, 10) : ''}</span>
     </li>
+  `).join('');
+}
+
+function renderRecentsList() {
+  const container = document.getElementById('recents-list');
+  if (!container) return;
+
+  if (!state.recentRFCs.length) {
+    container.innerHTML = '<div class="recents-empty">No recently played RFCs</div>';
+    return;
+  }
+
+  container.innerHTML = state.recentRFCs.map(r => `
+    <div class="recent-item" data-rfc="${r.rfcNumber}" tabindex="0" role="button"
+         aria-label="Resume RFC ${r.rfcNumber}: ${escHtml(r.title)}">
+      <span class="recent-number">RFC ${r.rfcNumber}</span>
+      <span class="recent-title">${escHtml(r.title)}</span>
+      <span class="recent-time">${_timeAgo(r.lastPlayed)}</span>
+    </div>
   `).join('');
 }
 
@@ -268,7 +328,7 @@ function renderSectionsNav(sections) {
       data-idx="${idx}"
       tabindex="0"
       role="button"
-      aria-label="Jump to ${s.heading}"
+      aria-label="Jump to ${escHtml(s.heading)}"
     >${escHtml(s.heading)}</li>
   `).join('');
 }
@@ -291,6 +351,7 @@ function renderPlayerState() {
   const btn = document.getElementById('btn-play-pause');
   btn.textContent = state.isPlaying ? '⏸' : '▶';
   btn.setAttribute('aria-label', state.isPlaying ? 'Pause' : 'Play');
+  btn.setAttribute('title', state.isPlaying ? 'Pause (Space)' : 'Play (Space)');
 }
 
 function renderPlayerNowPlaying(section) {
@@ -298,6 +359,20 @@ function renderPlayerNowPlaying(section) {
   document.getElementById('player-rfc-label').textContent =
     rfc ? `RFC ${rfc.rfcNumber}` : '';
   document.getElementById('player-section-label').textContent = section?.heading || '';
+}
+
+function renderSectionProgress() {
+  const progressEl = document.getElementById('section-progress');
+  if (!progressEl) return;
+  const total = player.totalSections;
+  const current = player.currentIdx + 1;
+  progressEl.textContent = total ? `${current} / ${total}` : '';
+
+  // Update progress bar
+  const bar = document.getElementById('progress-fill');
+  if (bar && total) {
+    bar.style.width = `${(current / total) * 100}%`;
+  }
 }
 
 function scrollToSection(idx) {
@@ -308,26 +383,72 @@ function scrollToSection(idx) {
 function populateVoices() {
   const select = document.getElementById('voice-select');
   const voices = window.speechSynthesis.getVoices();
-  select.innerHTML = voices.map(v =>
+  if (!voices.length) return;
+
+  // Group by language, prefer English voices
+  const english = voices.filter(v => v.lang.startsWith('en'));
+  const others = voices.filter(v => !v.lang.startsWith('en'));
+  const sorted = [...english, ...others];
+
+  select.innerHTML = sorted.map(v =>
     `<option value="${v.voiceURI}" ${state.selectedVoiceURI === v.voiceURI ? 'selected' : ''}>
       ${v.name} (${v.lang})
     </option>`
   ).join('');
 }
 
+// ── Toasts ────────────────────────────────────────────────────────────────────
+
 function showToast(message, type = 'error') {
+  // Remove any existing toasts
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+
   const toast = document.createElement('div');
-  toast.style.cssText = `
-    position:fixed;bottom:88px;right:20px;z-index:9999;
-    background:${type === 'error' ? '#da3633' : '#238636'};
-    color:#fff;padding:10px 18px;border-radius:8px;
-    font-size:14px;box-shadow:0 4px 12px #0004;
-    animation:fadeIn 0.2s ease;
-  `;
+  toast.className = `toast toast-${type}`;
+  toast.setAttribute('role', 'alert');
+  toast.setAttribute('aria-live', 'assertive');
   toast.textContent = message;
   document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+
+  // Trigger entrance animation on next frame
+  requestAnimationFrame(() => toast.classList.add('toast-visible'));
+
+  setTimeout(() => {
+    toast.classList.remove('toast-visible');
+    toast.addEventListener('transitionend', () => toast.remove());
+  }, 3500);
 }
+
+// ── Skeleton loaders ──────────────────────────────────────────────────────────
+
+function showListSkeleton() {
+  const list = document.getElementById('rfc-list');
+  list.innerHTML = Array.from({ length: 8 }, (_, i) => `
+    <li class="rfc-list-item skeleton-item" aria-hidden="true">
+      <span class="skeleton skeleton-number"></span>
+      <span class="skeleton skeleton-title" style="width:${60 + Math.random() * 35}%"></span>
+      <span class="skeleton skeleton-meta" style="width:${30 + Math.random() * 30}%"></span>
+    </li>
+  `).join('');
+}
+
+function showContentSkeleton() {
+  document.getElementById('rfc-content').innerHTML = `
+    <div class="content-skeleton" aria-hidden="true">
+      ${Array.from({ length: 6 }, () => `
+        <div class="skeleton-section">
+          <div class="skeleton skeleton-heading" style="width:${25 + Math.random() * 30}%"></div>
+          <div class="skeleton skeleton-line" style="width:${70 + Math.random() * 25}%"></div>
+          <div class="skeleton skeleton-line" style="width:${60 + Math.random() * 35}%"></div>
+          <div class="skeleton skeleton-line" style="width:${50 + Math.random() * 40}%"></div>
+          <div class="skeleton skeleton-line" style="width:${65 + Math.random() * 30}%"></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function escHtml(str = '') {
   return String(str)
@@ -337,16 +458,45 @@ function escHtml(str = '') {
     .replace(/"/g, '&quot;');
 }
 
+function _timeAgo(isoStr) {
+  const diff = Date.now() - new Date(isoStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
 // ── 6. Event Wiring ───────────────────────────────────────────────────────────
 
 function wireEvents() {
   // RFC list click
   document.getElementById('rfc-list').addEventListener('click', async (e) => {
     const item = e.target.closest('.rfc-list-item');
-    if (!item) return;
+    if (!item || item.classList.contains('skeleton-item')) return;
     const rfcNum = Number(item.dataset.rfc);
     await loadRFC(rfcNum);
   });
+
+  // RFC list keyboard navigation (Enter to select)
+  document.getElementById('rfc-list').addEventListener('keydown', async (e) => {
+    if (e.code === 'Enter') {
+      const item = e.target.closest('.rfc-list-item');
+      if (item) await loadRFC(Number(item.dataset.rfc));
+    }
+  });
+
+  // Recently played clicks
+  const recents = document.getElementById('recents-list');
+  if (recents) {
+    recents.addEventListener('click', async (e) => {
+      const item = e.target.closest('.recent-item');
+      if (!item) return;
+      await loadRFC(Number(item.dataset.rfc));
+    });
+  }
 
   // Search (debounced)
   let searchTimer;
@@ -402,12 +552,57 @@ function wireEvents() {
     player.jumpToSection(idx);
   });
 
-  // Keyboard shortcuts
+  // Section nav keyboard
+  document.getElementById('sections-list').addEventListener('keydown', (e) => {
+    if (e.code === 'Enter') {
+      const item = e.target.closest('.section-nav-item');
+      if (item) player.jumpToSection(Number(item.dataset.idx));
+    }
+  });
+
+  // ── Keyboard shortcuts ──────────────────────────────────────────────────────
   document.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-    if (e.code === 'Space') { e.preventDefault(); document.getElementById('btn-play-pause').click(); }
-    if (e.code === 'ArrowRight') player.nextSection();
-    if (e.code === 'ArrowLeft') player.prevSection();
+    // Skip when typing in inputs
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+
+    switch (e.code) {
+      case 'Space':
+        e.preventDefault();
+        document.getElementById('btn-play-pause').click();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        player.nextSection();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        player.prevSection();
+        break;
+      case 'ArrowUp': {
+        e.preventDefault();
+        const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+        const curIdx = speeds.indexOf(state.playbackRate);
+        if (curIdx < speeds.length - 1) {
+          player.setRate(speeds[curIdx + 1]);
+          showToast(`Speed: ${speeds[curIdx + 1]}×`, 'info');
+        }
+        break;
+      }
+      case 'ArrowDown': {
+        e.preventDefault();
+        const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+        const curIdx = speeds.indexOf(state.playbackRate);
+        if (curIdx > 0) {
+          player.setRate(speeds[curIdx - 1]);
+          showToast(`Speed: ${speeds[curIdx - 1]}×`, 'info');
+        }
+        break;
+      }
+      case 'KeyM':
+        // Mute / unmute (stop / play)
+        if (state.isPlaying) { player.stop(); showToast('Stopped', 'info'); }
+        break;
+    }
   });
 
   // Voices loaded async in some browsers
@@ -417,8 +612,7 @@ function wireEvents() {
 // ── 7. Data loaders ───────────────────────────────────────────────────────────
 
 async function loadRFCList() {
-  const list = document.getElementById('rfc-list');
-  list.innerHTML = '<li class="rfc-list-placeholder skeleton" style="height:40px;margin:4px 16px;"></li>'.repeat(8);
+  showListSkeleton();
 
   try {
     const data = await fetchRFCList(state.page, state.limit, state.search);
@@ -426,22 +620,26 @@ async function loadRFCList() {
     renderRFCList(data.rfcs);
 
     // Pagination controls
-    document.getElementById('page-info').textContent =
-      `Page ${state.page} of ${Math.ceil(data.count / state.limit) || 1}`;
+    const totalPages = Math.ceil(data.count / state.limit) || 1;
+    document.getElementById('page-info').textContent = `Page ${state.page} of ${totalPages}`;
     document.getElementById('btn-prev-page').disabled = state.page <= 1;
-    document.getElementById('btn-next-page').disabled =
-      state.page >= Math.ceil(data.count / state.limit);
+    document.getElementById('btn-next-page').disabled = state.page >= totalPages;
   } catch (err) {
     console.error(err);
     showToast('Could not load RFC list. Is the backend running?');
-    list.innerHTML = '<li class="rfc-list-placeholder">Failed to load RFCs.</li>';
+    document.getElementById('rfc-list').innerHTML =
+      '<li class="rfc-list-placeholder">Failed to load RFCs. Check if the backend is running on port 3000.</li>';
   }
 }
 
 async function loadRFC(rfcNumber) {
   player.stop();
-  document.getElementById('rfc-content').innerHTML =
-    '<div class="rfc-list-placeholder skeleton" style="height:32px;margin:16px 0;width:60%;"></div>'.repeat(12);
+  showContentSkeleton();
+
+  // Show header immediately with loading state
+  document.getElementById('rfc-header').classList.remove('hidden');
+  document.getElementById('rfc-badge').textContent = `RFC ${rfcNumber}`;
+  document.getElementById('rfc-title').textContent = 'Loading…';
 
   try {
     const rfc = await fetchParsedRFC(rfcNumber);
@@ -451,14 +649,23 @@ async function loadRFC(rfcNumber) {
     player.load(rfc.sections, 0);
     renderPlayerNowPlaying(rfc.sections[0]);
     renderPlayerState();
+    renderSectionProgress();
 
-    // Highlight selected item in list
+    // Add to recently played
+    addToRecents(rfcNumber, rfc.title);
+    renderRecentsList();
+
+    // Highlight selected item in left list
     document.querySelectorAll('.rfc-list-item').forEach(el => {
       el.classList.toggle('active', Number(el.dataset.rfc) === rfcNumber);
     });
+
+    showToast(`Loaded RFC ${rfcNumber}: ${rfc.title}`, 'success');
   } catch (err) {
     console.error(err);
-    showToast(`Could not load RFC ${rfcNumber}.`);
+    showToast(`Could not load RFC ${rfcNumber}. It may not exist or the backend timed out.`);
+    document.getElementById('rfc-content').innerHTML =
+      '<div id="welcome-screen"><div class="welcome-icon">⚠️</div><h2>Failed to load RFC</h2><p>Please try another RFC or check the backend.</p></div>';
   }
 }
 
@@ -469,14 +676,19 @@ async function init() {
   wireEvents();
   populateVoices();
 
+  // Render recently played
+  renderRecentsList();
+
   await loadRFCList();
 
   // Restore previous session
   if (state.currentRFC) {
     renderRFCContent(state.currentRFC);
     player.load(state.currentRFC.sections, state.currentSectionIdx);
-    renderPlayerNowPlaying(state.currentRFC.sections[state.currentSectionIdx]);
+    renderPlayerNowPlaying(state.currentRFC.sections[state.currentSectionIdx] || state.currentRFC.sections[0]);
     renderPlayerState();
+    renderSectionProgress();
+    renderActiveSectionHighlight(state.currentSectionIdx);
   }
 
   // Restore speed selector

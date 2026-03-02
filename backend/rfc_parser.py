@@ -325,15 +325,45 @@ def _normalise_prose(text: str) -> str:
 
 def _extract_title(raw_text: str) -> str:
     """
-    RFC titles appear on the first few lines of the document.
-    Heuristic: find the first non-blank, non-metadata line in the header.
+    RFC titles are typically the most prominent centered line in the first
+    ~20 lines.  We skip metadata, short phrases, and common non-title text.
     """
-    for line in raw_text.splitlines()[:30]:
+    _META_PATTERNS = re.compile(
+        r"^("
+        r"RFC[\s:]+\d|Request for Comments|Network Working Group|"
+        r"Internet Engineering Task Force|Category:|ISSN:|STD:|BCP:|"
+        r"Updates:|Obsoletes:|Status of|Copyright|"
+        r"prepared\s+for|by\s+|"
+        r"\w+\s+\w+\s+\d{4}$"  # "Author Name  Month YYYY"
+        r")",
+        re.IGNORECASE,
+    )
+    candidates = []
+    for line in raw_text.splitlines()[:25]:
         stripped = line.strip()
-        # Skip short lines, lines that look like dates/categories/numbers
-        if (
-            len(stripped) > 10
-            and not re.match(r"^\d|^RFC|^Network|^Request|^Category|^ISSN|^\w+\s+\w+\s+\d{4}", stripped)
-        ):
-            return stripped
-    return "Unknown Title"
+        if not stripped or len(stripped) < 8:
+            continue
+        if _META_PATTERNS.match(stripped):
+            continue
+        # Compute "centeredness" — highly indented lines are likely titles
+        leading = len(line) - len(line.lstrip())
+        # Only consider reasonably indented lines (likely centered titles)
+        if leading >= 10:
+            candidates.append((leading, stripped))
+
+    if not candidates:
+        # Fallback: first long non-metadata line in the first 30 lines
+        for line in raw_text.splitlines()[:30]:
+            stripped = line.strip()
+            if len(stripped) > 10 and not _META_PATTERNS.match(stripped):
+                return stripped
+        return "Unknown Title"
+
+    # Among centered candidates, prefer the first one (titles appear before
+    # subtitles / author info lines which may be even more centered)
+    for _, text in candidates:
+        if len(text) > 10:
+            return text
+    return candidates[0][1]
+
+

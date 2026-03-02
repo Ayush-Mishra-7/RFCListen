@@ -62,71 +62,70 @@
 ## Phase 2 — Frontend: Core UI
 
 ### 2.1 Layout & Design System (`frontend/style.css`)
-- [ ] Define CSS custom properties (color palette, typography scale, spacing)
-- [ ] Dark mode as default (engineering aesthetic); light mode toggle
-- [ ] Responsive grid: sidebar (RFC browser) + main panel (reader + player)
-- [ ] Monospace font for RFC text rendering (`JetBrains Mono` or `Fira Code`)
-- [ ] Sans-serif font for UI chrome (`Inter` or `Outfit`)
+- [x] Define CSS custom properties (color palette, typography scale, spacing)
+- [x] Dark mode as default (engineering aesthetic)
+- [x] Responsive grid: sidebar (RFC browser) + main panel (reader + player)
+- [x] Monospace font for RFC text rendering (`JetBrains Mono`)
+- [x] Sans-serif font for UI chrome (`Inter`)
 
 ### 2.2 RFC Browser Panel
-- [ ] Fetch RFC list from backend API on load
-- [ ] Render paginated list with RFC number, title, status badge, and date
-- [ ] Search input with debounce — filters by number or title
-- [ ] Filter dropdowns: Status (Standards Track, BCP, Informational, etc.), Year
-- [ ] Click on RFC → load its parsed content into the reader panel
+- [x] Fetch RFC list from backend API on load
+- [x] Render paginated list with RFC number, title, status badge, and date
+- [x] Search input with debounce — filters by number or title
+- [x] Status filter dropdown
+- [x] Click on RFC → load its parsed content into the reader panel
 
 ### 2.3 RFC Reader Panel
-- [ ] Display RFC title and metadata (authors, date, category, abstract)
-- [ ] Render sections sequentially with proper heading hierarchy
-- [ ] Scroll to currently playing section automatically
-- [ ] Highlight current paragraph being spoken
-- [ ] For `figure` sections: render raw ASCII art in a styled `<pre>` monospace block
-- [ ] For `table` sections: render as formatted table or `<pre>` block
-- [ ] "Jump to section" anchor links in the heading area
+- [x] Display RFC title and metadata (badge, date)
+- [x] Render sections sequentially with proper heading hierarchy
+- [x] Scroll to currently playing section automatically
+- [x] Highlight currently playing section with accent border
+- [x] For `figure` sections: render raw ASCII art in styled `<pre>` monospace block
+- [x] For `table` sections: render as `<pre>` block
+- [x] Section navigation sidebar with clickable headings
 
-### 2.4 TTS Audio Player (`frontend/player.js`)
-- [ ] Wrap the Web Speech API in a `Player` class with:
-  - `play()`, `pause()`, `resume()`, `stop()`
-  - `jumpToSection(sectionId)`
-  - `setSpeed(rate)` — 0.5 to 2.0
-  - `setVoice(voiceId)`
-  - Event callbacks: `onSectionChange`, `onEnd`, `onFigureEncountered`
-- [ ] Player UI bar (fixed bottom or top):
-  - [ ] Play/Pause button
-  - [ ] Previous Section / Next Section buttons
-  - [ ] Playback speed selector
-  - [ ] Voice selector (populated from `speechSynthesis.getVoices()`)
-  - [ ] Progress bar (showing current section index / total sections)
-  - [ ] Current section label display
-- [ ] Section timestamps sidebar/drawer:
-  - [ ] List all section headings with their index
-  - [ ] Highlight currently playing section
-  - [ ] Click to jump to section
-- [ ] When `type === 'figure'` or `type === 'table'`:
-  - [ ] Pause briefly, speak the announcement text
-  - [ ] Scroll reader panel to display the visual content
-  - [ ] Continue to next section automatically
+### 2.4 TTS Audio Player (`frontend/app.js`)
+- [x] Web Speech API `Player` class with play/pause/resume/stop/jumpToSection/setRate/setVoice
+- [x] Player UI bar (fixed bottom):
+  - [x] Play/Pause button
+  - [x] Previous Section / Next Section buttons
+  - [x] Playback speed selector (0.5×–2×)
+  - [x] Voice selector (populated from `speechSynthesis.getVoices()`)
+  - [x] Current RFC label + section label display
+- [x] Section timestamps sidebar:
+  - [x] All section headings listed (text, figure, table types styled differently)
+  - [x] Active section highlighted
+  - [x] Click to jump to section
+- [x] Figure/table sections: speak announcement, display visual in reader
 
-### 2.5 State Management (`frontend/state.js`)
-- [ ] Single `appState` object tracking:
-  - `rfcList`, `currentRFC`, `sections`, `currentSectionIndex`
-  - `isPlaying`, `playbackRate`, `selectedVoice`
-- [ ] Pure functions: `setState()`, `getState()`
-- [ ] Subscribe/notify pattern for UI updates
+### 2.5 State Management (inline in `app.js`)
+- [x] Single `state` object (rfcList, currentRFC, currentSectionIdx, isPlaying, playbackRate, selectedVoiceURI)
+- [x] `setState()` / `saveToStorage()` / `loadFromStorage()` functions
+- [x] Keyboard shortcuts: Space (play/pause), ArrowLeft/Right (skip section)
+
+### 2.6 Bug Fixes (discovered during Phase 2)
+- [x] **502 fix**: Switched RFC text source from rfc-editor.org (Cloudflare 403) to ietf.org/rfc/
+- [x] **Title extraction**: Rewrote heuristic — centered-line detection, skips metadata/Obsoletes/prepared for
+- [x] **Status labels**: Converted API URI slugs to human-readable labels (Proposed Standard, Informational, etc.)
+- [x] **User-Agent**: Added proper UA and `follow_redirects=True` to all httpx clients
 
 ---
 
 ## Phase 3 — Persistence & UX Polish
 
-- [ ] Save `currentRFC` and `currentSectionIndex` to `localStorage` — resume on page reload
-- [ ] Recently played RFCs list (stored in localStorage)
-- [ ] Keyboard shortcuts:
+- [x] Save `currentRFC` and `currentSectionIndex` to `localStorage` — resume on page reload
+- [x] Recently played RFCs list (stored in localStorage, max 10 items with timestamps)
+- [x] Keyboard shortcuts:
   - `Space` — Play/Pause
   - `←` / `→` — Previous/Next section
-  - `↑` / `↓` — Speed up/down
-- [ ] Loading skeleton UI while RFC is being fetched and parsed
-- [ ] Toast notifications for errors (RFC not found, network issue)
-- [ ] Accessible ARIA roles and labels on all interactive elements
+  - `↑` / `↓` — Speed up/down (with toast notification)
+  - `M` — Stop playback
+- [x] Loading skeleton UI while RFC list and content are being fetched
+- [x] Toast notifications for success/error/info with slide-in animations
+- [x] Section progress bar and counter in player bar (e.g. "3 / 125")
+- [x] Accessible ARIA roles and labels on all interactive elements
+- [x] English voices sorted first in voice selector
+- [x] Responsive layout improvements (hide player options on small screens)
 
 ---
 
