@@ -131,26 +131,29 @@
 
 ## Phase 4 — Testing & Validation
 
-- [ ] Test parser against a set of diverse RFCs:
-  - [ ] RFC 793 (TCP) — rich ASCII diagrams
-  - [ ] RFC 2616 (HTTP/1.1) — tables and long sections
-  - [ ] RFC 8446 (TLS 1.3) — modern, complex structure
-  - [ ] RFC 1149 (IP over Avian Carriers) — short, humorous
-- [ ] Manual end-to-end test: browse → select → listen → skip → figure announcement
+- [x] Test parser against a set of diverse RFCs (30 integration tests):
+  - [x] RFC 793 (TCP) — rich ASCII diagrams ✓ figures detected, rawAscii populated
+  - [x] RFC 2616 (HTTP/1.1) — tables and long sections ✓ parseable, known title-extraction limitation
+  - [x] RFC 8446 (TLS 1.3) — modern, complex structure ✓ figures, 10+ sections, no boilerplate
+  - [x] RFC 1149 (IP over Avian Carriers) — short, humorous ✓ title + content parsed
+- [x] Manual end-to-end test: browse → select → listen → skip → figure announcement
 - [ ] Cross-browser TTS test: Chrome, Firefox, Edge (Web Speech API support varies)
 - [ ] Mobile browser test (Chrome on Android / Safari on iOS)
-- [ ] Accessibility audit (keyboard nav, screen reader compatibility)
+- [x] Accessibility audit (keyboard nav, screen reader compatibility)
 
 ---
 
 ## Phase 5 — Deployment
 
-- [ ] Create `Dockerfile` for backend (optional)
-- [ ] Set up a simple static host for frontend (GitHub Pages, Vercel, or Netlify)
-- [ ] Host backend on Railway, Fly.io, or Render (free tier)
-- [ ] Update `README.md` with live demo URL
-- [ ] Set up environment variable management for production
-- [ ] Add `CONTRIBUTING.md` guide
+- [x] Create `Dockerfile` for backend
+- [x] Create `.dockerignore` to keep image lean
+- [x] Create `render.yaml` Render Blueprint for one-click deploy
+- [x] Set up frontend for GitHub Pages (auto-detect API_BASE in `app.js`)
+- [ ] Deploy backend to Render (free tier) — requires manual Render dashboard setup
+- [ ] Deploy frontend to GitHub Pages — requires repo Settings → Pages config
+- [x] Update `README.md` with deployment instructions and live demo URL placeholder
+- [x] Set up environment variable management for production (`.env.example`, `render.yaml`)
+- [x] Add `CONTRIBUTING.md` guide
 
 ---
 
@@ -162,6 +165,9 @@
 - [ ] **Section Notes**: Add text annotations to sections while listening
 - [ ] **RFC Diff Viewer**: Compare two versions of an RFC (updated/obsoleted relationships)
 - [ ] **PWA Support**: Make the app installable as a Progressive Web App with offline support
+- [ ] **IP-based rate limiting**: Restrict each IP to 3 hours of usage per session (FastAPI middleware)
+- [ ] **Max concurrent users**: Cap the number of active sessions at a configurable limit
+- [ ] **API key gating**: Optional `X-API-Key` header middleware for unlimited/premium access
 
 ---
 

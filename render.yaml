@@ -1,0 +1,20 @@
+# Render Blueprint — one-click deploy configuration
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: rfclisten-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    repo: https://github.com/Ayush-Mishra-7/RFCListen
+    branch: main
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: RFC_CACHE_DIR
+        value: "/app/cache"
+      - key: ALLOWED_ORIGINS
+        value: "https://ayush-mishra-7.github.io,http://localhost:8080,http://127.0.0.1:8080"

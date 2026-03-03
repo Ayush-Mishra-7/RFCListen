@@ -1,0 +1,10 @@
+# .dockerignore — keep the Docker image lean
+
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+.env
+cache/
+tests/
