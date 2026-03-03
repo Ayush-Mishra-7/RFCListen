@@ -8,7 +8,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     repo: https://github.com/Ayush-Mishra-7/RFCListen
-    branch: feat/project-bootstrap
+    branch: main
     plan: free
     healthCheckPath: /
     envVars:
