@@ -69,7 +69,10 @@ async def get_rfc_list(page: int = 1, limit: int = 50, search: str = "", sort: s
         search_lower = search.lower()
         filtered = [
             rfc for rfc in filtered 
-            if search_lower in str(rfc.get("rfcNumber")) or search_lower in rfc.get("title", "").lower()
+            if (search_lower in str(rfc.get("rfcNumber")) or 
+                search_lower in f"rfc {rfc.get('rfcNumber')}" or
+                search_lower in f"rfc{rfc.get('rfcNumber')}" or
+                search_lower in rfc.get("title", "").lower())
         ]
         
     # Sort

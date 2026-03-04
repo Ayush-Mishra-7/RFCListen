@@ -42,6 +42,16 @@
   - [x] Replace with spoken announcement
   - [x] Preserve raw table in `rawTable` field
 - [x] **Output structured JSON** (rfcNumber, title, sections array)
+- [x] Verification: Run tests & manual browser check
+
+- [ ] TTS Highlight & Resume Fixes
+  - [x] `app.js`: Use fuzzy closest-match logic in `highlightWordAt`
+  - [x] `app.js`: Switch `Player.pause`/`resume` to standard native APIs
+  - [x] `app.js`: Add cancel-and-respeak fallback for engines that stall on resume
+  - [x] Verification: Test pause/resume and highlight tracking with an RFC
+
+- [x] UX Polish & Bug Fixes
+  - [x] Allow searching by "RFC NNN" in backend `rfc_fetcher.py`
 - [x] Write unit tests for the parser (15 tests, all passing):
   - [x] Test page break stripping
   - [x] Test TOC removal

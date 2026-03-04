@@ -48,8 +48,17 @@ _RE_PAGE_BREAK = re.compile(
     re.MULTILINE,
 )
 
-# Trailing page footer like "   [Page 12]"
-_RE_PAGE_FOOTER = re.compile(r"\s+\[Page\s+\d+\]\s*$", re.MULTILINE)
+# Page footer: entire line containing [Page N] (includes author/status text)
+_RE_PAGE_FOOTER = re.compile(r"^.*\[Page\s+\d+\]\s*$", re.MULTILINE)
+
+# Pattern-based page footer + header (no form-feed)
+# Matches: footer line with [Page N], optional blank lines, RFC header line
+_RE_PAGE_FOOTER_HEADER = re.compile(
+    r"^[^\n]*\[Page\s+\d+\]\s*\n"     # footer: "Author   Standards Track   [Page 9]"
+    r"(?:\s*\n)*"                       # blank lines between footer and header
+    r"RFC\s+\d+[^\n]*\n",             # header: "RFC 2328   OSPF Version 2   April 1998"
+    re.MULTILINE,
+)
 
 # Numbered section headings: "1.  Title", "2.1.  Title", "A.  Appendix"
 _RE_SECTION_HEADING = re.compile(
@@ -99,6 +108,7 @@ def parse_rfc(rfc_number: int, raw_text: str) -> dict:
 def _strip_page_breaks(text: str) -> str:
     """Remove RFC page headers/footers introduced by form-feed page breaks."""
     text = _RE_PAGE_BREAK.sub("\n", text)
+    text = _RE_PAGE_FOOTER_HEADER.sub("\n", text)
     text = _RE_PAGE_FOOTER.sub("", text)
     return text
 
@@ -312,13 +322,83 @@ def _normalise_prose(text: str) -> str:
     """
     - Join soft-wrapped lines into paragraphs.
     - Collapse multiple blank lines.
+    - Detect definition-style blocks (a term on its own less-indented line
+      followed by a more-indented description) and preserve them as
+      separate paragraphs.
     """
     paragraphs = re.split(r"\n{2,}", text)
     joined = []
     for para in paragraphs:
-        lines = [l.strip() for l in para.splitlines() if l.strip()]
-        joined.append(" ".join(lines))
+        raw_lines = para.splitlines()
+        non_empty = [(l, len(l) - len(l.lstrip())) for l in raw_lines if l.strip()]
+        if not non_empty:
+            continue
+
+        # Check if this paragraph is a definition list:
+        # Pattern: a short term line with less indent, followed by
+        # a description with deeper indent, repeating.
+        if _is_definition_block(non_empty):
+            joined.append(_format_definition_block(non_empty))
+        else:
+            lines = [l.strip() for l, _ in non_empty]
+            joined.append(" ".join(lines))
     return "\n\n".join(p for p in joined if p)
+
+
+def _is_definition_block(lines: list[tuple[str, int]]) -> bool:
+    """
+    Return True if lines look like a definition list:
+    a term with indent N followed by body text with indent > N.
+    """
+    if len(lines) < 2:
+        return False
+
+    i = 0
+    found_def = False
+    while i < len(lines):
+        text, indent = lines[i]
+        # Look for a term: a relatively short line
+        if i + 1 < len(lines):
+            next_text, next_indent = lines[i + 1]
+            # Term line is shorter and next line is more indented
+            if next_indent > indent and len(text.strip().split()) <= 6:
+                found_def = True
+                i += 1
+                # Skip body lines (same or deeper indent)
+                while i < len(lines) and lines[i][1] >= next_indent:
+                    i += 1
+                continue
+        i += 1
+    return found_def
+
+
+def _format_definition_block(lines: list[tuple[str, int]]) -> str:
+    """
+    Format a definition block, preserving term/body structure.
+    Each term starts a new paragraph; body lines are joined.
+    """
+    result = []
+    i = 0
+    while i < len(lines):
+        text, indent = lines[i]
+        # Check if this is a term line (short, followed by more-indented body)
+        if i + 1 < len(lines):
+            next_text, next_indent = lines[i + 1]
+            if next_indent > indent and len(text.strip().split()) <= 6:
+                # Emit term
+                result.append(text.strip())
+                i += 1
+                # Collect and join body lines
+                body_lines = []
+                while i < len(lines) and lines[i][1] >= next_indent:
+                    body_lines.append(lines[i][0].strip())
+                    i += 1
+                result.append(" ".join(body_lines))
+                continue
+        # Regular line — just append stripped
+        result.append(text.strip())
+        i += 1
+    return "\n\n".join(result)
 
 
 # ── Title extraction ──────────────────────────────────────────────────────────

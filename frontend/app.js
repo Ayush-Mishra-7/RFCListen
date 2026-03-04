@@ -132,11 +132,8 @@ class Player {
   }
 
   pause() {
-    // Save the last known char position before cancelling.
-    // _lastBoundaryChar tracks the absolute char index (including _charOffset).
-    this._pauseCharIdx = this._lastBoundaryChar || 0;
     this._isPaused = true;
-    window.speechSynthesis.cancel();
+    window.speechSynthesis.pause();
     setState({ isPlaying: false });
     renderPlayerState();
     // Leave word highlights in place so user can see where we stopped
@@ -145,10 +142,32 @@ class Player {
   resume() {
     if (!this._isPaused) { this.play(); return; }
     this._isPaused = false;
+
+    // Attempt native resume
+    window.speechSynthesis.resume();
+    setState({ isPlaying: true });
+    renderPlayerState();
+
+    // Browser bug workaround: Sometimes Chrome/Safari get permanently stuck on pause
+    // If we don't receive a boundary event within 1.5 seconds of resuming, fall back
+    // to the cancel + respeak strategy.
+    clearTimeout(this._resumeTimeout);
+    this._resumeTimeout = setTimeout(() => {
+      console.warn("TTS engine failed to resume natively. Falling back to cancel+respeak.");
+      this._cancelAndRespeakFromLastBoundary();
+    }, 1500);
+  }
+
+  _cancelAndRespeakFromLastBoundary() {
+    window.speechSynthesis.cancel();
+
     const section = this._sectionQueue[this._currentIdx];
     if (!section) return;
 
-    // Speak from where we left off
+    // Advance _lastBoundaryChar slightly to avoid repeating too much of the last spoken word
+    // We assume an average word length of 6 characters
+    this._pauseCharIdx = (this._lastBoundaryChar || 0) + 6;
+
     const remainingText = section.content.substring(this._pauseCharIdx);
     if (!remainingText.trim()) {
       // Nothing left in this section, advance to next
@@ -160,8 +179,6 @@ class Player {
 
     this._charOffset = this._pauseCharIdx;
     this._speakText(remainingText, this._currentIdx);
-    setState({ isPlaying: true });
-    renderPlayerState();
   }
 
   stop() {
@@ -259,9 +276,16 @@ class Player {
     // ── Word-level highlighting via boundary events ──
     utterance.onboundary = (e) => {
       if (e.name !== 'word') return;
+
+      // Clear the fallback timeout because the engine is successfully firing events
+      if (this._resumeTimeout) {
+        clearTimeout(this._resumeTimeout);
+        this._resumeTimeout = null;
+      }
+
       const absChar = e.charIndex + this._charOffset;
       this._lastBoundaryChar = absChar;
-      highlightWordAt(this._currentIdx, absChar, e.charLength);
+      highlightWordAt(this._currentIdx, absChar);
     };
 
     utterance.onend = () => {
@@ -629,23 +653,41 @@ function wrapWordsForTTS(text) {
  * Highlight the word at the given char index in the active section.
  * Marks all prior words as "spoken" (dimmed) and the current word as "active".
  */
-function highlightWordAt(sectionIdx, charIdx, charLen) {
+/**
+ * Highlight the word at or near the given char index in the active section.
+ * Uses a fuzzy search because TTS engines often report char indices that have
+ * drifted from the exact text (due to punctuation, abbreviations, etc).
+ */
+function highlightWordAt(sectionIdx, targetCharIdx) {
   const block = document.getElementById(`section-${sectionIdx}`);
   if (!block) return;
 
-  const words = block.querySelectorAll('.tts-word');
-  let found = false;
+  const words = Array.from(block.querySelectorAll('.tts-word'));
+  if (words.length === 0) return;
 
-  for (const span of words) {
-    const spanChar = parseInt(span.dataset.char, 10);
-    if (spanChar === charIdx) {
+  // Find the span closest to the target char index without exceeding it by too much
+  let bestIdx = 0;
+  for (let i = 0; i < words.length; i++) {
+    const spanChar = parseInt(words[i].dataset.char, 10);
+    if (spanChar <= targetCharIdx) {
+      bestIdx = i;
+    } else {
+      break;
+    }
+  }
+
+  // Handle the active word and surrounding words
+  for (let i = 0; i < words.length; i++) {
+    const span = words[i];
+    if (i === bestIdx) {
       // This is the active word
-      span.classList.add('tts-word--active');
-      span.classList.remove('tts-word--spoken');
-      found = true;
-      // Scroll the word into view if needed (within the scrollable content area)
-      span.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    } else if (spanChar < charIdx) {
+      if (!span.classList.contains('tts-word--active')) {
+        span.classList.add('tts-word--active');
+        span.classList.remove('tts-word--spoken');
+        // Scroll the word into view if needed
+        span.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    } else if (i < bestIdx) {
       // Already spoken
       span.classList.remove('tts-word--active');
       span.classList.add('tts-word--spoken');
