@@ -319,7 +319,7 @@ function renderRFCList(rfcs) {
     >
       <span class="rfc-item-number">RFC ${rfc.rfcNumber}</span>
       <span class="rfc-item-title">${escHtml(rfc.title)}</span>
-      <span class="rfc-item-meta">${escHtml(rfc.status || '')} ${rfc.published ? '· ' + rfc.published.slice(0, 10) : ''}</span>
+      <span class="rfc-item-meta">${rfc.status && rfc.status !== 'Unknown' ? escHtml(rfc.status) : ''}${rfc.published ? (rfc.status && rfc.status !== 'Unknown' ? ' · ' : '') + _formatRfcDate(rfc.published) : ''}</span>
     </li>
   `).join('');
 }
@@ -672,6 +672,12 @@ function _timeAgo(isoStr) {
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
   return `${days}d ago`;
+}
+
+/** Format an ISO date string as "Month Year" (e.g. "February 2026"). */
+function _formatRfcDate(isoStr) {
+  const d = new Date(isoStr);
+  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
 // ── 6. Event Wiring ───────────────────────────────────────────────────────────
