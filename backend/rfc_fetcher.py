@@ -131,6 +131,26 @@ async def get_rfc_text(rfc_number: int) -> str:
     return text
 
 
+RFC_PDF_BASE = "https://www.ietf.org/rfc"  # same host as .txt — rfc-editor.org blocks via Cloudflare
+
+
+async def get_rfc_pdf_url(rfc_number: int) -> str | None:
+    """
+    Check if a PDF version of the RFC exists at rfc-editor.org.
+
+    Returns the full URL if the PDF exists (HTTP 200), otherwise None.
+    """
+    url = f"{RFC_PDF_BASE}/rfc{rfc_number}.pdf"
+    try:
+        async with _client(timeout=10.0) as client:
+            response = await client.head(url)
+            if response.status_code == 200:
+                return url
+    except httpx.HTTPError:
+        pass
+    return None
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _extract_rfc_number(name: str) -> int | None:

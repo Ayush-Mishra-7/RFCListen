@@ -2,7 +2,7 @@
 Routes — /api/rfcs
 """
 from fastapi import APIRouter, HTTPException, Query
-from rfc_fetcher import get_rfc_list, get_rfc_metadata, get_rfc_text
+from rfc_fetcher import get_rfc_list, get_rfc_metadata, get_rfc_text, get_rfc_pdf_url
 from rfc_parser import parse_rfc
 import httpx
 
@@ -42,11 +42,26 @@ async def rfc_parsed(rfc_number: int):
     """
     Return the structured, parsed RFC content (sections, figures, tables).
     This is the primary endpoint consumed by the frontend player.
+
+    If no plain-text is available but a PDF exists, returns a pdfOnly response
+    so the frontend can offer the user a link to the PDF.
     """
     try:
         raw_text = await get_rfc_text(rfc_number)
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 404:
+            # No .txt available — check if a PDF exists as fallback
+            pdf_url = await get_rfc_pdf_url(rfc_number)
+            if pdf_url:
+                # Try to get the title from metadata
+                meta = await get_rfc_metadata(rfc_number)
+                title = meta.get("title", f"RFC {rfc_number}") if meta else f"RFC {rfc_number}"
+                return {
+                    "rfcNumber": rfc_number,
+                    "pdfOnly": True,
+                    "pdfUrl": pdf_url,
+                    "title": title,
+                }
             raise HTTPException(status_code=404, detail=f"RFC {rfc_number} text not found")
         raise HTTPException(status_code=502, detail=f"Upstream error: {e}")
 

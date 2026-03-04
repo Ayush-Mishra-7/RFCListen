@@ -886,6 +886,46 @@ async function loadRFC(rfcNumber) {
 
   try {
     const rfc = await fetchParsedRFC(rfcNumber);
+
+    // ── PDF-only fallback ──────────────────────────────────────────────────
+    if (rfc.pdfOnly) {
+      setState({ currentRFC: null, currentSectionIdx: 0 });
+
+      document.getElementById('rfc-title').textContent = rfc.title;
+
+      // Render PDF-only content view
+      document.getElementById('rfc-content').innerHTML = `
+        <div class="pdf-only-view">
+          <div class="pdf-only-icon">📄</div>
+          <h2 class="pdf-only-heading">PDF Only</h2>
+          <p class="pdf-only-message">
+            This RFC is only available as a PDF and cannot be read aloud.
+          </p>
+          <a href="${escHtml(rfc.pdfUrl)}" target="_blank" rel="noopener noreferrer" class="pdf-only-btn">
+            View PDF <span class="pdf-only-btn-arrow">→</span>
+          </a>
+        </div>`;
+
+      // Hide sections nav and keep player disabled
+      document.getElementById('sections-nav').classList.add('hidden');
+      document.getElementById('sections-list').innerHTML = '';
+      document.getElementById('player-bar').classList.add('player-bar--disabled');
+      renderPlayerNowPlaying(null);
+
+      // Add to recently played so user can find it again
+      addToRecents(rfcNumber, rfc.title);
+      renderRecentsList();
+
+      // Highlight selected item in left list
+      document.querySelectorAll('.rfc-list-item').forEach(el => {
+        el.classList.toggle('active', Number(el.dataset.rfc) === rfcNumber);
+      });
+
+      showToast(`RFC ${rfcNumber} is available as PDF only`, 'info');
+      return;
+    }
+
+    // ── Normal text RFC ────────────────────────────────────────────────────
     setState({ currentRFC: rfc, currentSectionIdx: 0 });
     renderRFCContent(rfc);
 

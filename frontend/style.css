@@ -1079,3 +1079,81 @@ body {
     width: 120px;
   }
 }
+
+/* ── PDF-Only View ───────────────────────────────────────── */
+.pdf-only-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 320px;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.pdf-only-icon {
+  font-size: 4rem;
+  line-height: 1;
+  filter: grayscale(0.2);
+  animation: pdf-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes pdf-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
+}
+
+.pdf-only-heading {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+}
+
+.pdf-only-message {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+.pdf-only-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background: var(--accent);
+  color: var(--bg-base);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius);
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.pdf-only-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(88, 166, 255, 0.3);
+}
+
+.pdf-only-btn-arrow {
+  transition: transform var(--transition);
+}
+
+.pdf-only-btn:hover .pdf-only-btn-arrow {
+  transform: translateX(3px);
+}
