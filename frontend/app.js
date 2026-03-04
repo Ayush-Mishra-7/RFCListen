@@ -105,6 +105,10 @@ class Player {
     this._utterance = null;
     this._sectionQueue = [];
     this._currentIdx = 0;
+    this._pauseCharIdx = 0;   // char offset where we paused
+    this._charOffset = 0;     // offset added to boundary events for resumed utterances
+    this._isPaused = false;   // true when paused (so resume knows to continue)
+    this._lastBoundaryChar = 0; // last char index from boundary event
   }
 
   /** Load sections and optionally start from a given index. */
@@ -112,29 +116,61 @@ class Player {
     this.stop();
     this._sectionQueue = sections;
     this._currentIdx = startIdx;
+    this._pauseCharIdx = 0;
+    this._charOffset = 0;
+    this._isPaused = false;
   }
 
   play() {
     if (!this._sectionQueue.length) return;
+    this._isPaused = false;
+    this._pauseCharIdx = 0;
+    this._charOffset = 0;
     this._speakSection(this._currentIdx);
     setState({ isPlaying: true });
     renderPlayerState();
   }
 
   pause() {
-    window.speechSynthesis.pause();
+    // Save the last known char position before cancelling.
+    // _lastBoundaryChar tracks the absolute char index (including _charOffset).
+    this._pauseCharIdx = this._lastBoundaryChar || 0;
+    this._isPaused = true;
+    window.speechSynthesis.cancel();
     setState({ isPlaying: false });
     renderPlayerState();
+    // Leave word highlights in place so user can see where we stopped
   }
 
   resume() {
-    window.speechSynthesis.resume();
+    if (!this._isPaused) { this.play(); return; }
+    this._isPaused = false;
+    const section = this._sectionQueue[this._currentIdx];
+    if (!section) return;
+
+    // Speak from where we left off
+    const remainingText = section.content.substring(this._pauseCharIdx);
+    if (!remainingText.trim()) {
+      // Nothing left in this section, advance to next
+      this._pauseCharIdx = 0;
+      this._charOffset = 0;
+      this._speakSection(this._currentIdx + 1);
+      return;
+    }
+
+    this._charOffset = this._pauseCharIdx;
+    this._speakText(remainingText, this._currentIdx);
     setState({ isPlaying: true });
     renderPlayerState();
   }
 
   stop() {
     window.speechSynthesis.cancel();
+    this._isPaused = false;
+    this._pauseCharIdx = 0;
+    this._charOffset = 0;
+    this._lastBoundaryChar = 0;
+    clearWordHighlights();
     setState({ isPlaying: false });
   }
 
@@ -174,9 +210,11 @@ class Player {
 
   get currentIdx() { return this._currentIdx; }
   get totalSections() { return this._sectionQueue.length; }
+  get isPaused() { return this._isPaused; }
 
-  _speakSection(idx) {
+  _speakSection(idx, startChar = 0) {
     if (idx >= this._sectionQueue.length) {
+      clearWordHighlights();
       setState({ isPlaying: false });
       renderPlayerState();
       showToast('Finished reading this RFC.', 'success');
@@ -185,12 +223,31 @@ class Player {
 
     const section = this._sectionQueue[idx];
     this._currentIdx = idx;
+    this._pauseCharIdx = 0;
+    this._charOffset = startChar;
+    this._lastBoundaryChar = startChar;
     setState({ currentSectionIdx: idx });
     renderActiveSectionHighlight(idx);
     scrollToSection(idx);
     renderSectionProgress();
 
-    const utterance = new SpeechSynthesisUtterance(section.content);
+    // Show/hide the figure card overlay based on section type
+    if (section.type === 'figure' || section.type === 'table') {
+      showFigureCard(section);
+    } else {
+      hideFigureCard();
+    }
+
+    const textToSpeak = startChar > 0 ? section.content.substring(startChar) : section.content;
+    this._speakText(textToSpeak, idx);
+
+    // Update player bar
+    renderPlayerNowPlaying(section);
+  }
+
+  /** Internal: create an utterance, wire events, and speak. */
+  _speakText(text, sectionIdx) {
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = state.playbackRate;
 
     if (state.selectedVoiceURI) {
@@ -199,25 +256,31 @@ class Player {
       if (voice) utterance.voice = voice;
     }
 
+    // ── Word-level highlighting via boundary events ──
+    utterance.onboundary = (e) => {
+      if (e.name !== 'word') return;
+      const absChar = e.charIndex + this._charOffset;
+      this._lastBoundaryChar = absChar;
+      highlightWordAt(this._currentIdx, absChar, e.charLength);
+    };
+
     utterance.onend = () => {
-      this._speakSection(idx + 1);
+      clearWordHighlights();
+      this._speakSection(sectionIdx + 1);
     };
 
     utterance.onerror = (e) => {
       if (e.error !== 'interrupted') {
         console.warn('TTS error:', e.error);
       }
-      // Only advance on non-interrupted errors
       if (e.error !== 'interrupted' && e.error !== 'canceled') {
-        this._speakSection(idx + 1);
+        clearWordHighlights();
+        this._speakSection(sectionIdx + 1);
       }
     };
 
     this._utterance = utterance;
     window.speechSynthesis.speak(utterance);
-
-    // Update player bar
-    renderPlayerNowPlaying(section);
   }
 }
 
@@ -308,24 +371,36 @@ function renderRFCContent(rfc) {
     return `
       <div class="section-block" id="section-${idx}" data-idx="${idx}">
         <h3 class="section-heading">${escHtml(section.heading)}</h3>
-        <div class="section-content">${escHtml(section.content)}</div>
+        <div class="section-content">${wrapWordsForTTS(section.content)}</div>
       </div>`;
   }).join('');
 
   // Section nav
   renderSectionsNav(rfc.sections);
 
-  // Player bar
-  document.getElementById('player-bar').classList.remove('hidden');
+  // Player bar — enable controls now that an RFC is loaded
+  document.getElementById('player-bar').classList.remove('player-bar--disabled');
 }
 
 function renderSectionsNav(sections) {
   const nav = document.getElementById('sections-nav');
   const list = document.getElementById('sections-list');
   nav.classList.remove('hidden');
-  list.innerHTML = sections.map((s, idx) => `
+  // Only show text sections, and deduplicate by heading (parser may split
+  // a single section around figures, producing multiple entries with the
+  // same heading — we only show the first occurrence).
+  const seen = new Set();
+  list.innerHTML = sections
+    .map((s, idx) => ({ s, idx }))
+    .filter(({ s }) => s.type === 'text')
+    .filter(({ s }) => {
+      if (seen.has(s.heading)) return false;
+      seen.add(s.heading);
+      return true;
+    })
+    .map(({ s, idx }) => `
     <li
-      class="section-nav-item type-${s.type}"
+      class="section-nav-item"
       data-idx="${idx}"
       tabindex="0"
       role="button"
@@ -357,9 +432,18 @@ function renderPlayerState() {
 
 function renderPlayerNowPlaying(section) {
   const rfc = state.currentRFC;
-  document.getElementById('player-rfc-label').textContent =
-    rfc ? `RFC ${rfc.rfcNumber}` : '';
-  document.getElementById('player-section-label').textContent = section?.heading || '';
+  const rfcLabel = document.getElementById('player-rfc-label');
+  const sectionLabel = document.getElementById('player-section-label');
+
+  if (!rfc) {
+    rfcLabel.textContent = '';
+    // Show a hint in the section label when no RFC is loaded
+    sectionLabel.innerHTML = '<span class="player-bar--no-rfc-hint">Select an RFC to start listening</span>';
+    return;
+  }
+
+  rfcLabel.textContent = `RFC ${rfc.rfcNumber}`;
+  sectionLabel.textContent = section?.heading || '';
 }
 
 function renderSectionProgress() {
@@ -420,6 +504,58 @@ function showToast(message, type = 'error') {
   }, 3500);
 }
 
+// ── Figure Card Overlay ───────────────────────────────────────────────────────
+
+function showFigureCard(section) {
+  // Remove any existing card
+  hideFigureCard(true);
+
+  const isFigure = section.type === 'figure';
+  const icon = isFigure ? '📊' : '📋';
+  const ascii = isFigure ? (section.rawAscii || '') : (section.rawTable || '');
+
+  const card = document.createElement('div');
+  card.className = 'figure-card-overlay';
+  card.id = 'figure-card';
+  card.setAttribute('role', 'complementary');
+  card.setAttribute('aria-label', section.heading);
+
+  card.innerHTML = `
+    <div class="figure-card-header">
+      <span class="figure-card-label">${icon} ${escHtml(section.heading)}</span>
+      <button class="figure-card-close" aria-label="Close figure" title="Close">&times;</button>
+    </div>
+    <div class="figure-card-body">
+      <pre class="figure-card-pre">${escHtml(ascii)}</pre>
+      ${section.content ? `<div class="figure-card-announcement">${escHtml(section.content)}</div>` : ''}
+    </div>
+  `;
+
+  document.body.appendChild(card);
+
+  // Wire close button
+  card.querySelector('.figure-card-close').addEventListener('click', () => hideFigureCard());
+
+  // Trigger entrance animation on next frame
+  requestAnimationFrame(() => card.classList.add('figure-card--visible'));
+}
+
+function hideFigureCard(instant = false) {
+  const card = document.getElementById('figure-card');
+  if (!card) return;
+
+  if (instant) {
+    card.remove();
+    return;
+  }
+
+  card.classList.remove('figure-card--visible');
+  card.classList.add('figure-card--exiting');
+  card.addEventListener('transitionend', () => card.remove(), { once: true });
+  // Safety fallback in case transitionend doesn't fire
+  setTimeout(() => { if (card.parentNode) card.remove(); }, 500);
+}
+
 // ── Skeleton loaders ──────────────────────────────────────────────────────────
 
 function showListSkeleton() {
@@ -457,6 +593,74 @@ function escHtml(str = '') {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+/**
+ * Wrap each word in the given text with a <span class="tts-word" data-char="N">
+ * so the onboundary handler can highlight words by charIndex.
+ * Whitespace (spaces, newlines) is preserved as plain text between spans.
+ */
+function wrapWordsForTTS(text) {
+  if (!text) return '';
+  // Split into tokens: alternating (whitespace, word) while tracking char position
+  const result = [];
+  const regex = /(\S+)/g;
+  let lastIndex = 0;
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    // Emit any whitespace before this word
+    if (match.index > lastIndex) {
+      result.push(escHtml(text.substring(lastIndex, match.index)));
+    }
+    // Emit the word wrapped in a span
+    result.push(
+      `<span class="tts-word" data-char="${match.index}">${escHtml(match[0])}</span>`
+    );
+    lastIndex = regex.lastIndex;
+  }
+  // Trailing whitespace
+  if (lastIndex < text.length) {
+    result.push(escHtml(text.substring(lastIndex)));
+  }
+  return result.join('');
+}
+
+/**
+ * Highlight the word at the given char index in the active section.
+ * Marks all prior words as "spoken" (dimmed) and the current word as "active".
+ */
+function highlightWordAt(sectionIdx, charIdx, charLen) {
+  const block = document.getElementById(`section-${sectionIdx}`);
+  if (!block) return;
+
+  const words = block.querySelectorAll('.tts-word');
+  let found = false;
+
+  for (const span of words) {
+    const spanChar = parseInt(span.dataset.char, 10);
+    if (spanChar === charIdx) {
+      // This is the active word
+      span.classList.add('tts-word--active');
+      span.classList.remove('tts-word--spoken');
+      found = true;
+      // Scroll the word into view if needed (within the scrollable content area)
+      span.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    } else if (spanChar < charIdx) {
+      // Already spoken
+      span.classList.remove('tts-word--active');
+      span.classList.add('tts-word--spoken');
+    } else {
+      // Not yet spoken
+      span.classList.remove('tts-word--active');
+      span.classList.remove('tts-word--spoken');
+    }
+  }
+}
+
+/** Remove all word highlights across all sections. */
+function clearWordHighlights() {
+  document.querySelectorAll('.tts-word--active').forEach(el => el.classList.remove('tts-word--active'));
+  document.querySelectorAll('.tts-word--spoken').forEach(el => el.classList.remove('tts-word--spoken'));
 }
 
 function _timeAgo(isoStr) {
@@ -528,7 +732,7 @@ function wireEvents() {
   document.getElementById('btn-play-pause').addEventListener('click', () => {
     if (!state.currentRFC) return;
     if (state.isPlaying) player.pause();
-    else if (window.speechSynthesis.paused) player.resume();
+    else if (player.isPaused) player.resume();
     else player.play();
   });
 
@@ -676,6 +880,11 @@ async function init() {
   loadFromStorage();
   wireEvents();
   populateVoices();
+
+  // Show placeholder in the player bar immediately if no RFC is in session
+  if (!state.currentRFC) {
+    renderPlayerNowPlaying(null);
+  }
 
   // Render recently played
   renderRecentsList();
