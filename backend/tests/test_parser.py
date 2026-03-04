@@ -152,3 +152,38 @@ class TestFullParser:
         result = parse_rfc(793, RFC793_SNIPPET)
         full_text = " ".join(s["content"] for s in result["sections"])
         assert "This document specifies a standard" not in full_text
+
+
+class TestAbstractPreambleCleanup:
+    def test_strips_header_metadata_before_abstract(self):
+        text = """\
+Internet Engineering Task Force (IETF)                      W. Eddy
+Request for Comments: 9293                                   August 2022
+
+                  Transmission Control Protocol (TCP)
+
+Abstract
+
+   This document specifies the TCP protocol.
+
+1.  Purpose and Scope
+
+   TCP is important.
+"""
+        result = parse_rfc(9293, text)
+        abstract_sections = [s for s in result["sections"] if s["heading"] == "Abstract"]
+        assert len(abstract_sections) == 1
+        abstract_content = abstract_sections[0]["content"]
+        # Should NOT contain header metadata
+        assert "Internet Engineering Task Force" not in abstract_content
+        assert "Request for Comments" not in abstract_content
+        # Should contain actual abstract text
+        assert "TCP protocol" in abstract_content
+
+    def test_preserves_abstract_without_heading(self):
+        """When there is no explicit 'Abstract' heading, keep the full preamble."""
+        text = "Some preamble text.\n\n1.  Introduction\n\n   Body."
+        sections = _split_into_sections(text)
+        assert sections[0].heading == "Abstract"
+        assert "Some preamble text" in sections[0].content
+

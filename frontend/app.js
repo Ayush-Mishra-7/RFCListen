@@ -178,7 +178,8 @@ class Player {
     }
 
     this._charOffset = this._pauseCharIdx;
-    this._speakText(remainingText, this._currentIdx);
+    const maskedText = this._maskInlineReferences(remainingText);
+    this._speakText(maskedText, this._currentIdx);
   }
 
   stop() {
@@ -239,6 +240,27 @@ class Player {
     }
 
     const section = this._sectionQueue[idx];
+
+    // Automatically skip reference and appendix sections
+    const headingLower = (section.heading || "").toLowerCase().trim();
+    const isReferenceSection = headingLower === "references" ||
+      headingLower === "normative references" ||
+      headingLower === "informative references";
+    const isAppendixSection = headingLower.includes("appendix") ||
+      /^[a-z]\.\s/i.test(section.heading || "");
+    if (isReferenceSection || isAppendixSection) {
+      showToast(`Skipping ${section.heading} section.`, 'info');
+
+      // Momentarily update UI so the jump is visually tracked
+      setState({ currentSectionIdx: idx });
+      renderActiveSectionHighlight(idx);
+      scrollToSection(idx);
+
+      // Move to the next section immediately
+      this._speakSection(idx + 1);
+      return;
+    }
+
     this._currentIdx = idx;
     this._pauseCharIdx = 0;
     this._charOffset = startChar;
@@ -256,10 +278,22 @@ class Player {
     }
 
     const textToSpeak = startChar > 0 ? section.content.substring(startChar) : section.content;
-    this._speakText(textToSpeak, idx);
+    const maskedText = this._maskInlineReferences(textToSpeak);
+    this._speakText(maskedText, idx);
 
     // Update player bar
     renderPlayerNowPlaying(section);
+  }
+
+  /**
+   * Replace bracketed references like [1], [RFC 1234], [Moy98] with spaces of
+   * the exact same length. This causes the TTS engine to silently skip over them
+   * while preserving the exact character indices needed for word highlighting.
+   */
+  _maskInlineReferences(text) {
+    if (!text) return text;
+    // Matches bracketed text up to 30 characters long
+    return text.replace(/\[[^\]]{1,30}\]/g, match => ' '.repeat(match.length));
   }
 
   /** Internal: create an utterance, wire events, and speak. */

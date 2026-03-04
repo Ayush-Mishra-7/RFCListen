@@ -154,6 +154,10 @@ def _split_into_sections(text: str) -> list[Section]:
     # Preamble (abstract / intro before first numbered section)
     preamble = text[: matches[0].start()].strip()
     if preamble:
+        # Strip RFC header metadata — keep only text after "Abstract" heading
+        abstract_match = re.search(r'^Abstract\s*$', preamble, re.MULTILINE | re.IGNORECASE)
+        if abstract_match:
+            preamble = preamble[abstract_match.end():].strip()
         sections.append(Section(id="s0", heading="Abstract", content=preamble))
 
     for i, match in enumerate(matches):
