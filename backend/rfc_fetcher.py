@@ -11,7 +11,7 @@ import httpx
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+import json
 
 DATATRACKER_BASE = "https://datatracker.ietf.org"
 RFC_TEXT_BASE = "https://www.ietf.org/rfc"  # rfc-editor.org has Cloudflare bot protection
@@ -37,63 +37,75 @@ def _client(**kwargs) -> httpx.AsyncClient:
     )
 
 
-async def get_rfc_list(page: int = 1, limit: int = 50, search: str = "") -> dict:
+_RFC_INDEX = None
+
+def _load_index():
+    global _RFC_INDEX
+    if _RFC_INDEX is not None:
+        return _RFC_INDEX
+        
+    index_path = CACHE_DIR / "rfc_index.json"
+    if not index_path.exists():
+        # Fallback to empty list or ideally we'd trigger an index generation here,
+        # but to keep it simple we just return empty list.
+        print("Warning: rfc_index.json not found in cache. Run scripts/update_rfc_index.py")
+        return []
+        
+    with open(index_path, "r", encoding="utf-8") as f:
+        _RFC_INDEX = json.load(f)
+    return _RFC_INDEX
+
+async def get_rfc_list(page: int = 1, limit: int = 50, search: str = "", sort: str = "desc") -> dict:
     """
-    Fetch a paginated list of published RFCs from the IETF Datatracker API.
+    Fetch a paginated list of published RFCs from the local rfc_index.json.
 
     Returns a dict with keys: `count`, `rfcs` (list of metadata dicts), `next`, `previous`.
     """
-    offset = (page - 1) * limit
-    params = {
-        "type": "rfc",
-        "limit": limit,
-        "offset": offset,
-        "format": "json",
-    }
+    index = _load_index()
+    
+    # Filter
+    filtered = index
     if search:
-        params["name__icontains"] = search
-
-    url = f"{DATATRACKER_BASE}/api/v1/doc/document/"
-    async with _client() as client:
-        response = await client.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-
-    rfcs = [
-        {
-            "rfcNumber": _extract_rfc_number(doc.get("name", "")),
-            "name": doc.get("name", ""),
-            "title": doc.get("title", ""),
-            "abstract": doc.get("abstract", ""),
-            "status": _clean_status(doc.get("std_level", "")),
-            "published": doc.get("time", ""),
-        }
-        for doc in data.get("objects", [])
-    ]
-
+        search_lower = search.lower()
+        filtered = [
+            rfc for rfc in filtered 
+            if search_lower in str(rfc.get("rfcNumber")) or search_lower in rfc.get("title", "").lower()
+        ]
+        
+    # Sort
+    is_reverse = (sort == "desc")
+    # rfcNumber is an integer locally we can sort on reliably safely
+    filtered = sorted(filtered, key=lambda x: x.get("rfcNumber", 0), reverse=is_reverse)
+    
+    # Paginate
+    total_count = len(filtered)
+    offset = (page - 1) * limit
+    paginated = filtered[offset:offset+limit]
+    
+    # Generate next/prev mock URLs just for frontend compat if needed
+    base_query = f"?limit={limit}&search={search}&sort={sort}"
+    has_next = (offset + limit) < total_count
+    has_prev = page > 1
+    
     return {
-        "count": data.get("meta", {}).get("total_count", 0),
+        "count": total_count,
         "page": page,
         "limit": limit,
-        "rfcs": rfcs,
-        "next": data.get("meta", {}).get("next"),
-        "previous": data.get("meta", {}).get("previous"),
+        "rfcs": paginated,
+        "next": base_query + f"&page={page+1}" if has_next else None,
+        "previous": base_query + f"&page={page-1}" if has_prev else None,
     }
 
 
 async def get_rfc_metadata(rfc_number: int) -> dict:
     """
-    Fetch simplified metadata for a specific RFC from the Datatracker.
-
-    Uses the /doc/rfcXXXX/doc.json simplified endpoint.
+    Fetch simplified metadata for a specific RFC from the local index.
     """
-    url = f"{DATATRACKER_BASE}/doc/rfc{rfc_number}/doc.json"
-    async with _client() as client:
-        response = await client.get(url)
-        if response.status_code == 404:
-            return {}
-        response.raise_for_status()
-        return response.json()
+    index = _load_index()
+    for rfc in index:
+        if rfc.get("rfcNumber") == rfc_number:
+            return rfc
+    return {}
 
 
 async def get_rfc_text(rfc_number: int) -> str:

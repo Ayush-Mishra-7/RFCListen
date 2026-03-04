@@ -14,10 +14,11 @@ async def list_rfcs(
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     limit: int = Query(50, ge=1, le=200, description="Results per page"),
     search: str = Query("", description="Filter by RFC name/title"),
+    sort: str = Query("desc", description="Sort order: 'desc' or 'asc'"),
 ):
     """Return a paginated list of published RFCs."""
     try:
-        return await get_rfc_list(page=page, limit=limit, search=search)
+        return await get_rfc_list(page=page, limit=limit, search=search, sort=sort)
     except httpx.HTTPStatusError as e:
         raise HTTPException(status_code=502, detail=f"Upstream error: {e}")
 
