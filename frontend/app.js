@@ -41,6 +41,10 @@ let state = {
   isPlaying: false,
   playbackRate: 1.0,
   selectedVoiceURI: '',
+  ttsEngine: 'edge',      // 'edge' or 'browser'
+
+  edgeVoices: [],         // array of { id, name }
+  browserVoices: [],      // array of browser voice objects
 
   recentRFCs: [],         // [{ rfcNumber, title, lastPlayed: ISO string }]
 };
@@ -57,6 +61,7 @@ function _persistState() {
       currentSectionIdx: state.currentSectionIdx,
       playbackRate: state.playbackRate,
       selectedVoiceURI: state.selectedVoiceURI,
+      ttsEngine: state.ttsEngine || 'edge',
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persist));
   } catch (_) { /* ignore */ }
@@ -109,6 +114,11 @@ class Player {
     this._charOffset = 0;     // offset added to boundary events for resumed utterances
     this._isPaused = false;   // true when paused (so resume knows to continue)
     this._lastBoundaryChar = 0; // last char index from boundary event
+
+    this._audio = new Audio();
+    this._audio.addEventListener('ended', () => this._onAudioEnded());
+    this._audio.addEventListener('error', (e) => this._onAudioError(e));
+    this._audio.addEventListener('timeupdate', () => this._onAudioTimeUpdate());
   }
 
   /** Load sections and optionally start from a given index. */
@@ -124,16 +134,27 @@ class Player {
   play() {
     if (!this._sectionQueue.length) return;
     this._isPaused = false;
-    this._pauseCharIdx = 0;
-    this._charOffset = 0;
-    this._speakSection(this._currentIdx);
+
+    if (state.ttsEngine === 'edge' && this._audio.src) {
+      this._audio.playbackRate = state.playbackRate;
+      this._audio.play().catch(e => console.error("Audio play failed", e));
+    } else {
+      this._pauseCharIdx = 0;
+      this._charOffset = 0;
+      this._speakSection(this._currentIdx);
+    }
+
     setState({ isPlaying: true });
     renderPlayerState();
   }
 
   pause() {
     this._isPaused = true;
-    window.speechSynthesis.pause();
+    if (state.ttsEngine === 'edge') {
+      this._audio.pause();
+    } else {
+      window.speechSynthesis.pause();
+    }
     setState({ isPlaying: false });
     renderPlayerState();
     // Leave word highlights in place so user can see where we stopped
@@ -142,6 +163,14 @@ class Player {
   resume() {
     if (!this._isPaused) { this.play(); return; }
     this._isPaused = false;
+
+    if (state.ttsEngine === 'edge') {
+      this._audio.playbackRate = state.playbackRate;
+      this._audio.play().catch(console.error);
+      setState({ isPlaying: true });
+      renderPlayerState();
+      return;
+    }
 
     // Attempt native resume
     window.speechSynthesis.resume();
@@ -183,7 +212,13 @@ class Player {
   }
 
   stop() {
-    window.speechSynthesis.cancel();
+    if (state.ttsEngine === 'edge') {
+      this._audio.pause();
+      this._audio.currentTime = 0;
+      this._audio.src = '';
+    } else {
+      window.speechSynthesis.cancel();
+    }
     this._isPaused = false;
     this._pauseCharIdx = 0;
     this._charOffset = 0;
@@ -279,7 +314,12 @@ class Player {
 
     const textToSpeak = startChar > 0 ? section.content.substring(startChar) : section.content;
     const maskedText = this._maskInlineReferences(textToSpeak);
-    this._speakText(maskedText, idx);
+
+    if (state.ttsEngine === 'edge') {
+      this._speakEdgeAudio(idx);
+    } else {
+      this._speakText(maskedText, idx);
+    }
 
     // Update player bar
     renderPlayerNowPlaying(section);
@@ -298,6 +338,10 @@ class Player {
 
   /** Internal: create an utterance, wire events, and speak. */
   _speakText(text, sectionIdx) {
+    if (!text.trim()) {
+      this._speakSection(sectionIdx + 1);
+      return;
+    }
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = state.playbackRate;
 
@@ -339,6 +383,53 @@ class Player {
 
     this._utterance = utterance;
     window.speechSynthesis.speak(utterance);
+  }
+
+  _speakEdgeAudio(sectionIdx) {
+    const rfcNumber = state.currentRFC.rfcNumber;
+    let url = `${API_BASE}/rfc/${rfcNumber}/tts/${sectionIdx}`;
+
+    // Only pass voice parameter if an Edge voice is selected (not a browser voice ID)
+    if (state.selectedVoiceURI && state.edgeVoices.some(v => v.id === state.selectedVoiceURI)) {
+      url += `?voice=${encodeURIComponent(state.selectedVoiceURI)}`;
+    }
+
+    this._audio.src = url;
+    this._audio.playbackRate = state.playbackRate;
+
+    // Show loading state or wait indicator if desired
+    this._audio.play().catch(e => {
+      console.warn('Audio playback failed', e);
+      if (e.name !== 'AbortError') {
+        showToast('TTS audio failed to load. Skipping section.', 'error');
+        this._speakSection(sectionIdx + 1);
+      }
+    });
+  }
+
+  _onAudioEnded() {
+    clearWordHighlights();
+    this._speakSection(this._currentIdx + 1);
+  }
+
+  _onAudioError(e) {
+    console.warn("Edge TTS error:", e);
+    // Usually means no interactable audio, or server 500
+    clearWordHighlights();
+    this._speakSection(this._currentIdx + 1);
+  }
+
+  _onAudioTimeUpdate() {
+    const section = this._sectionQueue[this._currentIdx];
+    if (!section || !this._audio.duration) return;
+
+    // Smooth progress visualization over the text length:
+    const progressPercent = this._audio.currentTime / this._audio.duration;
+    const charIndex = Math.floor(progressPercent * section.content.length);
+
+    // Fallback: estimate word highlighting based on audio duration proportion.
+    // It's not exact but helps track progress visually.
+    highlightWordAt(this._currentIdx, charIndex);
   }
 }
 
@@ -523,21 +614,51 @@ function scrollToSection(idx) {
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+async function fetchEdgeVoices() {
+  if (state.edgeVoices.length) return state.edgeVoices;
+  try {
+    const res = await fetch(`${API_BASE}/tts/voices`);
+    if (res.ok) {
+      const data = await res.json();
+      state.edgeVoices = data.voices || [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch Edge TTS voices:", err);
+  }
+  return state.edgeVoices;
+}
+
 function populateVoices() {
   const select = document.getElementById('voice-select');
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return;
 
-  // Group by language, prefer English voices
-  const english = voices.filter(v => v.lang.startsWith('en'));
-  const others = voices.filter(v => !v.lang.startsWith('en'));
-  const sorted = [...english, ...others];
+  if (state.ttsEngine === 'edge') {
+    if (!state.edgeVoices.length) {
+      select.innerHTML = '<option value="">Loading Edge Voices...</option>';
+      return;
+    }
+    select.innerHTML = state.edgeVoices.map(v =>
+      `<option value="${v.id}" ${state.selectedVoiceURI === v.id ? 'selected' : ''}>
+        ${v.name} (${v.gender}, ${v.locale})
+      </option>`
+    ).join('');
+  } else {
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) {
+      select.innerHTML = '<option value="">Default Browser Voice</option>';
+      return;
+    }
 
-  select.innerHTML = sorted.map(v =>
-    `<option value="${v.voiceURI}" ${state.selectedVoiceURI === v.voiceURI ? 'selected' : ''}>
-      ${v.name} (${v.lang})
-    </option>`
-  ).join('');
+    // Group by language, prefer English voices
+    const english = voices.filter(v => v.lang.startsWith('en'));
+    const others = voices.filter(v => !v.lang.startsWith('en'));
+    const sorted = [...english, ...others];
+
+    select.innerHTML = sorted.map(v =>
+      `<option value="${v.voiceURI}" ${state.selectedVoiceURI === v.voiceURI ? 'selected' : ''}>
+        ${v.name} (${v.lang})
+      </option>`
+    ).join('');
+  }
 }
 
 // ── Toasts ────────────────────────────────────────────────────────────────────
@@ -824,6 +945,19 @@ function wireEvents() {
   document.getElementById('btn-prev-section').addEventListener('click', () => player.prevSection());
   document.getElementById('btn-next-section').addEventListener('click', () => player.nextSection());
 
+  // Engine Toggle
+  const engineSelect = document.getElementById('engine-select');
+  if (engineSelect) {
+    engineSelect.addEventListener('change', (e) => {
+      setState({ ttsEngine: e.target.value });
+      populateVoices();
+      if (state.isPlaying) {
+        player.stop();
+        player.play(); // Restart section with new engine
+      }
+    });
+  }
+
   // Speed
   document.getElementById('speed-select').addEventListener('change', (e) => {
     player.setRate(Number(e.target.value));
@@ -1013,6 +1147,7 @@ async function loadRFC(rfcNumber) {
 
     player.load(rfc.sections, 0);
     renderPlayerNowPlaying(rfc.sections[0]);
+    player.play(); // Auto-play the RFC when clicked
     renderPlayerState();
     renderSectionProgress();
 
@@ -1039,7 +1174,17 @@ async function loadRFC(rfcNumber) {
 async function init() {
   loadFromStorage();
   wireEvents();
-  populateVoices();
+
+  // Set UI elements to match loaded state
+  const engineSelect = document.getElementById('engine-select');
+  if (engineSelect && state.ttsEngine) {
+    engineSelect.value = state.ttsEngine;
+  }
+  document.getElementById('speed-select').value = String(state.playbackRate);
+
+  // Fetch Edge voices in background, then populate UI
+  fetchEdgeVoices().then(() => populateVoices());
+  window.speechSynthesis.onvoiceschanged = populateVoices;
 
   // Show placeholder in the player bar immediately if no RFC is in session
   if (!state.currentRFC) {
@@ -1060,9 +1205,6 @@ async function init() {
     renderSectionProgress();
     renderActiveSectionHighlight(state.currentSectionIdx);
   }
-
-  // Restore speed selector
-  document.getElementById('speed-select').value = String(state.playbackRate);
 }
 
 init();

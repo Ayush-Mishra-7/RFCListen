@@ -147,7 +147,7 @@
   - [x] RFC 8446 (TLS 1.3) — modern, complex structure ✓ figures, 10+ sections, no boilerplate
   - [x] RFC 1149 (IP over Avian Carriers) — short, humorous ✓ title + content parsed
 - [x] Manual end-to-end test: browse → select → listen → skip → figure announcement
-- [ ] Cross-browser TTS test: Chrome, Firefox, Edge (Web Speech API support varies)
+- [x] Cross-browser TTS test: Chrome, Firefox, Edge (Web Speech API support varies)
 - [ ] Mobile browser test (Chrome on Android / Safari on iOS)
 - [x] Accessibility audit (keyboard nav, screen reader compatibility)
 
@@ -169,7 +169,8 @@
 
 ## Stretch Goals (Post-MVP)
 
-- [ ] **Cloud TTS integration**: Add Google Cloud TTS or AWS Polly as a higher-quality voice option (requires API key)
+- [x] **Cloud TTS integration**: Integrated free Microsoft Edge Neural TTS as a higher-quality voice option.
+- [ ] **TTS Highlight Sync**: Investigate and fix Edge TTS audio playback and text-highlight synchronization (word-level sync is currently estimated since Edge TTS MP3s don't contain exact word timestamps).
 - [ ] **RFC Bookmarks / Playlists**: Save a list of RFCs to a personal playlist
 - [ ] **Audio Export**: Download generated audio as an MP3 file (requires server-side TTS)
 - [ ] **Section Notes**: Add text annotations to sections while listening

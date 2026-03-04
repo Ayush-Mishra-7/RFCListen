@@ -71,3 +71,63 @@ async def rfc_parsed(rfc_number: int):
         raise HTTPException(status_code=500, detail=f"Parser error: {e}")
 
     return parsed
+
+
+@router.get("/rfc/{rfc_number}/tts/{section_idx}")
+async def rfc_section_tts(
+    rfc_number: int,
+    section_idx: int,
+    voice: str = Query("", description="Edge TTS voice ID (e.g. en-US-GuyNeural)"),
+):
+    """
+    Synthesise a single RFC section as MP3 audio using Edge TTS.
+
+    Returns an MP3 audio stream that the frontend can play via <audio>.
+    Audio is cached to disk — repeated requests are served instantly.
+    """
+    from tts_service import synthesize
+    from rfc_parser import parse_rfc
+    from rfc_fetcher import get_rfc_text
+    from fastapi.responses import FileResponse
+
+    # Get the parsed RFC and extract the requested section
+    try:
+        raw_text = await get_rfc_text(rfc_number)
+    except httpx.HTTPStatusError:
+        raise HTTPException(status_code=404, detail=f"RFC {rfc_number} not found")
+
+    parsed = parse_rfc(rfc_number, raw_text)
+    sections = parsed["sections"]
+
+    if section_idx < 0 or section_idx >= len(sections):
+        raise HTTPException(status_code=404, detail=f"Section {section_idx} not found")
+
+    section = sections[section_idx]
+    text = section["content"]
+
+    if not text or not text.strip():
+        raise HTTPException(status_code=400, detail="Section has no speakable content")
+
+    try:
+        audio_path = await synthesize(text, voice)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TTS synthesis error: {e}")
+
+    return FileResponse(
+        path=str(audio_path),
+        media_type="audio/mpeg",
+        filename=f"rfc{rfc_number}_s{section_idx}.mp3",
+    )
+
+
+@router.get("/tts/voices")
+async def tts_voices():
+    """Return available Edge TTS English voices."""
+    from tts_service import list_voices
+
+    try:
+        voices = await list_voices()
+        return {"voices": voices}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Could not list voices: {e}")
+

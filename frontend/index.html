@@ -123,9 +123,15 @@
         <option value="2">2×</option>
       </select>
 
+      <label for="engine-select" class="sr-only">TTS Engine</label>
+      <select id="engine-select" aria-label="TTS Engine">
+        <option value="edge" selected>Cloud AI Voice</option>
+        <option value="browser">Browser Voice</option>
+      </select>
+
       <label for="voice-select" class="sr-only">Voice</label>
       <select id="voice-select" aria-label="TTS voice">
-        <!-- Populated by app.js from speechSynthesis.getVoices() -->
+        <!-- Populated by app.js from speechSynthesis.getVoices() or backend -->
       </select>
     </div>
   </footer>

@@ -15,3 +15,6 @@ httpx  # also used as async test client for FastAPI
 
 # Optional: for future concurrency / background tasks
 anyio==4.7.0
+
+# Edge TTS — free neural text-to-speech via Microsoft Edge
+edge-tts>=7.0.0

@@ -1,39 +1,72 @@
 """
-tts_service.py — TTS abstraction layer.
+tts_service.py — Edge TTS integration with audio caching.
 
-MVP: All TTS is handled by the browser's Web Speech API on the frontend.
-This module exists as a hook for future server-side TTS (Google Cloud TTS / AWS Polly).
-
-When Cloud TTS is configured (env vars present), this module can be used
-to pre-generate audio segments server-side and return URLs to the client.
+Synthesises RFC section text into MP3 audio using Microsoft Edge's
+free neural TTS service. Audio is cached to disk so repeated requests
+for the same section are served instantly.
 """
+import hashlib
 import os
+from pathlib import Path
+
+import edge_tts
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-GOOGLE_TTS_API_KEY = os.getenv("GOOGLE_TTS_API_KEY", "")
-AWS_POLLY_ACCESS_KEY = os.getenv("AWS_POLLY_ACCESS_KEY", "")
+# ── Config ────────────────────────────────────────────────────────────────────
+
+# Voice to use — "en-US-GuyNeural" is a clear, professional male voice.
+# Run `edge-tts --list-voices` to see all available voices.
+DEFAULT_VOICE = os.getenv("EDGE_TTS_VOICE", "en-US-GuyNeural")
+
+# Cache directory for generated audio files
+TTS_CACHE_DIR = Path(os.getenv("TTS_CACHE_DIR", "./cache/tts"))
 
 
-def is_cloud_tts_configured() -> bool:
-    """Return True if a Cloud TTS provider is configured via environment."""
-    return bool(GOOGLE_TTS_API_KEY or AWS_POLLY_ACCESS_KEY)
+def _ensure_cache():
+    TTS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def get_tts_provider() -> str:
-    """Return the name of the active TTS provider."""
-    if GOOGLE_TTS_API_KEY:
-        return "google"
-    if AWS_POLLY_ACCESS_KEY:
-        return "aws_polly"
-    return "web_speech_api"  # browser-native default
+def _cache_key(text: str, voice: str) -> str:
+    """Generate a deterministic cache key from text + voice."""
+    content = f"{voice}:{text}"
+    return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
 
-# Future implementations:
-#
-# async def synthesize_google(text: str, voice: str) -> bytes:
-#     ...
-#
-# async def synthesize_polly(text: str, voice: str) -> bytes:
-#     ...
+async def synthesize(text: str, voice: str = "") -> Path:
+    """
+    Synthesise text to MP3 using Edge TTS.
+
+    Returns the Path to the cached MP3 file.
+    If the audio is already cached, returns immediately.
+    """
+    _ensure_cache()
+    voice = voice or DEFAULT_VOICE
+    key = _cache_key(text, voice)
+    cache_path = TTS_CACHE_DIR / f"{key}.mp3"
+
+    if cache_path.exists():
+        return cache_path
+
+    communicate = edge_tts.Communicate(text, voice)
+    await communicate.save(str(cache_path))
+    return cache_path
+
+
+async def list_voices() -> list[dict]:
+    """Return a list of available Edge TTS voices."""
+    voices = await edge_tts.list_voices()
+    # Filter to English voices and return a simplified list
+    english_voices = [
+        {
+            "id": v["ShortName"],
+            "name": v["FriendlyName"],
+            "gender": v["Gender"],
+            "locale": v["Locale"],
+        }
+        for v in voices
+        if v["Locale"].startswith("en")
+    ]
+    return english_voices
