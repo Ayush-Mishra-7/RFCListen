@@ -34,7 +34,6 @@ let state = {
   page: 1,
   limit: 50,
   search: '',
-  filterStatus: '',
   sortOrder: 'desc',
 
   currentRFC: null,       // { rfcNumber, title, sections: [] }
@@ -714,12 +713,6 @@ function wireEvents() {
     }, 350);
   });
 
-  // Status filter
-  document.getElementById('filter-status').addEventListener('change', (e) => {
-    setState({ filterStatus: e.target.value, page: 1 });
-    loadRFCList();
-  });
-
   // Sort dropdown
   const sortSelect = document.getElementById('sort-order');
   if (sortSelect) {
@@ -833,8 +826,8 @@ async function loadRFCList() {
   let hasRenderedStatic = false;
 
   try {
-    // HYBRID LOADING: If we are on the first page, with no search/filter, and default sort, try to load the static JSON instantly
-    if (state.page === 1 && !state.search && !state.filterStatus && state.sortOrder === 'desc') {
+    // HYBRID LOADING: If we are on the first page, with no search, and default sort, try to load the static JSON instantly
+    if (state.page === 1 && !state.search && state.sortOrder === 'desc') {
       try {
         const staticRes = await fetch('./top-rfcs.json');
         if (staticRes.ok) {
