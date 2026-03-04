@@ -155,8 +155,14 @@ body {
   color: var(--text-muted);
 }
 
+.filter-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
 .filter-row select {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -744,6 +750,30 @@ body {
 .recents-section {
   border-top: 1px solid var(--border);
   padding: var(--space-3) var(--space-4);
+  max-height: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+#recents-list {
+  overflow-y: auto;
+  min-height: 0;
+  margin-right: -4px;
+  /* offset for scrollbar so it doesn't push content */
+  padding-right: 4px;
+}
+
+#recents-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+#recents-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#recents-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
 }
 
 .recents-heading {

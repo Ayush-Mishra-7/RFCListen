@@ -35,6 +35,7 @@ let state = {
   limit: 50,
   search: '',
   filterStatus: '',
+  sortOrder: 'desc',
 
   currentRFC: null,       // { rfcNumber, title, sections: [] }
   currentSectionIdx: 0,
@@ -288,8 +289,8 @@ const player = new Player();
 
 // ── 4. API Client ─────────────────────────────────────────────────────────────
 
-async function fetchRFCList(page = 1, limit = 50, search = '') {
-  const params = new URLSearchParams({ page, limit, search });
+async function fetchRFCList(page = 1, limit = 50, search = '', sort = 'desc') {
+  const params = new URLSearchParams({ page, limit, search, sort });
   const res = await fetch(`${API_BASE}/rfcs?${params}`);
   if (!res.ok) throw new Error(`API error ${res.status}`);
   return res.json();
@@ -719,6 +720,15 @@ function wireEvents() {
     loadRFCList();
   });
 
+  // Sort dropdown
+  const sortSelect = document.getElementById('sort-order');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', (e) => {
+      setState({ sortOrder: e.target.value, page: 1 });
+      loadRFCList();
+    });
+  }
+
   // Pagination
   document.getElementById('btn-prev-page').addEventListener('click', () => {
     if (state.page > 1) { setState({ page: state.page - 1 }); loadRFCList(); }
@@ -819,21 +829,56 @@ function wireEvents() {
 async function loadRFCList() {
   showListSkeleton();
 
+  // Flag to track if we've rendered something from cache/static file
+  let hasRenderedStatic = false;
+
   try {
-    const data = await fetchRFCList(state.page, state.limit, state.search);
+    // HYBRID LOADING: If we are on the first page, with no search/filter, and default sort, try to load the static JSON instantly
+    if (state.page === 1 && !state.search && !state.filterStatus && state.sortOrder === 'desc') {
+      try {
+        const staticRes = await fetch('./top-rfcs.json');
+        if (staticRes.ok) {
+          const staticData = await staticRes.json();
+          setState({ rfcList: staticData.rfcs, totalCount: staticData.count });
+          renderRFCList(staticData.rfcs);
+
+          const totalPages = Math.ceil(staticData.count / state.limit) || 1;
+          document.getElementById('page-info').textContent = `Page ${state.page} of ${totalPages}`;
+          document.getElementById('btn-prev-page').disabled = state.page <= 1;
+          document.getElementById('btn-next-page').disabled = state.page >= totalPages;
+
+          hasRenderedStatic = true;
+        }
+      } catch (staticErr) {
+        console.warn('Failed to load static top-rfcs.json, falling back to API only', staticErr);
+      }
+    }
+
+    // Always fetch live data from the backend in the background (Stale-While-Revalidate)
+    const data = await fetchRFCList(state.page, state.limit, state.search, state.sortOrder);
+
+    // Only update and re-render if the state has actually changed, or if we haven't rendered anything yet
+    // For simplicity, we just safely re-render with the fresh data
     setState({ rfcList: data.rfcs, totalCount: data.count });
     renderRFCList(data.rfcs);
 
-    // Pagination controls
+    // Pagination controls update
     const totalPages = Math.ceil(data.count / state.limit) || 1;
     document.getElementById('page-info').textContent = `Page ${state.page} of ${totalPages}`;
     document.getElementById('btn-prev-page').disabled = state.page <= 1;
     document.getElementById('btn-next-page').disabled = state.page >= totalPages;
+
   } catch (err) {
     console.error(err);
-    showToast('Could not load RFC list. Is the backend running?');
-    document.getElementById('rfc-list').innerHTML =
-      '<li class="rfc-list-placeholder">Failed to load RFCs. Check if the backend is running on port 3000.</li>';
+    if (!hasRenderedStatic) {
+      // Only show error visually if we didn't already successfully render the static fallback
+      showToast('Could not load target RFC list. Is the backend running?');
+      document.getElementById('rfc-list').innerHTML =
+        '<li class="rfc-list-placeholder">Failed to load RFCs. Check if the backend is running on port 3000.</li>';
+    } else {
+      // If we had static data, just silently fail the background update or show a tiny warning
+      console.warn("Background revalidation failed, using static data.");
+    }
   }
 }
 

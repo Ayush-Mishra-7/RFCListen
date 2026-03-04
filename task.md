@@ -149,8 +149,8 @@
 - [x] Create `.dockerignore` to keep image lean
 - [x] Create `render.yaml` Render Blueprint for one-click deploy
 - [x] Set up frontend for GitHub Pages (auto-detect API_BASE in `app.js`)
-- [ ] Deploy backend to Render (free tier) — requires manual Render dashboard setup
-- [ ] Deploy frontend to GitHub Pages — requires repo Settings → Pages config
+- [x] Deploy backend to Render (free tier) — requires manual Render dashboard setup
+- [x] Deploy frontend to GitHub Pages — requires repo Settings → Pages config
 - [x] Update `README.md` with deployment instructions and live demo URL placeholder
 - [x] Set up environment variable management for production (`.env.example`, `render.yaml`)
 - [x] Add `CONTRIBUTING.md` guide

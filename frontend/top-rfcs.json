@@ -1,0 +1,409 @@
+{
+  "count": 9726,
+  "page": 1,
+  "limit": 50,
+  "rfcs": [
+    {
+      "rfcNumber": 9945,
+      "name": "rfc9945",
+      "title": "IETF Community Moderation",
+      "abstract": "The IETF community will treat people with kindness and grace, but not endless patience. This memo obsoletes RFCs 3683 and 3934, and it updates RFCs 2418 and 9245 by establishing a policy for the moderation of disruptive participation across the IETF's various public contribution channels and discussion fora. It establishes guardrails for moderation and a moderator team. That team will develop a set of moderation procedures and facilitate their consistent implementation with chairs and administrators.",
+      "status": "Best Current Practice",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9939,
+      "name": "rfc9939",
+      "title": "PKCS #8: Private-Key Information Content Types",
+      "abstract": "This document defines PKCS #8 content types for use with PrivateKeyInfo and EncryptedPrivateKeyInfo as specified in RFC 5958.",
+      "status": "Proposed Standard",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9937,
+      "name": "rfc9937",
+      "title": "Proportional Rate Reduction (PRR)",
+      "abstract": "This document specifies a Standards Track version of the Proportional Rate Reduction (PRR) algorithm that obsoletes the Experimental version described in RFC 6937.  PRR regulates the amount of data sent by TCP or other transport protocols during fast recovery.  PRR accurately regulates the actual flight size through recovery such that at the end of recovery it will be as close as possible to the slow start threshold (ssthresh), as determined by the congestion control algorithm.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9930,
+      "name": "rfc9930",
+      "title": "Tunnel Extensible Authentication Protocol (TEAP) Version 1",
+      "abstract": "This document defines the Tunnel Extensible Authentication Protocol (TEAP) version 1.  TEAP is a tunnel-based EAP method that enables secure communication between a peer and a server by using the Transport Layer Security (TLS) protocol to establish a mutually authenticated tunnel.  Within the tunnel, TLV objects are used to convey authentication-related data between the EAP peer and the EAP server.  This document obsoletes RFC 7170 and updates RFC 9427 by moving all TEAP specifications from those documents to this one.",
+      "status": "Proposed Standard",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9929,
+      "name": "rfc9929",
+      "title": "IGP Unreachable Prefix Announcement",
+      "abstract": "Summarization is often used in multi-area or multi-domain networks to improve network efficiency and scalability. With summarization in place, there is a need to signal loss of reachability to an individual prefix covered by the summary. This enables fast convergence by steering traffic, when applicable, away from the node which owns the prefix and is no longer reachable. This document specifies protocol mechanisms in IS-IS and OSPF, together with two new flags, to advertise such prefix reachability loss. The term \"OSPF\" in this document is used to refer to both OSPFv2 and OSPFv3.",
+      "status": "Proposed Standard",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9927,
+      "name": "rfc9927",
+      "title": "Fixing the C-Flag in the Extended Address Registration Option (EARO)",
+      "abstract": "This document updates \"Address-Protected Neighbor Discovery for Low-Power and Lossy Networks\" (RFC 8928) by changing the position of the C-flag in the Extended Address Registration Option (EARO) and registering it with IANA.",
+      "status": "Proposed Standard",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9926,
+      "name": "rfc9926",
+      "title": "Prefix Registration for IPv6 Neighbor Discovery",
+      "abstract": "This document updates IPv6 Neighbor Discovery (RFC 4861) and IPv6 Subnet Neighbor Discovery (RFC 8505, RFC 8928) to enable a node that owns or is directly connected to a prefix to register that prefix to neighbor routers.  The registration indicates that the registered prefix can be reached via the advertising node without a loop.  The unicast prefix registration allows the node to request one or more neighbor routers to redistribute the prefix in another routing domain regardless of the routing protocol used in that domain.  This document updates the Routing Protocol for Low-Power and Lossy Networks (RPL), as specified in RFCs 6550 and 9010, to enable a 6LoWPAN Router (6LR) to inject the registered prefix in RPL.",
+      "status": "Proposed Standard",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9925,
+      "name": "rfc9925",
+      "title": "Unsigned X.509 Certificates",
+      "abstract": "This document defines a placeholder X.509 signature algorithm that may be used in contexts where the consumer of the certificate is not expected to verify the signature.  As part of this, it updates RFC 5280.",
+      "status": "Proposed Standard",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9924,
+      "name": "rfc9924",
+      "title": "Advanced Professional Video",
+      "abstract": "This document describes the bitstream format of Advanced Professional Video (APV) and its decoding process.  APV is a professional video codec providing visually lossless compression mainly for recording and post production.",
+      "status": "Informational",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9923,
+      "name": "rfc9923",
+      "title": "The FNV Non-Cryptographic Hash Algorithm",
+      "abstract": "FNV (Fowler/Noll/Vo) is a fast, non-cryptographic hash algorithm with good dispersion that has been widely used and is referenced in a number of standards documents.  The purpose of this document is to make information on FNV and open-source code performing all specified sizes of FNV conveniently available to the Internet community.",
+      "status": "Informational",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9921,
+      "name": "rfc9921",
+      "title": "CBOR Object Signing and Encryption (COSE) Header Parameter for Timestamp Tokens as Defined in RFC 3161",
+      "abstract": "This document defines two CBOR Object Signing and Encryption (COSE) header parameters for incorporating timestamping based on RFC 3161 into COSE message structures (COSE_Sign and COSE_Sign1).  This enables the use of established timestamping infrastructure per RFC 3161 in COSE-based protocols.",
+      "status": "Proposed Standard",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9920,
+      "name": "rfc9920",
+      "title": "RFC Editor Model (Version 3)",
+      "abstract": "This document specifies version 3 of the RFC Editor Model. The model defines two high-level tasks related to the RFC Series. First, policy definition is the joint responsibility of the RFC Series Working Group (RSWG), which produces policy proposals, and the RFC Series Approval Board (RSAB), which approves such proposals. Second, policy implementation is primarily the responsibility of the RFC Production Center (RPC) as contractually overseen by the IETF Administration Limited Liability Company (IETF LLC). In addition, various responsibilities of the RFC Editor function are now performed alone or in combination by the RSWG, RSAB, RPC, RFC Series Consulting Editor (RSCE), and IETF LLC. Finally, this document specifies the Editorial Stream for publication of future policy definition documents produced through the processes defined herein. Since the publication of RFC 9280, lessons have been learned about implementing this model. This document lists some of those lessons learned and updates RFC 9280 based on that experience. This document obsoletes RFC 9280. This document updates RFCs 7841, 7991, 7992, 7993, 7994, 7995, 7996, 7997, 8729, 8730, and 9720.",
+      "status": "Informational",
+      "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9917,
+      "name": "rfc9917",
+      "title": "IGP Flexible Algorithms Reverse Affinity Constraint",
+      "abstract": "An IGP Flexible Algorithm (Flex-Algorithm) enables the computation of constraint-based paths within an IGP domain, allowing operators to influence path selection according to administrative policies. This document defines an extension to Flex-Algorithm that allows the inclusion or exclusion of links from path computation based on Administrative Groups (also known as link affinities) associated with the reverse direction of the path under computation. This document updates RFCs 9350 and 9843 by introducing the new IANA registry that specifies the ordered set of rules that are used to prune links from the topology during the Flex-Algorithm path computation.",
+      "status": "Proposed Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9915,
+      "name": "rfc9915",
+      "title": "Dynamic Host Configuration Protocol for IPv6 (DHCPv6)",
+      "abstract": "This document specifies the Dynamic Host Configuration Protocol for IPv6 (DHCPv6), an extensible mechanism for configuring nodes with network configuration parameters, IP addresses, and prefixes. Parameters can be provided statelessly or in combination with stateful assignment of one or more IPv6 addresses and/or IPv6 prefixes. DHCPv6 can operate either in place of or in addition to stateless address autoconfiguration (SLAAC). This document obsoletes RFC 8415. It incorporates verified errata and obsoletes the assignment of temporary addresses (the IA_TA option) and the server unicast capability (the Server Unicast option and UseMulticast status code).",
+      "status": "Internet Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9911,
+      "name": "rfc9911",
+      "title": "Common YANG Data Types",
+      "abstract": "This document defines a collection of common data types to be used with the YANG data modeling language.  It includes several new type definitions and obsoletes RFC 6991.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9910,
+      "name": "rfc9910",
+      "title": "Registration Data Access Protocol (RDAP) Regional Internet Registry (RIR) Search",
+      "abstract": "The Registration Data Access Protocol (RDAP) is used by Regional Internet Registries (RIRs) and Domain Name Registries (DNRs) to provide access to their resource registration information.  The core specifications for RDAP define basic search functionality, but there are various search options related to IP addresses, IP prefixes, and Autonomous System Numbers (ASNs), which are provided by RIRs via their WHOIS services, but for which there is no corresponding RDAP functionality.  This document extends RDAP to support those search options.",
+      "status": "Proposed Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9909,
+      "name": "rfc9909",
+      "title": "Internet X.509 Public Key Infrastructure -- Algorithm Identifiers for the Stateless Hash-Based Digital Signature Algorithm (SLH-DSA)",
+      "abstract": "Digital signatures are used within the X.509 Public Key Infrastructure, such as X.509 certificates and Certificate Revocation Lists (CRLs), as well as to sign messages.  This document specifies the conventions for using the Stateless Hash-Based Digital Signature Algorithm (SLH-DSA) in the X.509 Public Key Infrastructure.  The conventions for the associated signatures, subject public keys, and private keys are also specified.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9908,
+      "name": "rfc9908",
+      "title": "Clarification and Enhancement of the CSR Attributes Definition in RFC 7030",
+      "abstract": "This document updates RFC 7030, \"Enrollment over Secure Transport\" (EST), clarifying how the Certificate Signing Request (CSR) Attributes Response can be used by an EST server to specify both CSR attribute Object Identifiers (OIDs) and CSR attribute values, particularly X.509 extension values, that the server expects the client to include in a subsequent CSR request. RFC 9148 is derived from RFC 7030 and is also updated. RFC 7030 is ambiguous in its specification of the CSR Attributes Response. This has resulted in implementation challenges and implementor confusion because there was no universal understanding of what was specified. This document clarifies the encoding rules. This document also provides a new straightforward approach: using a template for CSR contents that may be partially filled in by the server. This also allows an EST server to specify a subject Distinguished Name (DN).",
+      "status": "Proposed Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9906,
+      "name": "rfc9906",
+      "title": "Deprecate Usage of ECC-GOST within DNSSEC",
+      "abstract": "This document retires the use of GOST R 34.10-2001 (mnemonic \"ECC-GOST\") and GOST R 34.11-94 within DNSSEC. RFC 5933 (Historic) defined the use of GOST R 34.10-2001 and GOST R 34.11-94 algorithms with DNS Security Extensions (DNSSEC). This document updates RFC 5933 by deprecating the use of ECC-GOST.",
+      "status": "Proposed Standard",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9905,
+      "name": "rfc9905",
+      "title": "Deprecating the Use of SHA-1 in DNSSEC Signature Algorithms",
+      "abstract": "This document deprecates the use of the RSASHA1 and\nRSASHA1-NSEC3-SHA1 algorithms for the creation of DNS Public Key\n(DNSKEY) and Resource Record Signature (RRSIG) records. It updates RFCs 4034 and 5155 as it deprecates the use of these\nalgorithms.",
+      "status": "Proposed Standard",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9904,
+      "name": "rfc9904",
+      "title": "DNSSEC Cryptographic Algorithm Recommendation Update Process",
+      "abstract": "The DNSSEC protocol makes use of various cryptographic algorithms to provide authentication of DNS data and proof of nonexistence. To ensure interoperability between DNS resolvers and DNS authoritative servers, it is necessary to specify both a set of algorithm implementation requirements and usage guidelines to ensure that there is at least one algorithm that all implementations support. This document replaces and obsoletes RFC 8624 and moves the canonical source of algorithm implementation requirements and usage guidance for DNSSEC from RFC 8624 to the IANA DNSSEC algorithm registries. This is done to allow the list of requirements to be more easily updated and referenced. Extensions to these registries can be made in future RFCs. This document also updates RFC 9157 and incorporates the revised IANA DNSSEC considerations from that RFC. This document does not change the recommendation status (MUST, MAY, RECOMMENDED, etc.) of the algorithms listed in RFC 8624; that is the work of future documents.",
+      "status": "Proposed Standard",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9903,
+      "name": "rfc9903",
+      "title": "A YANG Data Model for OSPF Segment Routing over the MPLS Data Plane",
+      "abstract": "This document defines a YANG data model that can be used to manage OSPF extensions for Segment Routing over the MPLS data plane.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9902,
+      "name": "rfc9902",
+      "title": "A YANG Data Model for IS-IS Segment Routing over the MPLS Data Plane",
+      "abstract": "This document defines a YANG data model that can be used to manage IS-IS extensions for Segment Routing (SR) over the MPLS data plane.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9901,
+      "name": "rfc9901",
+      "title": "Selective Disclosure for JSON Web Tokens",
+      "abstract": "This specification defines a mechanism for the selective disclosure\nof individual elements of a JSON data structure used as the payload\nof a JSON Web Signature (JWS).  The primary use case is the selective\ndisclosure of JSON Web Token (JWT) claims.",
+      "status": "Proposed Standard",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9900,
+      "name": "rfc9900",
+      "title": "Updates to NETCONF Transport Port Numbers",
+      "abstract": "This document releases IANA-assigned port numbers for services related to the Network Configuration Protocol (NETCONF) that have not been in use in production networks.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9899,
+      "name": "rfc9899",
+      "title": "Extensions to the YANG Data Model for Access Control Lists (ACLs)",
+      "abstract": "RFC 8519 defines a YANG data model for Access Control Lists (ACLs). This document specifies a set of extensions that fix many of the limitations of the ACL model as initially defined in RFC 8519. Specifically, it introduces augmentations to the ACL base model to enhance its functionality and applicability. This document also creates initial versions of IANA-maintained modules for ICMP types and IPv6 extension headers.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9898,
+      "name": "rfc9898",
+      "title": "Neighbor Discovery Considerations in IPv6 Deployments",
+      "abstract": "The Neighbor Discovery (ND) protocol is a critical component of the\nIPv6 architecture. The protocol uses multicast in many messages. It\nalso assumes a security model where all nodes on a link are trusted.\nSuch a design might be inefficient in some scenarios (e.g., use of\nmulticast in wireless networks) or when nodes are not trustworthy\n(e.g., public access networks). These security and operational issues\nand the associated mitigation solutions are documented in more than\ntwenty RFCs. There is a need to track these issues and solutions in a\nsingle document. To that aim, this document summarizes the published ND issues and\nthen describes how all these issues originate from three causes.\nAddressing the issues is made simpler by addressing the causes. This\ndocument also analyzes the mitigation solutions and demonstrates that\nisolating hosts into different subnets and links can help to address\nthe three causes. Guidance is provided for selecting a suitable\nisolation method to prevent potential ND issues.",
+      "status": "Informational",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9897,
+      "name": "rfc9897",
+      "title": "Datagram Congestion Control Protocol (DCCP) Extensions for Multipath Operation with Multiple Addresses",
+      "abstract": "Datagram Congestion Control Protocol (DCCP) communications, as defined in RFC 4340, are inherently restricted to a single path per connection, despite the availability of multiple network paths between peers. The ability to utilize multiple paths simultaneously for a DCCP session can enhance network resource utilization, improve throughput, and increase resilience to network failures, ultimately enhancing the user experience. Use cases for Multipath DCCP (MP-DCCP) include mobile devices (e.g., handsets and vehicles) and residential home gateways that maintain simultaneous connections to distinct network types such as cellular and Wireless Local Area Networks (WLANs) or cellular and fixed access networks. Compared to existing multipath transport protocols, such as Multipath TCP (MPTCP), MP-DCCP is particularly suited for latency-sensitive applications with varying requirements for reliability and in-order delivery. This document specifies a set of protocol extensions to DCCP that enable multipath operations. These extensions maintain the same service model as DCCP while introducing mechanisms to establish and utilize multiple concurrent DCCP flows across different network paths.",
+      "status": "Proposed Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9896,
+      "name": "rfc9896",
+      "title": "SVG in RFCs",
+      "abstract": "This document defines policy for the inclusion of Scalable Vector Graphics (SVG) in the definitive versions of RFCs and relevant publication formats. It contains policy requirements from RFC 7996 but removes all requirements related to using a specific SVG profile or implementation code. It also makes the RFC Production Center (RPC) responsible for decisions about SVG tooling and implementation. This document obsoletes RFC 7996.",
+      "status": "Informational",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9895,
+      "name": "rfc9895",
+      "title": "Dynamic Link Exchange Protocol (DLEP) IEEE 802.1Q Aware Credit Window Extension",
+      "abstract": "This document defines an extension to the Dynamic Link Exchange Protocol (DLEP) that enables an Ethernet IEEE 802.1Q aware credit window scheme for destination-specific and shared flow control.",
+      "status": "Proposed Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9894,
+      "name": "rfc9894",
+      "title": "Dynamic Link Exchange Protocol (DLEP) Diffserv Aware Credit Window Extension",
+      "abstract": "This document defines an extension to the Dynamic Link Exchange Protocol (DLEP) that enables a Diffserv aware credit window scheme for destination-specific and shared flow control.",
+      "status": "Proposed Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9893,
+      "name": "rfc9893",
+      "title": "Dynamic Link Exchange Protocol (DLEP) Credit-Based Flow Control Messages and Data Items",
+      "abstract": "This document defines new Dynamic Link Exchange Protocol (DLEP) Data Items that are used to support credit-based flow control. Credit window flow control is used to regulate when data may be sent to an associated virtual or physical queue. These Data Items are extensible and reusable. This document also defines new messages that support credit window flow control.",
+      "status": "Proposed Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9892,
+      "name": "rfc9892",
+      "title": "Dynamic Link Exchange Protocol (DLEP) Traffic Classification Data Item",
+      "abstract": "This document defines a new Data Item for the Dynamic Link Exchange Protocol (DLEP) to support traffic classification.  Traffic classification information identifies traffic flows based on frame/packet content such as a destination address.  The Data Item is defined in an extensible and reusable fashion.  Its use will be mandated in other documents defining specific DLEP extensions.  This document also introduces DLEP Sub-Data Items and defines two new Sub-Data Items to support Diffserv and Ethernet traffic classification.",
+      "status": "Proposed Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9891,
+      "name": "rfc9891",
+      "title": "Automated Certificate Management Environment (ACME) Delay-Tolerant Networking (DTN) Node ID Validation Extension",
+      "abstract": "This document specifies an extension to the Automated Certificate Management Environment (ACME) protocol that allows an ACME server to validate the Delay-Tolerant Networking (DTN) Node ID for an ACME client.  A DTN Node ID is an identifier used in the Bundle Protocol (BP) to name a \"singleton endpoint\": an endpoint that is registered on a single BP Node.  The DTN Node ID is encoded both as a certificate Subject Alternative Name (SAN) identity of type otherName with an Other Name form of BundleEID and as an ACME Identifier type \"bundleEID\".",
+      "status": "Experimental",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9890,
+      "name": "rfc9890",
+      "title": "An Update to YANG Module Names Registration",
+      "abstract": "This document amends the IANA guidance on the uniqueness of YANG module and submodule names. The document updates RFC 6020 to clarify how modules and their revisions are handled by IANA.",
+      "status": "Proposed Standard",
+      "published": "2025-10-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9889,
+      "name": "rfc9889",
+      "title": "A Realization of Network Slices for 5G Networks Using Current IP/MPLS Technologies",
+      "abstract": "Network slicing is a feature that was introduced by the 3rd Generation Partnership Project (3GPP) in Mobile Networks. Realization of 5G slicing implies requirements for all mobile domains, including the Radio Access Network (RAN), Core Network (CN), and Transport Network (TN). This document describes a network slice realization model for IP/MPLS networks with a focus on the Transport Network fulfilling the service objectives for 5G slicing connectivity. The realization model reuses many building blocks commonly used in service provider networks at the current time.",
+      "status": "Informational",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9887,
+      "name": "rfc9887",
+      "title": "Terminal Access Controller Access-Control System Plus (TACACS+) over TLS 1.3",
+      "abstract": "This document specifies the use of Transport Layer Security (TLS) version 1.3 to secure the communication channel between a Terminal Access Controller Access-Control System Plus (TACACS+) client and server. TACACS+ is a protocol used for Authentication, Authorization, and Accounting (AAA) in networked environments. The original TACACS+ protocol does not mandate the use of encryption or secure transport. This specification defines a profile for using TLS 1.3 with TACACS+, including guidance on authentication, connection establishment, and operational considerations. The goal is to enhance the confidentiality, integrity, and authenticity of TACACS+ traffic, aligning the protocol with modern security best practices. This document updates RFC 8907.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9886,
+      "name": "rfc9886",
+      "title": "DRIP Entity Tags (DETs) in the Domain Name System",
+      "abstract": "This document defines the Domain Name System (DNS) functionality of a Drone Remote Identification Protocol (DRIP) Identity Management Entity (DIME).  It is built around DRIP Entity Tags (DETs) to standardize a hierarchical registry structure and associated processes to facilitate trustable and scalable registration and lookup of information related to Unmanned Aircraft Systems (UAS).  The registry system supports issuance, discovery, and verification of DETs, enabling secure identification and association of UAS and their operators.  It also defines the interactions between different classes of registries (root, organizational, and individual) and their respective roles in maintaining the integrity of the registration data.  This architecture enables decentralized, federated operation while supporting privacy, traceability, and regulatory compliance requirements in the context of UAS Remote Identification and other services.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9885,
+      "name": "rfc9885",
+      "title": "Multi-Part TLVs in IS-IS",
+      "abstract": "New technologies are adding new information into IS-IS while deployment scales are simultaneously increasing.  This causes the contents of many critical TLVs to exceed the currently supported limit of 255 octets.  This document codifies the common mechanism of extending the TLV content space through multiple TLVs.",
+      "status": "Proposed Standard",
+      "published": "2025-10-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9884,
+      "name": "rfc9884",
+      "title": "Label Switched Path Ping for Segment Routing Path Segment Identifier with MPLS Data Plane",
+      "abstract": "Segment Routing (SR) leverages source routing to steer packets through an ordered list of instructions called \"segments\".  SR can be instantiated over the MPLS data plane.  Path Segment Identifiers (PSIDs) are used to identify and correlate bidirectional or end-to-end paths in SR networks.  This document defines procedures (i.e., six new Target Forwarding Equivalence Class (FEC) Stack sub-TLVs) for the use of LSP Ping to support connectivity verification and fault isolation for SR paths that include PSIDs.  The mechanisms described enable the validation and tracing of SR paths with Path SIDs in MPLS networks, complementing existing SR-MPLS Operations, Administration, and Maintenance (OAM) capabilities.",
+      "status": "Proposed Standard",
+      "published": "2025-10-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9883,
+      "name": "rfc9883",
+      "title": "An Attribute for Statement of Possession of a Private Key",
+      "abstract": "This document specifies an attribute for a statement of possession of a private key by a certificate subject.  As part of X.509 certificate enrollment, a Certification Authority (CA) typically demands proof that the subject possesses the private key that corresponds to the to-be-certified public key.  In some cases, a CA might accept a signed statement from the certificate subject.  For example, when a certificate subject needs separate certificates for signature and key establishment, a statement that can be validated with the previously issued signature certificate for the same subject might be adequate for subsequent issuance of the key establishment certificate.",
+      "status": "Proposed Standard",
+      "published": "2025-10-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9882,
+      "name": "rfc9882",
+      "title": "Use of the ML-DSA Signature Algorithm in the Cryptographic Message Syntax (CMS)",
+      "abstract": "The Module-Lattice-Based Digital Signature Algorithm (ML-DSA), as defined by NIST in FIPS 204, is a post-quantum digital signature scheme that aims to be secure against an adversary in possession of a Cryptographically Relevant Quantum Computer (CRQC).  This document specifies the conventions for using the ML-DSA signature algorithm with the Cryptographic Message Syntax (CMS).  In addition, the algorithm identifier syntax is provided.",
+      "status": "Proposed Standard",
+      "published": "2025-10-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9881,
+      "name": "rfc9881",
+      "title": "Internet X.509 Public Key Infrastructure -- Algorithm Identifiers for the Module-Lattice-Based Digital Signature Algorithm (ML-DSA)",
+      "abstract": "Digital signatures are used within X.509 certificates and Certificate Revocation Lists (CRLs), and to sign messages.  This document specifies the conventions for using FIPS 204, the Module-Lattice-Based Digital Signature Algorithm (ML-DSA) in Internet X.509 certificates and CRLs.  The conventions for the associated signatures, subject public keys, and private key are also described.",
+      "status": "Proposed Standard",
+      "published": "2025-10-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9880,
+      "name": "rfc9880",
+      "title": "Semantic Definition Format (SDF) for Data and Interactions of Things",
+      "abstract": "The Semantic Definition Format (SDF) is a format for domain experts to use in the creation and maintenance of data and interaction models that describe Things, i.e., physical objects that are available for interaction over a network.  An SDF specification describes definitions of SDF Objects/SDF Things and their associated interactions (Events, Actions, and Properties), as well as the Data types for the information exchanged in those interactions.  Tools convert this format to database formats and other serializations as needed.",
+      "status": "Proposed Standard",
+      "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9879,
+      "name": "rfc9879",
+      "title": "Use of Password-Based Message Authentication Code 1 (PBMAC1) in PKCS #12 Syntax",
+      "abstract": "This document specifies additions and amendments to RFCs 7292 and 8018.  It also obsoletes the RFC 9579.  It defines a way to use the Password-Based Message Authentication Code 1 (PBMAC1), defined in RFC 8018, inside the PKCS #12 syntax.  The purpose of this specification is to permit the use of more modern Password-Based Key Derivation Functions (PBKDFs) and allow for regulatory compliance.",
+      "status": "Informational",
+      "published": "2025-09-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9878,
+      "name": "rfc9878",
+      "title": "Updates to Private Header (P-Header) Extension Usage in Session Initiation Protocol (SIP) Requests and Responses",
+      "abstract": "The Third Generation Partnership Project (3GPP) has identified cases where different SIP private header extensions referred to as \"P-\" header fields, and defined in RFC 7315, need to be included in SIP requests and responses where they were not allowed according to RFC 7315. This document updates RFC 7315, in order to allow inclusion of the affected \"P-\" header fields in such requests and responses. This document obsoletes RFC 7976. The changes related to RFC 7976 involve the inclusion of the P-Visited-Network-ID header field in SIP responses. This document also makes updates to RFC 7315 in order to fix misalignments that occurred when RFC 3455 was obsoleted by RFC 7315.",
+      "status": "Informational",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9877,
+      "name": "rfc9877",
+      "title": "Registration Data Access Protocol (RDAP) Extension for Geofeed Data",
+      "abstract": "This document defines a new Registration Data Access Protocol (RDAP) extension, \"geofeed1\", for indicating that an RDAP server hosts geofeed URLs for its IP network objects.  It also defines a new media type and a new link relation type for the associated link objects included in responses.",
+      "status": "Proposed Standard",
+      "published": "2025-10-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9876,
+      "name": "rfc9876",
+      "title": "Updates to the IANA Registration Procedures for Constrained Application Protocol (CoAP) Content-Formats",
+      "abstract": "This document updates RFC 7252 by modifying the registration procedures for the \"CoAP Content-Formats\" IANA registry, within the \"Constrained RESTful Environments (CoRE) Parameters\" registry group.  This document also introduces a new column, \"Media Type\", to the registry.  Furthermore, this document reserves Content-Format identifiers 64998 and 64999 for use in documentation.",
+      "status": "Proposed Standard",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9875,
+      "name": "rfc9875",
+      "title": "HTTP Cache Groups",
+      "abstract": "This specification introduces a means of describing the relationships between stored responses in HTTP caches, grouping them by associating a stored response with one or more strings.",
+      "status": "Proposed Standard",
+      "published": "2025-10-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9874,
+      "name": "rfc9874",
+      "title": "Best Practices for Deletion of Domain and Host Objects in the Extensible Provisioning Protocol (EPP)",
+      "abstract": "The Extensible Provisioning Protocol (EPP) includes commands for clients to delete domain and host objects, both of which are used to publish information in the Domain Name System (DNS).  EPP also includes guidance for deletions that is intended to avoid DNS resolution disruptions and maintain data consistency.  However, operational relationships between objects can make that guidance difficult to implement.  Some EPP clients have developed operational practices to delete those objects that have unintended impacts on DNS resolution and security.  This document describes best current practices and proposes new potential practices to delete domain and host objects that reduce the risk of DNS resolution failure and maintain client-server data consistency.",
+      "status": "Best Current Practice",
+      "published": "2025-09-01T00:00:00Z"
+    }
+  ],
+  "next": "?limit=50&search=&sort=desc&page=2",
+  "previous": null
+}
