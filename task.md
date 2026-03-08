@@ -170,12 +170,14 @@
 ## Stretch Goals (Post-MVP)
 
 - [x] **Cloud TTS integration**: Integrated free Microsoft Edge Neural TTS as a higher-quality voice option.
-- [ ] **TTS Highlight Sync**: Investigate and fix Edge TTS audio playback and text-highlight synchronization (word-level sync is currently estimated since Edge TTS MP3s don't contain exact word timestamps).
+- [x] **TTS Highlight Sync**: Investigate and fix Edge TTS audio playback and text-highlight synchronization (word-level sync is currently estimated since Edge TTS MP3s don't contain exact word timestamps).
+- [x] **Fix Slow TTS Section Start**: Use `StreamingResponse` wrapping a text chunk generator from Edge TTS instead of waiting for the full synthesis completion, coupled with a Loading toast on the frontend.
 - [ ] **RFC Bookmarks / Playlists**: Save a list of RFCs to a personal playlist
 - [ ] **Audio Export**: Download generated audio as an MP3 file (requires server-side TTS)
 - [ ] **Section Notes**: Add text annotations to sections while listening
-- [ ] **RFC Diff Viewer**: Compare two versions of an RFC (updated/obsoleted relationships)
 - [ ] **PWA Support**: Make the app installable as a Progressive Web App with offline support
+
+## Future Goals
 - [ ] **IP-based rate limiting**: Restrict each IP to 3 hours of usage per session (FastAPI middleware)
 - [ ] **Max concurrent users**: Cap the number of active sessions at a configurable limit
 - [ ] **API key gating**: Optional `X-API-Key` header middleware for unlimited/premium access

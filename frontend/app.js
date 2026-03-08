@@ -23,8 +23,10 @@
 const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:3000/api'
   : 'https://rfclisten-api.onrender.com/api';
+const STORAGE_KEY = 'rfclisten_state';
 const RECENTS_KEY = 'rfclisten_recents';
 const MAX_RECENTS = 10;
+const DEFAULT_EDGE_VOICE_ID = 'en-US-BrianMultilingualNeural';
 
 // ── 2. State ──────────────────────────────────────────────────────────────────
 
@@ -42,6 +44,7 @@ let state = {
   playbackRate: 1.0,
   selectedVoiceURI: '',
   ttsEngine: 'edge',      // 'edge' or 'browser'
+  rfcVoiceLocks: {},      // { [rfcNumber]: { voiceURI: string, ttsEngine: 'edge' | 'browser' } }
 
   edgeVoices: [],         // array of { id, name }
   browserVoices: [],      // array of browser voice objects
@@ -62,6 +65,7 @@ function _persistState() {
       playbackRate: state.playbackRate,
       selectedVoiceURI: state.selectedVoiceURI,
       ttsEngine: state.ttsEngine || 'edge',
+      rfcVoiceLocks: state.rfcVoiceLocks || {},
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persist));
   } catch (_) { /* ignore */ }
@@ -115,7 +119,20 @@ class Player {
     this._isPaused = false;   // true when paused (so resume knows to continue)
     this._lastBoundaryChar = 0; // last char index from boundary event
 
+    // Word boundary data from Edge TTS (populated per-section)
+    this._wordBoundaries = [];  // [{text, offset (ms), duration (ms), charIdx}, ...]
+
     this._audio = new Audio();
+    this._playbackToken = 0;
+    this._hasLoadedEdgeAudio = false;
+    this._syncDiagnostics = {
+      mode: 'none',
+      sectionIdx: -1,
+      boundariesCount: 0,
+      matchRate: 0,
+      notFoundCount: 0,
+      rejectedCount: 0,
+    };
     this._audio.addEventListener('ended', () => this._onAudioEnded());
     this._audio.addEventListener('error', (e) => this._onAudioError(e));
     this._audio.addEventListener('timeupdate', () => this._onAudioTimeUpdate());
@@ -133,11 +150,26 @@ class Player {
 
   play() {
     if (!this._sectionQueue.length) return;
+
+    lockVoiceForCurrentRFCIfNeeded();
+    syncVoiceSelectionForCurrentRFC();
+
+    const canResumeEdge =
+      state.ttsEngine === 'edge' &&
+      this._isPaused &&
+      this._hasLoadedEdgeAudio &&
+      !!this._audio.currentSrc;
+
     this._isPaused = false;
 
-    if (state.ttsEngine === 'edge' && this._audio.src) {
+    if (canResumeEdge) {
       this._audio.playbackRate = state.playbackRate;
-      this._audio.play().catch(e => console.error("Audio play failed", e));
+      this._audio.play().catch(e => {
+        console.error("Audio play failed", e);
+        this._pauseCharIdx = 0;
+        this._charOffset = 0;
+        this._speakSection(this._currentIdx);
+      });
     } else {
       this._pauseCharIdx = 0;
       this._charOffset = 0;
@@ -162,15 +194,25 @@ class Player {
 
   resume() {
     if (!this._isPaused) { this.play(); return; }
-    this._isPaused = false;
 
     if (state.ttsEngine === 'edge') {
+      this._isPaused = false;
+      if (!this._hasLoadedEdgeAudio || !this._audio.currentSrc) {
+        this._pauseCharIdx = 0;
+        this._charOffset = 0;
+        this._speakSection(this._currentIdx);
+        setState({ isPlaying: true });
+        renderPlayerState();
+        return;
+      }
       this._audio.playbackRate = state.playbackRate;
       this._audio.play().catch(console.error);
       setState({ isPlaying: true });
       renderPlayerState();
       return;
     }
+
+    this._isPaused = false;
 
     // Attempt native resume
     window.speechSynthesis.resume();
@@ -212,10 +254,13 @@ class Player {
   }
 
   stop() {
+    this._playbackToken += 1;
     if (state.ttsEngine === 'edge') {
       this._audio.pause();
       this._audio.currentTime = 0;
-      this._audio.src = '';
+      this._audio.removeAttribute('src');
+      this._audio.load();
+      this._hasLoadedEdgeAudio = false;
     } else {
       window.speechSynthesis.cancel();
     }
@@ -266,6 +311,9 @@ class Player {
   get isPaused() { return this._isPaused; }
 
   _speakSection(idx, startChar = 0) {
+    this._playbackToken += 1;
+    const token = this._playbackToken;
+
     if (idx >= this._sectionQueue.length) {
       clearWordHighlights();
       setState({ isPlaying: false });
@@ -316,9 +364,9 @@ class Player {
     const maskedText = this._maskInlineReferences(textToSpeak);
 
     if (state.ttsEngine === 'edge') {
-      this._speakEdgeAudio(idx);
+      this._speakEdgeAudio(idx, token);
     } else {
-      this._speakText(maskedText, idx);
+      this._speakText(maskedText, idx, token);
     }
 
     // Update player bar
@@ -337,7 +385,7 @@ class Player {
   }
 
   /** Internal: create an utterance, wire events, and speak. */
-  _speakText(text, sectionIdx) {
+  _speakText(text, sectionIdx, token) {
     if (!text.trim()) {
       this._speakSection(sectionIdx + 1);
       return;
@@ -353,6 +401,7 @@ class Player {
 
     // ── Word-level highlighting via boundary events ──
     utterance.onboundary = (e) => {
+      if (token !== this._playbackToken) return;
       if (e.name !== 'word') return;
 
       // Clear the fallback timeout because the engine is successfully firing events
@@ -367,11 +416,13 @@ class Player {
     };
 
     utterance.onend = () => {
+      if (token !== this._playbackToken) return;
       clearWordHighlights();
       this._speakSection(sectionIdx + 1);
     };
 
     utterance.onerror = (e) => {
+      if (token !== this._playbackToken) return;
       if (e.error !== 'interrupted') {
         console.warn('TTS error:', e.error);
       }
@@ -385,34 +436,158 @@ class Player {
     window.speechSynthesis.speak(utterance);
   }
 
-  _speakEdgeAudio(sectionIdx) {
+  _speakEdgeAudio(sectionIdx, token) {
     const rfcNumber = state.currentRFC.rfcNumber;
-    let url = `${API_BASE}/rfc/${rfcNumber}/tts/${sectionIdx}`;
+    const selectedEdgeVoice =
+      state.selectedVoiceURI && state.edgeVoices.some(v => v.id === state.selectedVoiceURI)
+        ? state.selectedVoiceURI
+        : '';
 
-    // Only pass voice parameter if an Edge voice is selected (not a browser voice ID)
-    if (state.selectedVoiceURI && state.edgeVoices.some(v => v.id === state.selectedVoiceURI)) {
-      url += `?voice=${encodeURIComponent(state.selectedVoiceURI)}`;
+    let packageUrl = `${API_BASE}/rfc/${rfcNumber}/tts/${sectionIdx}/package`;
+    if (selectedEdgeVoice) {
+      packageUrl += `?voice=${encodeURIComponent(selectedEdgeVoice)}`;
     }
 
-    this._audio.src = url;
-    this._audio.playbackRate = state.playbackRate;
+    // Fetch audio+boundaries package from a single backend synthesis path.
+    this._wordBoundaries = [];
+    this._syncDiagnostics = {
+      mode: 'loading',
+      sectionIdx,
+      boundariesCount: 0,
+      matchRate: 0,
+      notFoundCount: 0,
+      rejectedCount: 0,
+    };
 
-    // Show loading state or wait indicator if desired
-    this._audio.play().catch(e => {
-      console.warn('Audio playback failed', e);
-      if (e.name !== 'AbortError') {
-        showToast('TTS audio failed to load. Skipping section.', 'error');
-        this._speakSection(sectionIdx + 1);
+    // Show loading toast
+    let loadingToast = document.createElement('div');
+    loadingToast.id = 'tts-loading';
+    loadingToast.className = 'toast toast-info';
+    loadingToast.textContent = 'Generating audio...';
+    document.body.appendChild(loadingToast);
+    requestAnimationFrame(() => loadingToast.classList.add('toast-visible'));
+
+    const removeLoading = () => {
+      const t = document.getElementById('tts-loading');
+      if (t) {
+        t.classList.remove('toast-visible');
+        t.addEventListener('transitionend', () => t.remove());
       }
+      this._audio.removeEventListener('canplay', removeLoading);
+      this._audio.removeEventListener('playing', removeLoading);
+    };
+
+    this._audio.addEventListener('canplay', removeLoading);
+    this._audio.addEventListener('playing', removeLoading);
+
+    fetch(packageUrl)
+      .then(res => res.ok ? res.json() : Promise.reject(new Error(`Package fetch failed: ${res.status}`)))
+      .then(pkg => {
+        if (token !== this._playbackToken) return;
+
+        const section = this._sectionQueue[sectionIdx];
+        const boundaries = pkg?.boundaries || [];
+        const mapped = section
+          ? this._mapBoundariesToChars(section.content, boundaries)
+          : { mappedBoundaries: [], stats: null };
+
+        this._wordBoundaries = mapped.mappedBoundaries;
+        this._syncDiagnostics = {
+          mode: this._wordBoundaries.length ? 'boundary' : 'fallback',
+          sectionIdx,
+          boundariesCount: boundaries.length,
+          matchRate: mapped.stats?.matchRate ?? 0,
+          notFoundCount: mapped.stats?.notFoundCount ?? 0,
+          rejectedCount: mapped.stats?.rejectedCount ?? 0,
+        };
+
+        console.info('[RFCListen Sync]', {
+          rfcNumber,
+          sectionIdx,
+          sync: this._syncDiagnostics,
+          packageDiagnostics: pkg?.diagnostics || null,
+          fromCache: pkg?.fromCache,
+        });
+
+        if (!pkg?.audioUrl) {
+          throw new Error('Missing audioUrl in TTS package response');
+        }
+
+        const apiOrigin = API_BASE.replace(/\/api$/, '');
+        this._audio.src = pkg.audioUrl.startsWith('http')
+          ? pkg.audioUrl
+          : `${apiOrigin}${pkg.audioUrl}`;
+        this._hasLoadedEdgeAudio = true;
+        this._audio.playbackRate = state.playbackRate;
+
+        return this._audio.play();
+      })
+      .catch(e => {
+        removeLoading();
+        console.warn('Audio playback failed', e);
+        if (e.name !== 'AbortError') {
+          showToast('TTS package failed to load. Skipping section.', 'error');
+          this._speakSection(sectionIdx + 1);
+        }
+      });
+  }
+
+  _mapBoundariesToChars(content, boundaries) {
+    let searchPos = 0;
+    let matchedCount = 0;
+    let notFoundCount = 0;
+    let rejectedCount = 0;
+
+    const mappedBoundaries = boundaries.map(b => {
+      const maxLookahead = 4000;
+      const textLower = (b.text || '').toLowerCase();
+      const windowStr = content.substring(searchPos, searchPos + maxLookahead).toLowerCase();
+
+      const localIdx = windowStr.indexOf(textLower);
+      let charIdx;
+
+      if (textLower && localIdx >= 0) {
+        const jumpedText = windowStr.substring(0, localIdx);
+        const jumpedWords = jumpedText.match(/[a-z0-9]+/gi);
+        const skippedWordCount = jumpedWords ? jumpedWords.length : 0;
+
+        if (skippedWordCount <= 5) {
+          charIdx = searchPos + localIdx;
+          searchPos = charIdx + textLower.length;
+          matchedCount += 1;
+        } else {
+          charIdx = searchPos;
+          rejectedCount += 1;
+        }
+      } else {
+        charIdx = searchPos;
+        notFoundCount += 1;
+      }
+
+      return { ...b, charIdx };
     });
+
+    const total = boundaries.length || 1;
+    return {
+      mappedBoundaries,
+      stats: {
+        matchRate: matchedCount / total,
+        matchedCount,
+        notFoundCount,
+        rejectedCount,
+      },
+    };
   }
 
   _onAudioEnded() {
+    if (!state.isPlaying) return;
     clearWordHighlights();
     this._speakSection(this._currentIdx + 1);
   }
 
   _onAudioError(e) {
+    if (!state.isPlaying) return;
+    if (!this._hasLoadedEdgeAudio) return;
     console.warn("Edge TTS error:", e);
     // Usually means no interactable audio, or server 500
     clearWordHighlights();
@@ -423,17 +598,36 @@ class Player {
     const section = this._sectionQueue[this._currentIdx];
     if (!section || !this._audio.duration) return;
 
-    // Smooth progress visualization over the text length:
+    // If we have real word boundary data, use it for precise highlighting
+    if (this._wordBoundaries.length > 0) {
+      const currentMs = this._audio.currentTime * 1000;
+
+      // Binary search for the last boundary whose offset <= currentMs
+      let lo = 0, hi = this._wordBoundaries.length - 1, bestIdx = 0;
+      while (lo <= hi) {
+        const mid = (lo + hi) >> 1;
+        if (this._wordBoundaries[mid].offset <= currentMs) {
+          bestIdx = mid;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
+      }
+
+      const charIndex = this._wordBoundaries[bestIdx].charIdx;
+      highlightWordAt(this._currentIdx, charIndex);
+      return;
+    }
+
+    // Fallback: linear estimation when boundaries aren't available yet
     const progressPercent = this._audio.currentTime / this._audio.duration;
     const charIndex = Math.floor(progressPercent * section.content.length);
-
-    // Fallback: estimate word highlighting based on audio duration proportion.
-    // It's not exact but helps track progress visually.
     highlightWordAt(this._currentIdx, charIndex);
   }
 }
 
 const player = new Player();
+let sectionNavTargets = []; // [{ navIdx, sectionIdx, heading }]
 
 // ── 4. API Client ─────────────────────────────────────────────────────────────
 
@@ -539,7 +733,7 @@ function renderSectionsNav(sections) {
   // a single section around figures, producing multiple entries with the
   // same heading — we only show the first occurrence).
   const seen = new Set();
-  list.innerHTML = sections
+  sectionNavTargets = sections
     .map((s, idx) => ({ s, idx }))
     .filter(({ s }) => s.type === 'text')
     .filter(({ s }) => {
@@ -547,15 +741,39 @@ function renderSectionsNav(sections) {
       seen.add(s.heading);
       return true;
     })
-    .map(({ s, idx }) => `
+    .map(({ s, idx }, navIdx) => ({
+      navIdx,
+      sectionIdx: idx,
+      heading: s.heading,
+    }));
+
+  list.innerHTML = sectionNavTargets.map(({ navIdx, sectionIdx, heading }) => `
     <li
       class="section-nav-item"
-      data-idx="${idx}"
+      data-nav-idx="${navIdx}"
+      data-section-idx="${sectionIdx}"
       tabindex="0"
       role="button"
-      aria-label="Jump to ${escHtml(s.heading)}"
-    >${escHtml(s.heading)}</li>
+      aria-label="Jump to ${escHtml(heading)}"
+    >${escHtml(heading)}</li>
   `).join('');
+}
+
+function getNavTargetForSectionIdx(sectionIdx) {
+  if (!sectionNavTargets.length) return null;
+
+  const exact = sectionNavTargets.find(t => t.sectionIdx === sectionIdx);
+  if (exact) return exact;
+
+  let best = sectionNavTargets[0];
+  for (const target of sectionNavTargets) {
+    if (target.sectionIdx <= sectionIdx) {
+      best = target;
+      continue;
+    }
+    break;
+  }
+  return best;
 }
 
 function renderActiveSectionHighlight(idx) {
@@ -565,7 +783,10 @@ function renderActiveSectionHighlight(idx) {
   const block = document.getElementById(`section-${idx}`);
   if (block) block.classList.add('active');
 
-  const navItem = document.querySelector(`.section-nav-item[data-idx="${idx}"]`);
+  const navTarget = getNavTargetForSectionIdx(idx);
+  const navItem = navTarget
+    ? document.querySelector(`.section-nav-item[data-nav-idx="${navTarget.navIdx}"]`)
+    : null;
   if (navItem) {
     navItem.classList.add('active');
     navItem.scrollIntoView({ block: 'nearest' });
@@ -659,6 +880,95 @@ function populateVoices() {
       </option>`
     ).join('');
   }
+
+  updateVoiceControlsLockState();
+}
+
+function getCurrentRFCLock() {
+  const rfcNumber = state.currentRFC?.rfcNumber;
+  if (!rfcNumber) return null;
+  return state.rfcVoiceLocks?.[String(rfcNumber)] || null;
+}
+
+function lockVoiceForCurrentRFCIfNeeded() {
+  const rfcNumber = state.currentRFC?.rfcNumber;
+  if (!rfcNumber) return;
+
+  const key = String(rfcNumber);
+  if (state.rfcVoiceLocks?.[key]) return;
+
+  const effectiveVoice = getEffectiveSelectedVoice();
+  const nextLocks = {
+    ...(state.rfcVoiceLocks || {}),
+    [key]: {
+      voiceURI: effectiveVoice,
+      ttsEngine: state.ttsEngine,
+    },
+  };
+
+  setState({
+    rfcVoiceLocks: nextLocks,
+    selectedVoiceURI: effectiveVoice,
+  });
+
+  updateVoiceControlsLockState();
+}
+
+function getEffectiveSelectedVoice() {
+  if (state.ttsEngine === 'edge') {
+    const hasCurrent = state.selectedVoiceURI && state.edgeVoices.some(v => v.id === state.selectedVoiceURI);
+    if (hasCurrent) return state.selectedVoiceURI;
+    const hasBrian = state.edgeVoices.some(v => v.id === DEFAULT_EDGE_VOICE_ID);
+    return hasBrian ? DEFAULT_EDGE_VOICE_ID : (state.edgeVoices[0]?.id || DEFAULT_EDGE_VOICE_ID);
+  }
+  return state.selectedVoiceURI || '';
+}
+
+function syncVoiceSelectionForCurrentRFC() {
+  const lock = getCurrentRFCLock();
+  if (lock) {
+    setState({
+      ttsEngine: lock.ttsEngine,
+      selectedVoiceURI: lock.voiceURI,
+    });
+    const engineSelect = document.getElementById('engine-select');
+    if (engineSelect) engineSelect.value = lock.ttsEngine;
+    populateVoices();
+    const voiceSelect = document.getElementById('voice-select');
+    if (voiceSelect) voiceSelect.value = lock.voiceURI;
+    updateVoiceControlsLockState();
+    return;
+  }
+
+  if (state.ttsEngine === 'edge') {
+    const nextVoice = getEffectiveSelectedVoice();
+    if (nextVoice !== state.selectedVoiceURI) {
+      setState({ selectedVoiceURI: nextVoice });
+    }
+    const voiceSelect = document.getElementById('voice-select');
+    if (voiceSelect) voiceSelect.value = nextVoice;
+  }
+
+  updateVoiceControlsLockState();
+}
+
+function updateVoiceControlsLockState() {
+  const lock = getCurrentRFCLock();
+  const voiceSelect = document.getElementById('voice-select');
+  const engineSelect = document.getElementById('engine-select');
+  if (!voiceSelect || !engineSelect) return;
+
+  const locked = Boolean(lock);
+  voiceSelect.disabled = locked;
+  engineSelect.disabled = locked;
+
+  const lockMsg = locked
+    ? `Voice locked for RFC ${state.currentRFC?.rfcNumber}.`
+    : 'TTS voice';
+
+  voiceSelect.setAttribute('aria-label', lockMsg);
+  voiceSelect.title = lockMsg;
+  engineSelect.title = lockMsg;
 }
 
 // ── Toasts ────────────────────────────────────────────────────────────────────
@@ -949,8 +1259,23 @@ function wireEvents() {
   const engineSelect = document.getElementById('engine-select');
   if (engineSelect) {
     engineSelect.addEventListener('change', (e) => {
+      const lock = getCurrentRFCLock();
+      if (lock) {
+        engineSelect.value = lock.ttsEngine;
+        showToast(`Voice is locked for RFC ${state.currentRFC.rfcNumber}.`, 'info');
+        return;
+      }
+
       setState({ ttsEngine: e.target.value });
       populateVoices();
+
+      if (state.ttsEngine === 'edge') {
+        const nextVoice = getEffectiveSelectedVoice();
+        setState({ selectedVoiceURI: nextVoice });
+        const voiceSelect = document.getElementById('voice-select');
+        if (voiceSelect) voiceSelect.value = nextVoice;
+      }
+
       if (state.isPlaying) {
         player.stop();
         player.play(); // Restart section with new engine
@@ -965,6 +1290,12 @@ function wireEvents() {
 
   // Voice
   document.getElementById('voice-select').addEventListener('change', (e) => {
+    const lock = getCurrentRFCLock();
+    if (lock) {
+      e.target.value = lock.voiceURI;
+      showToast(`Voice is locked for RFC ${state.currentRFC.rfcNumber}.`, 'info');
+      return;
+    }
     player.setVoice(e.target.value);
   });
 
@@ -972,7 +1303,7 @@ function wireEvents() {
   document.getElementById('sections-list').addEventListener('click', (e) => {
     const item = e.target.closest('.section-nav-item');
     if (!item) return;
-    const idx = Number(item.dataset.idx);
+    const idx = Number(item.dataset.sectionIdx);
     player.jumpToSection(idx);
   });
 
@@ -980,7 +1311,7 @@ function wireEvents() {
   document.getElementById('sections-list').addEventListener('keydown', (e) => {
     if (e.code === 'Enter') {
       const item = e.target.closest('.section-nav-item');
-      if (item) player.jumpToSection(Number(item.dataset.idx));
+      if (item) player.jumpToSection(Number(item.dataset.sectionIdx));
     }
   });
 
@@ -1144,10 +1475,11 @@ async function loadRFC(rfcNumber) {
     // ── Normal text RFC ────────────────────────────────────────────────────
     setState({ currentRFC: rfc, currentSectionIdx: 0 });
     renderRFCContent(rfc);
+    syncVoiceSelectionForCurrentRFC();
 
     player.load(rfc.sections, 0);
     renderPlayerNowPlaying(rfc.sections[0]);
-    player.play(); // Auto-play the RFC when clicked
+    setState({ isPlaying: false });
     renderPlayerState();
     renderSectionProgress();
 
@@ -1183,7 +1515,10 @@ async function init() {
   document.getElementById('speed-select').value = String(state.playbackRate);
 
   // Fetch Edge voices in background, then populate UI
-  fetchEdgeVoices().then(() => populateVoices());
+  fetchEdgeVoices().then(() => {
+    syncVoiceSelectionForCurrentRFC();
+    populateVoices();
+  });
   window.speechSynthesis.onvoiceschanged = populateVoices;
 
   // Show placeholder in the player bar immediately if no RFC is in session
@@ -1199,6 +1534,7 @@ async function init() {
   // Restore previous session
   if (state.currentRFC) {
     renderRFCContent(state.currentRFC);
+    syncVoiceSelectionForCurrentRFC();
     player.load(state.currentRFC.sections, state.currentSectionIdx);
     renderPlayerNowPlaying(state.currentRFC.sections[state.currentSectionIdx] || state.currentRFC.sections[0]);
     renderPlayerState();

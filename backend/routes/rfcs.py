@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Query
 from rfc_fetcher import get_rfc_list, get_rfc_metadata, get_rfc_text, get_rfc_pdf_url
 from rfc_parser import parse_rfc
 import httpx
+from urllib.parse import quote
 
 router = APIRouter(tags=["rfcs"])
 
@@ -85,10 +86,10 @@ async def rfc_section_tts(
     Returns an MP3 audio stream that the frontend can play via <audio>.
     Audio is cached to disk — repeated requests are served instantly.
     """
-    from tts_service import synthesize
+    from tts_service import synthesize_stream, get_audio_cache_path
     from rfc_parser import parse_rfc
     from rfc_fetcher import get_rfc_text
-    from fastapi.responses import FileResponse
+    from fastapi.responses import FileResponse, StreamingResponse
 
     # Get the parsed RFC and extract the requested section
     try:
@@ -109,15 +110,135 @@ async def rfc_section_tts(
         raise HTTPException(status_code=400, detail="Section has no speakable content")
 
     try:
-        audio_path = await synthesize(text, voice)
+        cache_path = get_audio_cache_path(text, voice)
+        if cache_path:
+            return FileResponse(
+                path=str(cache_path),
+                media_type="audio/mpeg",
+                filename=f"rfc{rfc_number}_s{section_idx}.mp3",
+            )
+            
+        return StreamingResponse(
+            synthesize_stream(text, voice),
+            media_type="audio/mpeg",
+            headers={
+                "Content-Disposition": f'attachment; filename="rfc{rfc_number}_s{section_idx}.mp3"'
+            }
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"TTS synthesis error: {e}")
 
-    return FileResponse(
-        path=str(audio_path),
-        media_type="audio/mpeg",
-        filename=f"rfc{rfc_number}_s{section_idx}.mp3",
-    )
+
+@router.get("/rfc/{rfc_number}/tts/{section_idx}/boundaries")
+async def rfc_section_boundaries(
+    rfc_number: int,
+    section_idx: int,
+    voice: str = Query("", description="Edge TTS voice ID (e.g. en-US-GuyNeural)"),
+):
+    """
+    Return word boundary timing data for a given RFC section.
+
+    Each boundary contains:
+      - text: the word spoken
+      - offset: start time in milliseconds
+      - duration: word duration in milliseconds
+
+    This endpoint is called by the frontend alongside the audio request
+    to enable precise text-highlight synchronization.
+    """
+    from tts_service import synthesize
+    from rfc_parser import parse_rfc
+    from rfc_fetcher import get_rfc_text
+
+    try:
+        raw_text = await get_rfc_text(rfc_number)
+    except httpx.HTTPStatusError:
+        raise HTTPException(status_code=404, detail=f"RFC {rfc_number} not found")
+
+    parsed = parse_rfc(rfc_number, raw_text)
+    sections = parsed["sections"]
+
+    if section_idx < 0 or section_idx >= len(sections):
+        raise HTTPException(status_code=404, detail=f"Section {section_idx} not found")
+
+    section = sections[section_idx]
+    text = section["content"]
+
+    if not text or not text.strip():
+        return {"boundaries": []}
+
+    try:
+        _audio_path, boundaries = await synthesize(text, voice)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TTS synthesis error: {e}")
+
+    return {"boundaries": boundaries}
+
+
+@router.get("/rfc/{rfc_number}/tts/{section_idx}/package")
+async def rfc_section_tts_package(
+    rfc_number: int,
+    section_idx: int,
+    voice: str = Query("", description="Edge TTS voice ID (e.g. en-US-BrianMultilingualNeural)"),
+):
+    """
+    Generate (or load from cache) both audio and boundaries in a single synthesis path.
+
+    This endpoint guarantees the frontend receives word-boundary timing data that
+    corresponds to the same synthesized audio artifact.
+    """
+    from tts_service import synthesize, get_audio_cache_path
+    from rfc_parser import parse_rfc
+    from rfc_fetcher import get_rfc_text
+
+    try:
+        raw_text = await get_rfc_text(rfc_number)
+    except httpx.HTTPStatusError:
+        raise HTTPException(status_code=404, detail=f"RFC {rfc_number} not found")
+
+    parsed = parse_rfc(rfc_number, raw_text)
+    sections = parsed["sections"]
+
+    if section_idx < 0 or section_idx >= len(sections):
+        raise HTTPException(status_code=404, detail=f"Section {section_idx} not found")
+
+    section = sections[section_idx]
+    text = section["content"]
+
+    if not text or not text.strip():
+        return {
+            "audioUrl": f"/api/rfc/{rfc_number}/tts/{section_idx}",
+            "boundaries": [],
+            "fromCache": True,
+            "diagnostics": {
+                "boundariesCount": 0,
+                "textLength": 0,
+                "sectionType": section.get("type", "text"),
+            },
+        }
+
+    cache_before = get_audio_cache_path(text, voice) is not None
+
+    try:
+        _audio_path, boundaries = await synthesize(text, voice)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TTS synthesis error: {e}")
+
+    audio_url = f"/api/rfc/{rfc_number}/tts/{section_idx}"
+    if voice:
+        audio_url += f"?voice={quote(voice, safe='')}"
+
+    return {
+        "audioUrl": audio_url,
+        "boundaries": boundaries,
+        "fromCache": cache_before,
+        "diagnostics": {
+            "boundariesCount": len(boundaries),
+            "textLength": len(text),
+            "sectionType": section.get("type", "text"),
+            "voice": voice or "default",
+        },
+    }
 
 
 @router.get("/tts/voices")
