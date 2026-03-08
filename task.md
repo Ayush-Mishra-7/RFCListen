@@ -150,6 +150,7 @@
 - [x] Cross-browser TTS test: Chrome, Firefox, Edge (Web Speech API support varies)
 - [ ] Mobile browser test (Chrome on Android / Safari on iOS)
 - [x] Accessibility audit (keyboard nav, screen reader compatibility)
+- [x] Resolve pytest warnings in backend tests
 
 ---
 
