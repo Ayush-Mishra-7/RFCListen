@@ -25,7 +25,7 @@ const API_BASE = (window.location.hostname === 'localhost' || window.location.ho
   : 'https://rfclisten-api.onrender.com/api';
 const STORAGE_KEY = 'rfclisten_state';
 const RECENTS_KEY = 'rfclisten_recents';
-const MAX_RECENTS = 10;
+const MAX_RECENTS = 5;
 const DEFAULT_EDGE_VOICE_ID = 'en-US-BrianMultilingualNeural';
 
 // ── 2. State ──────────────────────────────────────────────────────────────────
@@ -66,6 +66,7 @@ function _persistState() {
       selectedVoiceURI: state.selectedVoiceURI,
       ttsEngine: state.ttsEngine || 'edge',
       rfcVoiceLocks: state.rfcVoiceLocks || {},
+      sortOrder: state.sortOrder || 'desc',
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persist));
   } catch (_) { /* ignore */ }
@@ -186,6 +187,16 @@ class Player {
       this._audio.pause();
     } else {
       window.speechSynthesis.pause();
+      // Browser TTS pause() is unreliable — retry until it actually pauses
+      let retries = 0;
+      const retryPause = setInterval(() => {
+        retries++;
+        if (!window.speechSynthesis.speaking || window.speechSynthesis.paused || retries >= 10) {
+          clearInterval(retryPause);
+          return;
+        }
+        window.speechSynthesis.pause();
+      }, 50);
     }
     setState({ isPlaying: false });
     renderPlayerState();
@@ -1513,6 +1524,12 @@ async function init() {
     engineSelect.value = state.ttsEngine;
   }
   document.getElementById('speed-select').value = String(state.playbackRate);
+
+  // Sync sort dropdown with persisted state
+  const sortSelect = document.getElementById('sort-order');
+  if (sortSelect && state.sortOrder) {
+    sortSelect.value = state.sortOrder;
+  }
 
   // Fetch Edge voices in background, then populate UI
   fetchEdgeVoices().then(() => {
