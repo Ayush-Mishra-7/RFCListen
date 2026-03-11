@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from rfc_parser import (
     _strip_page_breaks,
+    _extract_toc_sections,
     _strip_boilerplate,
     _split_into_sections,
     _normalise_prose,
@@ -79,6 +80,28 @@ class TestPageBreakStripping:
         assert _strip_page_breaks(text) == text
 
 
+class TestTOCExtraction:
+    def test_extracts_section_ids(self):
+        text = """\
+Table of Contents
+
+   1. Introduction ....................................... 1
+   2. Philosophy .......................................... 9
+   2.1.  Philosophy 2 ....................... 10
+   A. Appendix ................................. 10
+   A.1. Appendix sub ............... 11
+
+1.  Introduction
+"""
+        result = _extract_toc_sections(text)
+        assert result == {"s1", "s2", "s2_1", "sA", "sA_1"}
+        
+    def test_returns_none_if_no_toc(self):
+        text = "1. Introduction\n\n   Content."
+        assert _extract_toc_sections(text) is None
+
+
+
 class TestBoilerplateStripping:
     def test_removes_status_of_this_memo(self):
         result = _strip_boilerplate(BOILERPLATE_TEXT)
@@ -147,6 +170,8 @@ class TestFullParser:
         result = parse_rfc(793, RFC793_SNIPPET)
         full_text = " ".join(s["content"] for s in result["sections"])
         assert "Introduction ......" not in full_text
+        # Abstract (s0) should be missing because it's filtered out of sections!
+        assert not any(s["id"] == "s0" for s in result["sections"])
 
     def test_boilerplate_stripped(self):
         result = parse_rfc(793, RFC793_SNIPPET)

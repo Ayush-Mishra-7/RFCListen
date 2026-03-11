@@ -92,8 +92,20 @@ def parse_rfc(rfc_number: int, raw_text: str) -> dict:
     Parse a raw RFC plain-text string into a structured JSON-serialisable dict.
     """
     text = _strip_page_breaks(raw_text)
+    toc_ids = _extract_toc_sections(text)
     text = _strip_boilerplate(text)
     sections = _split_into_sections(text)
+
+    # If ToC is present, keep only the sections listed in the ToC.
+    if toc_ids is not None:
+        filtered_sections = []
+        for section in sections:
+            # We check if the section ID is in toc_ids.
+            # Figures and tables haven't been generated yet, so section IDs are top-level like `s1` or `s2_1`.
+            if section.id in toc_ids:
+                filtered_sections.append(section)
+        sections = filtered_sections
+
     sections = _classify_and_clean(sections)
 
     return {
@@ -111,6 +123,43 @@ def _strip_page_breaks(text: str) -> str:
     text = _RE_PAGE_FOOTER_HEADER.sub("\n", text)
     text = _RE_PAGE_FOOTER.sub("", text)
     return text
+
+
+# ── Step 1.5: Table of Contents Extraction ────────────────────────────────────
+
+def _extract_toc_sections(text: str) -> set[str] | None:
+    """
+    Finds the Table of Contents and extracts the section IDs listed within it.
+    Returns a set of section IDs (e.g. {'s1', 's2_1'}), or None if no ToC is found.
+    """
+    lines = text.splitlines()
+    toc_ids = set()
+    in_toc = False
+
+    for line in lines:
+        stripped = line.strip()
+        if not in_toc and stripped.lower() == "table of contents":
+            in_toc = True
+            continue
+        
+        if in_toc:
+            if not stripped:
+                continue
+                
+            if _BOILERPLATE_HEADINGS.match(stripped) and stripped.lower() != "table of contents":
+                break
+            
+            if _RE_SECTION_HEADING.match(line):
+                break
+            
+            # Extract section numbers. e.g. "   1. Introduction" or "   A. Appendix"
+            match = re.match(r"^\s*(?P<num>\d+(?:\.\d+)*|[A-Z](?:\.\d+)*)\.?\s+", line)
+            if match:
+                num = match.group("num")
+                toc_ids.add(f"s{num.replace('.', '_')}")
+
+    return toc_ids if toc_ids else None
+
 
 
 # ── Step 2: Boilerplate removal ───────────────────────────────────────────────
