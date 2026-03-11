@@ -6,5 +6,10 @@ __pycache__/
 *.pyc
 *.pyo
 .env
-cache/
 tests/
+
+# Exclude bulky cached files but keep the cache directory itself
+# so the build step can write rfc_index.json into it
+cache/*.txt
+cache/*.xml
+cache/tts/

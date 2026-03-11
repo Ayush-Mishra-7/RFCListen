@@ -46,9 +46,25 @@ def _load_index():
         
     index_path = CACHE_DIR / "rfc_index.json"
     if not index_path.exists():
-        # Fallback to empty list or ideally we'd trigger an index generation here,
-        # but to keep it simple we just return empty list.
-        print("Warning: rfc_index.json not found in cache. Run scripts/update_rfc_index.py")
+        # Attempt to auto-generate the index at startup
+        print("Warning: rfc_index.json not found in cache. Attempting to generate...")
+        try:
+            import subprocess, sys
+            script = Path(__file__).parent / "scripts" / "update_rfc_index.py"
+            if script.exists():
+                subprocess.run(
+                    [sys.executable, str(script)],
+                    check=True,
+                    timeout=120,
+                )
+                print("rfc_index.json generated successfully.")
+            else:
+                print(f"Index script not found at {script}")
+        except Exception as e:
+            print(f"Failed to auto-generate rfc_index.json: {e}")
+    
+    if not index_path.exists():
+        print("Error: rfc_index.json still not available. RFC list will be empty.")
         return []
         
     with open(index_path, "r", encoding="utf-8") as f:

@@ -15,7 +15,7 @@ app = FastAPI(
 )
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
-_origins_raw = os.getenv("ALLOWED_ORIGINS", "http://ayush-mishra-7.github.io,http://localhost:8080,http://127.0.0.1:8080")
+_origins_raw = os.getenv("ALLOWED_ORIGINS", "https://ayush-mishra-7.github.io,http://localhost:8080,http://127.0.0.1:8080")
 origins = [o.strip() for o in _origins_raw.split(",") if o.strip()]
 
 app.add_middleware(
