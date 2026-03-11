@@ -88,6 +88,11 @@ function loadFromStorage() {
     const recentsRaw = localStorage.getItem(RECENTS_KEY);
     if (recentsRaw) {
       state.recentRFCs = JSON.parse(recentsRaw);
+      // Trim to current MAX_RECENTS (may have been larger before)
+      if (state.recentRFCs.length > MAX_RECENTS) {
+        state.recentRFCs = state.recentRFCs.slice(0, MAX_RECENTS);
+        _persistRecents();
+      }
     }
   } catch (_) { /* ignore */ }
 }
