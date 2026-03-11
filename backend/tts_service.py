@@ -52,6 +52,14 @@ def get_audio_cache_path(text: str, voice: str = "") -> Path | None:
     return None
 
 
+def get_boundaries_cache_path(text: str, voice: str = "") -> Path | None:
+    """Return the path to the cached word-boundaries JSON if it exists."""
+    voice = voice or DEFAULT_VOICE
+    key = _cache_key(text, voice)
+    path = TTS_CACHE_DIR / f"{key}.json"
+    return path if path.exists() else None
+
+
 async def synthesize_stream(text: str, voice: str = ""):
     """
     Stream audio from Edge TTS to the client while simultaneously

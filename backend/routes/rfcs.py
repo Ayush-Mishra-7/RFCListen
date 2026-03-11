@@ -71,6 +71,14 @@ async def rfc_parsed(rfc_number: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Parser error: {e}")
 
+    # Tiered title fallback: parser → index → "RFC {number}"
+    if not parsed.get("title"):
+        meta = await get_rfc_metadata(rfc_number)
+        parsed["title"] = (
+            meta.get("title") if meta and meta.get("title")
+            else f"RFC {rfc_number}"
+        )
+
     return parsed
 
 
@@ -143,12 +151,14 @@ async def rfc_section_boundaries(
       - offset: start time in milliseconds
       - duration: word duration in milliseconds
 
-    This endpoint is called by the frontend alongside the audio request
-    to enable precise text-highlight synchronization.
+    If boundaries are already cached (from a prior synthesis), returns them
+    instantly.  If synthesis is still in progress (audio endpoint was just hit),
+    returns ``{"boundaries": [], "pending": true}`` so the frontend can retry.
     """
-    from tts_service import synthesize
+    from tts_service import get_boundaries_cache_path
     from rfc_parser import parse_rfc
     from rfc_fetcher import get_rfc_text
+    import json as _json
 
     try:
         raw_text = await get_rfc_text(rfc_number)
@@ -167,12 +177,15 @@ async def rfc_section_boundaries(
     if not text or not text.strip():
         return {"boundaries": []}
 
-    try:
-        _audio_path, boundaries = await synthesize(text, voice)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"TTS synthesis error: {e}")
+    # Fast path: return from cache without triggering synthesis
+    cached = get_boundaries_cache_path(text, voice)
+    if cached:
+        boundaries = _json.loads(cached.read_text(encoding="utf-8"))
+        return {"boundaries": boundaries}
 
-    return {"boundaries": boundaries}
+    # Not cached yet — the streaming audio endpoint is likely still
+    # synthesising.  Return empty so the frontend retries shortly.
+    return {"boundaries": [], "pending": True}
 
 
 @router.get("/rfc/{rfc_number}/tts/{section_idx}/package")

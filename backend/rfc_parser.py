@@ -441,7 +441,7 @@ def _extract_title(raw_text: str) -> str:
             stripped = line.strip()
             if len(stripped) > 10 and not _META_PATTERNS.match(stripped):
                 return stripped
-        return "Unknown Title"
+        return ""
 
     # Among centered candidates, prefer the first one (titles appear before
     # subtitles / author info lines which may be even more centered)
