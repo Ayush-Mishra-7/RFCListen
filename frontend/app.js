@@ -1276,11 +1276,37 @@ function _formatRfcDate(isoStr) {
 // ── 6. Event Wiring ───────────────────────────────────────────────────────────
 
 function wireEvents() {
+  // Mobile drawer logic
+  const overlay = document.getElementById('mobile-overlay');
+  function closeDrawers() {
+    document.body.classList.remove('sidebar-open', 'nav-open');
+    if (overlay) overlay.classList.remove('overlay-visible');
+  }
+
+  const btnMenu = document.getElementById('btn-mobile-menu');
+  if (btnMenu) {
+    btnMenu.addEventListener('click', () => {
+      document.body.classList.toggle('sidebar-open');
+      if (overlay) overlay.classList.toggle('overlay-visible', document.body.classList.contains('sidebar-open'));
+    });
+  }
+
+  const btnToc = document.getElementById('btn-mobile-toc');
+  if (btnToc) {
+    btnToc.addEventListener('click', () => {
+      document.body.classList.toggle('nav-open');
+      if (overlay) overlay.classList.toggle('overlay-visible', document.body.classList.contains('nav-open'));
+    });
+  }
+
+  if (overlay) overlay.addEventListener('click', closeDrawers);
+
   // RFC list click
   document.getElementById('rfc-list').addEventListener('click', async (e) => {
     const item = e.target.closest('.rfc-list-item');
     if (!item || item.classList.contains('skeleton-item')) return;
     const rfcNum = Number(item.dataset.rfc);
+    closeDrawers();
     await loadRFC(rfcNum);
   });
 
@@ -1288,7 +1314,10 @@ function wireEvents() {
   document.getElementById('rfc-list').addEventListener('keydown', async (e) => {
     if (e.code === 'Enter') {
       const item = e.target.closest('.rfc-list-item');
-      if (item) await loadRFC(Number(item.dataset.rfc));
+      if (item) {
+        closeDrawers();
+        await loadRFC(Number(item.dataset.rfc));
+      }
     }
   });
 
@@ -1298,6 +1327,7 @@ function wireEvents() {
     recents.addEventListener('click', async (e) => {
       const item = e.target.closest('.recent-item');
       if (!item) return;
+      closeDrawers();
       await loadRFC(Number(item.dataset.rfc));
     });
   }
@@ -1390,6 +1420,9 @@ function wireEvents() {
     const item = e.target.closest('.section-nav-item');
     if (!item) return;
     const idx = Number(item.dataset.sectionIdx);
+    document.body.classList.remove('sidebar-open', 'nav-open');
+    const overlay = document.getElementById('mobile-overlay');
+    if (overlay) overlay.classList.remove('overlay-visible');
     player.jumpToSection(idx);
   });
 
@@ -1397,7 +1430,12 @@ function wireEvents() {
   document.getElementById('sections-list').addEventListener('keydown', (e) => {
     if (e.code === 'Enter') {
       const item = e.target.closest('.section-nav-item');
-      if (item) player.jumpToSection(Number(item.dataset.sectionIdx));
+      if (item) {
+        document.body.classList.remove('sidebar-open', 'nav-open');
+        const overlay = document.getElementById('mobile-overlay');
+        if (overlay) overlay.classList.remove('overlay-visible');
+        player.jumpToSection(Number(item.dataset.sectionIdx));
+      }
     }
   });
 

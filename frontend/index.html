@@ -65,11 +65,20 @@
     <!-- Main Panel: Reader + Section Nav -->
     <main id="main-panel" aria-label="RFC Reader">
 
+      <!-- Mobile Header (Visible only on mobile) -->
+      <header id="mobile-header" class="desktop-hidden">
+        <button id="btn-mobile-menu" aria-label="Open menu">☰</button>
+        <span class="mobile-logo">📡 RFCListen</span>
+      </header>
+
       <!-- RFC Header -->
       <header id="rfc-header" class="hidden">
-        <div class="rfc-meta">
-          <span id="rfc-badge" class="badge"></span>
-          <span id="rfc-date" class="meta-date"></span>
+        <div class="rfc-meta-row">
+          <div class="rfc-meta">
+            <span id="rfc-badge" class="badge"></span>
+            <span id="rfc-date" class="meta-date"></span>
+          </div>
+          <button id="btn-mobile-toc" class="desktop-hidden" aria-label="Table of Contents">📑</button>
         </div>
         <h2 id="rfc-title"></h2>
         <p id="rfc-authors" class="authors"></p>
@@ -141,6 +150,9 @@
       </select>
     </div>
   </footer>
+
+  <!-- ── Mobile Overlay ──────────────────────────────────────────────── -->
+  <div id="mobile-overlay" aria-hidden="true"></div>
 
   <script type="module" src="app.js"></script>
   <script>
