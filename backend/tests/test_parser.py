@@ -12,6 +12,7 @@ from rfc_parser import (
     _extract_toc_sections,
     _strip_boilerplate,
     _split_into_sections,
+    _strip_rfc_metadata,
     _normalise_prose,
     parse_rfc,
 )
@@ -126,10 +127,28 @@ class TestSectionSplitting:
         assert any("Introduction" in h for h in headings)
         assert any("Background" in h for h in headings)
 
-    def test_preamble_becomes_abstract(self):
+    def test_preamble_is_discarded(self):
+        """Everything before the first numbered heading is dropped."""
         text = "Some preamble text.\n\n1.  Introduction\n\n   Body."
         sections = _split_into_sections(text)
-        assert sections[0].heading == "Abstract"
+        assert sections[0].id == "s1"
+        assert "preamble" not in sections[0].content.lower()
+
+    def test_indented_subsection_headings(self):
+        """Subsection headings indented up to 6 spaces should be detected (RFC 2328 style)."""
+        text = (
+            "1.  Introduction\n\n"
+            "   Overview paragraph.\n\n"
+            "    1.1.  Protocol overview\n\n"
+            "   Details here.\n\n"
+            "    1.2.  Definitions\n\n"
+            "   More details.\n"
+        )
+        sections = _split_into_sections(text)
+        ids = [s.id for s in sections]
+        assert "s1" in ids
+        assert "s1_1" in ids
+        assert "s1_2" in ids
 
     def test_single_section_document(self):
         text = "Just a plain document with no section headings."
@@ -179,8 +198,9 @@ class TestFullParser:
         assert "This document specifies a standard" not in full_text
 
 
-class TestAbstractPreambleCleanup:
-    def test_strips_header_metadata_before_abstract(self):
+class TestAbstractAndMetadataStripping:
+    def test_abstract_stripped_as_boilerplate(self):
+        """Abstract section should be stripped by boilerplate removal."""
         text = """\
 Internet Engineering Task Force (IETF)                      W. Eddy
 Request for Comments: 9293                                   August 2022
@@ -196,19 +216,63 @@ Abstract
    TCP is important.
 """
         result = parse_rfc(9293, text)
-        abstract_sections = [s for s in result["sections"] if s["heading"] == "Abstract"]
-        assert len(abstract_sections) == 1
-        abstract_content = abstract_sections[0]["content"]
-        # Should NOT contain header metadata
-        assert "Internet Engineering Task Force" not in abstract_content
-        assert "Request for Comments" not in abstract_content
-        # Should contain actual abstract text
-        assert "TCP protocol" in abstract_content
+        # No abstract/s0 section should be present
+        assert not any(s["id"] == "s0" for s in result["sections"])
+        full_text = " ".join(s["content"] for s in result["sections"])
+        assert "TCP protocol" not in full_text  # abstract body is stripped
+        assert "TCP is important" in full_text  # real content preserved
 
-    def test_preserves_abstract_without_heading(self):
-        """When there is no explicit 'Abstract' heading, keep the full preamble."""
+    def test_no_preamble_section_created(self):
+        """Even without explicit Abstract heading, preamble is discarded."""
         text = "Some preamble text.\n\n1.  Introduction\n\n   Body."
         sections = _split_into_sections(text)
-        assert sections[0].heading == "Abstract"
-        assert "Some preamble text" in sections[0].content
+        assert sections[0].id == "s1"
+        assert "preamble" not in sections[0].content.lower()
+
+    def test_metadata_stripped_for_sectionless_rfc(self):
+        """Old RFCs with no numbered sections should have header metadata removed."""
+        text = """\
+Network Working Group                                        S. Crocker
+Request for Comments: 1                                       7 April 1969
+
+                         Title of RFC
+
+This is the actual content.
+"""
+        sections = _split_into_sections(text)
+        assert len(sections) == 1
+        assert sections[0].id == "s0"
+        assert "Network Working Group" not in sections[0].content
+        assert "Request for Comments" not in sections[0].content
+        assert "actual content" in sections[0].content
+
+    def test_strip_rfc_metadata_function(self):
+        text = """\
+Network Working Group                                        Editor
+Request for Comments: 42
+Category: Informational
+
+                         Some Title
+
+First paragraph of real content.
+"""
+        result = _strip_rfc_metadata(text)
+        assert "Network Working Group" not in result
+        assert "Request for Comments" not in result
+        assert "First paragraph" in result
+
+    def test_preface_stripped_as_boilerplate(self):
+        """PREFACE heading should be stripped like other boilerplate."""
+        text = """\
+PREFACE
+
+This document is based on earlier editions.
+
+1.  Introduction
+
+   Content here.
+"""
+        result = _strip_boilerplate(text)
+        assert "based on earlier editions" not in result
+        assert "Content here" in result
 

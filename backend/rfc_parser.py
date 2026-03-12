@@ -61,17 +61,20 @@ _RE_PAGE_FOOTER_HEADER = re.compile(
 )
 
 # Numbered section headings: "1.  Title", "2.1.  Title", "A.  Appendix"
+# Allow up to 6 leading spaces so indented sub-section headings are captured
+# (e.g. RFC 2328 uses "    1.1.  Protocol overview").
 _RE_SECTION_HEADING = re.compile(
-    r"^(?P<num>(?:\d+\.)+\s{1,3}|[A-Z]\.\s{1,3})"  # section number
-    r"(?P<title>[A-Z][^\n]{2,})",                    # title (starts uppercase)
+    r"^\s{0,6}"                                       # optional leading indent
+    r"(?P<num>(?:\d+\.)+\s{1,3}|[A-Z]\.\s{1,3})"  # section number
+    r"(?P<title>[A-Za-z][^\n]{2,})",                  # title (starts letter)
     re.MULTILINE,
 )
 
 # Boilerplate section headings to strip entirely
 _BOILERPLATE_HEADINGS = re.compile(
     r"^(Status of [Tt]his Memo|Copyright Notice|Copyright \(C\)|"
-    r"Table of Contents|Full Copyright Statement)",
-    re.MULTILINE,
+    r"Table of Contents|Full Copyright Statement|Abstract|PREFACE)",
+    re.MULTILINE | re.IGNORECASE,
 )
 
 # ASCII diagram detection heuristic:
@@ -150,7 +153,11 @@ def _extract_toc_sections(text: str) -> set[str] | None:
                 break
             
             if _RE_SECTION_HEADING.match(line):
-                break
+                # If it's a section heading, it might be the start of the actual document body.
+                # TOC entries typically end with a page number, often preceded by dots or spaces.
+                # If it doesn't look like a TOC entry, we've left the TOC.
+                if not re.search(r'(?:\.[\s\.]*\.|\s{3,})\s*\d+\s*$', line):
+                    break
             
             # Extract section numbers. e.g. "   1. Introduction" or "   A. Appendix"
             match = re.match(r"^\s*(?P<num>\d+(?:\.\d+)*|[A-Z](?:\.\d+)*)\.?\s+", line)
@@ -179,7 +186,8 @@ def _strip_boilerplate(text: str) -> str:
             continue
         # A new numbered section heading ends skip mode
         if skip and _RE_SECTION_HEADING.match(line):
-            skip = False
+            if not re.search(r'(?:\.[\s\.]*\.|\s{3,})\s*\d+\s*$', line):
+                skip = False
         if not skip:
             result.append(line)
 
@@ -188,26 +196,59 @@ def _strip_boilerplate(text: str) -> str:
 
 # ── Step 3: Section splitting ─────────────────────────────────────────────────
 
+# Common RFC header metadata lines that appear before the first section.
+_RE_RFC_METADATA = re.compile(
+    r"^("
+    r"RFC[\s:\-]+\d|Request for Comments|Network Working Group|"
+    r"Internet Engineering Task Force|Category:|ISSN:|STD:|BCP:|"
+    r"Updates:|Obsoletes:|Status of|Copyright|"
+    r"prepared\s+for|by\s+"
+    r")",
+    re.IGNORECASE,
+)
+
+
+def _strip_rfc_metadata(text: str) -> str:
+    """
+    Remove RFC header metadata lines (Network Working Group, Request for
+    Comments, Category, etc.) from the beginning of *text*.  Stops as soon
+    as a non-metadata, non-blank line is encountered.
+    """
+    lines = text.splitlines()
+    first_content = 0
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if _RE_RFC_METADATA.match(stripped):
+            first_content = i + 1
+            continue
+        # Centered title-like short lines (highly indented) are still metadata
+        leading = len(line) - len(line.lstrip())
+        if leading >= 10 and len(stripped) < 80:
+            first_content = i + 1
+            continue
+        break
+    return "\n".join(lines[first_content:]).strip()
+
+
 def _split_into_sections(text: str) -> list[Section]:
     """
     Split the cleaned text into sections based on numbered headings.
-    Content before the first section heading becomes a preamble section.
+    Everything before the first numbered heading is discarded (preamble /
+    abstract / metadata) — the user only cares about the actual content
+    starting from section 1.
     """
     sections: list[Section] = []
     matches = list(_RE_SECTION_HEADING.finditer(text))
 
     if not matches:
         # No sections found — treat entire text as a single section
-        return [Section(id="s0", heading="RFC Content", content=text.strip())]
+        # but strip leading RFC metadata so the user doesn't hear it.
+        cleaned = _strip_rfc_metadata(text)
+        return [Section(id="s0", heading="RFC Content", content=cleaned.strip())]
 
-    # Preamble (abstract / intro before first numbered section)
-    preamble = text[: matches[0].start()].strip()
-    if preamble:
-        # Strip RFC header metadata — keep only text after "Abstract" heading
-        abstract_match = re.search(r'^Abstract\s*$', preamble, re.MULTILINE | re.IGNORECASE)
-        if abstract_match:
-            preamble = preamble[abstract_match.end():].strip()
-        sections.append(Section(id="s0", heading="Abstract", content=preamble))
+    # Skip everything before the first numbered section heading.
 
     for i, match in enumerate(matches):
         heading_num = match.group("num").strip().rstrip(".")
