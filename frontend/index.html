@@ -67,8 +67,13 @@
 
       <!-- Mobile Header (Visible only on mobile) -->
       <header id="mobile-header" class="desktop-hidden">
-        <button id="btn-mobile-menu" aria-label="Open menu">☰</button>
-        <span class="mobile-logo">📡 RFCListen</span>
+        <div class="mobile-header-left">
+          <button id="btn-mobile-menu" aria-label="Open menu">☰</button>
+          <span class="mobile-logo">📡 RFCListen</span>
+        </div>
+        <button id="btn-mobile-toc" aria-label="Table of Contents">
+          <span aria-hidden="true">📑</span> Sections
+        </button>
       </header>
 
       <!-- RFC Header -->
@@ -78,7 +83,6 @@
             <span id="rfc-badge" class="badge"></span>
             <span id="rfc-date" class="meta-date"></span>
           </div>
-          <button id="btn-mobile-toc" class="desktop-hidden" aria-label="Table of Contents">📑</button>
         </div>
         <h2 id="rfc-title"></h2>
         <p id="rfc-authors" class="authors"></p>
@@ -89,6 +93,7 @@
         <h3 class="nav-heading">Sections</h3>
         <ul id="sections-list">
           <!-- Populated by app.js -->
+          <li class="section-nav-item rfc-list-placeholder" style="cursor: default;">Select an RFC to view its table of contents.</li>
         </ul>
       </nav>
 

@@ -1047,9 +1047,15 @@ body {
 #mobile-header {
   display: none;
   align-items: center;
+  justify-content: space-between;
   padding: var(--space-3) var(--space-6);
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
+}
+
+.mobile-header-left {
+  display: flex;
+  align-items: center;
   gap: var(--space-3);
 }
 
@@ -1077,26 +1083,25 @@ body {
 #btn-mobile-menu:hover { background: var(--bg-hover); }
 
 #btn-mobile-toc {
-  display: none;
-  background: transparent;
+  background: var(--bg-elevated);
   border: 1px solid var(--border);
   color: var(--text-primary);
   font-size: var(--text-sm);
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-2) var(--space-3);
   cursor: pointer;
   border-radius: var(--radius-sm);
+  display: flex;
   align-items: center;
-  justify-content: center;
-  transition: background var(--transition);
+  gap: var(--space-2);
+  transition: background var(--transition), border-color var(--transition);
+  font-weight: 500;
 }
-#btn-mobile-toc:hover { background: var(--bg-hover); }
+#btn-mobile-toc:hover { background: var(--bg-hover); border-color: var(--accent); }
 
 .rfc-meta-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: var(--space-3);
-  gap: var(--space-3);
 }
 
 #mobile-overlay {
@@ -1139,14 +1144,21 @@ body {
     transform: translateX(100%);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: -4px 0 16px rgba(0,0,0,0.5);
+    display: block !important; /* ensure it works empty */
   }
 
   .nav-open #sections-nav {
     transform: translateX(0);
   }
 
+  #mobile-header {
+    display: flex; /* Show at <= 900px */
+  }
+  .mobile-header-left {
+    display: none; /* Hide menu+logo until <= 600px */
+  }
   #btn-mobile-toc {
-    display: flex; /* Show TOC button */
+    margin-left: auto; /* Push TOC to right when left is hidden */
   }
 
   .player-progress {
@@ -1177,8 +1189,8 @@ body {
     transform: translateX(0);
   }
 
-  #mobile-header {
-    display: flex; /* Show completely on <= 600px */
+  .mobile-header-left {
+    display: flex; /* Show menu+logo beneath 600px */
   }
 
   .player-options {
