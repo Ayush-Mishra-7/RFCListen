@@ -20,7 +20,7 @@ Output schema:
 See Agent.md for full parser specification.
 """
 import re
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import Literal
 
 # ── Data model ────────────────────────────────────────────────────────────────
@@ -36,6 +36,16 @@ class Section:
     type: SectionType = "text"
     rawAscii: str = ""
     rawTable: str = ""
+
+
+@dataclass
+class TocAnalysis:
+    start_offset: int
+    end_offset: int
+    toc_text: str
+    toc_ids: set[str] = field(default_factory=set)
+    confidence: float = 0.0
+    reason: str = ""
 
 
 # ── Regexes ───────────────────────────────────────────────────────────────────
@@ -76,12 +86,45 @@ _RE_SECTION_HEADING = re.compile(
     re.MULTILINE,
 )
 
+_RE_TOC_HEADING = re.compile(r"^\s*Table of Contents\s*$", re.IGNORECASE)
+_RE_APPENDIX_HEADING = re.compile(
+    r"^\s*Appendix\s+(?P<num>[A-Z](?:\.\d+)*)\.?\s+(?P<title>[^\n]{2,})$",
+    re.IGNORECASE,
+)
+_RE_TOC_PAGE_NUMBER = re.compile(r'(?:\.[\s\.]*\.|\s{3,})\s*\d+\s*$')
+_RE_RESIDUAL_PAGE_ARTIFACT = re.compile(
+    r"^\s*(?:RFC\s+\d+.*|.*\[Page\s+\d+\].*)\s*$",
+    re.IGNORECASE,
+)
+
 # Boilerplate section headings to strip entirely
 _BOILERPLATE_HEADINGS = re.compile(
     r"^(Status of [Tt]his Memo|Copyright Notice|Copyright \(C\)|"
     r"Table of Contents|Full Copyright Statement|Abstract|PREFACE)",
     re.MULTILINE | re.IGNORECASE,
 )
+
+_NON_TOC_BOILERPLATE_HEADINGS = re.compile(
+    r"^(Status of [Tt]his Memo|Copyright Notice|Copyright \(C\)|"
+    r"Full Copyright Statement|Abstract|PREFACE)",
+    re.MULTILINE | re.IGNORECASE,
+)
+
+_TOC_BACKMATTER_HEADINGS = {
+    "acknowledgments",
+    "acknowledgements",
+    "references",
+    "normative references",
+    "informative references",
+    "security considerations",
+    "iana considerations",
+    "authors' addresses",
+    "author's address",
+    "authors' address",
+    "footnotes",
+    "index",
+    "full copyright statement",
+}
 
 # ASCII diagram detection heuristic:
 # A line is "drawing-like" if it contains any box-drawing chars (+, |)
@@ -101,19 +144,11 @@ def parse_rfc(rfc_number: int, raw_text: str) -> dict:
     Parse a raw RFC plain-text string into a structured JSON-serialisable dict.
     """
     text = _strip_page_breaks(raw_text)
-    toc_ids = _extract_toc_sections(text)
+    toc_analysis = _analyze_toc(text)
+    if toc_analysis is not None:
+        text = _strip_span(text, toc_analysis.start_offset, toc_analysis.end_offset)
     text = _strip_boilerplate(text)
     sections = _split_into_sections(text)
-
-    # If ToC is present, keep only the sections listed in the ToC.
-    if toc_ids is not None:
-        filtered_sections = []
-        for section in sections:
-            # We check if the section ID is in toc_ids.
-            # Figures and tables haven't been generated yet, so section IDs are top-level like `s1` or `s2_1`.
-            if section.id in toc_ids:
-                filtered_sections.append(section)
-        sections = filtered_sections
 
     sections = _classify_and_clean(sections)
 
@@ -136,42 +171,214 @@ def _strip_page_breaks(text: str) -> str:
 
 # ── Step 1.5: Table of Contents Extraction ────────────────────────────────────
 
+def _strip_span(text: str, start_offset: int, end_offset: int) -> str:
+    """Remove a character span from text and normalise the join boundary."""
+    return f"{text[:start_offset].rstrip()}\n\n{text[end_offset:].lstrip()}"
+
+
+def _is_plausible_section_number(num: str) -> bool:
+    """Reject wrapped RFC numbers and similar metadata that look like headings."""
+    stripped = num.rstrip(".")
+    if not stripped:
+        return False
+    if stripped[0].isalpha():
+        return True
+    try:
+        parts = [int(part) for part in stripped.split(".") if part]
+    except ValueError:
+        return False
+    if not parts:
+        return False
+    return all(part <= 99 for part in parts)
+
+
+def _match_section_id(line: str) -> str | None:
+    match = re.match(rf"^\s*(?P<num>{_SECTION_NUMBER_PATTERN})\s+", line)
+    if not match:
+        return None
+    num = match.group("num").rstrip(".")
+    if not _is_plausible_section_number(num):
+        return None
+    return f"s{num.replace('.', '_')}"
+
+
+def _match_appendix_section_id(line: str) -> str | None:
+    match = _RE_APPENDIX_HEADING.match(line.strip())
+    if not match:
+        return None
+    num = match.group("num").rstrip(".")
+    return f"s{num.replace('.', '_')}"
+
+
+def _iter_section_heading_matches(text: str) -> list[re.Match[str]]:
+    """Return only plausible numbered-section matches from the RFC body."""
+    return [
+        match for match in _RE_SECTION_HEADING.finditer(text)
+        if _is_plausible_section_number(match.group("num"))
+    ]
+
+
+def _is_toc_backmatter_entry(line: str) -> bool:
+    stripped = line.strip().rstrip(":.").lower()
+    return stripped in _TOC_BACKMATTER_HEADINGS
+
+
+def _is_toc_continuation_line(line: str, previous_was_toc_entry: bool) -> bool:
+    if not previous_was_toc_entry:
+        return False
+    stripped = line.strip()
+    if not stripped:
+        return False
+    if _match_section_id(line) or _match_appendix_section_id(line) or _is_toc_backmatter_entry(line):
+        return False
+    if _RE_RESIDUAL_PAGE_ARTIFACT.match(stripped):
+        return False
+    if stripped.endswith((".", ";", ":", ")")):
+        return False
+    indent = len(line) - len(line.lstrip())
+    return indent >= 2 and len(stripped.split()) >= 2
+
+
+def _looks_like_body_prose(line: str) -> bool:
+    stripped = line.strip()
+    if not stripped:
+        return False
+    if _match_section_id(line) or _match_appendix_section_id(line) or _is_toc_backmatter_entry(line):
+        return False
+    if _RE_RESIDUAL_PAGE_ARTIFACT.match(stripped):
+        return False
+    word_count = len(stripped.split())
+    if word_count < 2:
+        return False
+    if not bool(re.search(r"[a-z]", stripped)):
+        return False
+    if stripped.endswith((".", ";", ":", ")")) and len(stripped) >= 10:
+        return True
+    return len(stripped) >= 32 and word_count >= 4
+
+
+def _next_nonblank_lines(lines: list[str], start_idx: int, limit: int = 3) -> list[tuple[int, str]]:
+    result = []
+    for idx in range(start_idx, len(lines)):
+        if lines[idx].strip():
+            result.append((idx, lines[idx]))
+            if len(result) >= limit:
+                break
+    return result
+
+
+def _looks_like_body_start(lines: list[str], idx: int) -> bool:
+    line = lines[idx]
+    if not (_match_section_id(line) or _match_appendix_section_id(line) or _is_toc_backmatter_entry(line)):
+        return False
+
+    look_idx = idx + 1
+    saw_blank = False
+    while look_idx < len(lines) and not lines[look_idx].strip():
+        saw_blank = True
+        look_idx += 1
+
+    if look_idx >= len(lines):
+        return True
+
+    first_following = lines[look_idx]
+    if saw_blank and not (
+        _match_section_id(first_following)
+        or _match_appendix_section_id(first_following)
+        or _is_toc_backmatter_entry(first_following)
+        or _RE_RESIDUAL_PAGE_ARTIFACT.match(first_following.strip())
+    ):
+        return True
+
+    for _, next_line in _next_nonblank_lines(lines, idx + 1, limit=3):
+        if _RE_RESIDUAL_PAGE_ARTIFACT.match(next_line.strip()):
+            continue
+        if _match_section_id(next_line) or _match_appendix_section_id(next_line) or _is_toc_backmatter_entry(next_line):
+            return False
+        if _is_toc_continuation_line(next_line, previous_was_toc_entry=True):
+            return False
+        if _looks_like_body_prose(next_line):
+            return True
+    return False
+
+
+def _analyze_toc(text: str) -> TocAnalysis | None:
+    """Find the Table of Contents block and extract any listed section IDs."""
+    lines_with_endings = text.splitlines(keepends=True)
+    if not lines_with_endings:
+        return None
+
+    lines = [line.rstrip("\r\n") for line in lines_with_endings]
+    offsets: list[int] = []
+    cursor = 0
+    for line in lines_with_endings:
+        offsets.append(cursor)
+        cursor += len(line)
+
+    toc_start_idx = None
+    for idx, line in enumerate(lines):
+        if _RE_TOC_HEADING.match(line.strip()):
+            toc_start_idx = idx
+            break
+    if toc_start_idx is None:
+        return None
+
+    toc_ids: set[str] = set()
+    toc_end_idx = toc_start_idx + 1
+    previous_was_toc_entry = False
+
+    for idx in range(toc_start_idx + 1, len(lines)):
+        line = lines[idx]
+        stripped = line.strip()
+
+        if not stripped:
+            toc_end_idx = idx + 1
+            continue
+
+        if _RE_RESIDUAL_PAGE_ARTIFACT.match(stripped):
+            toc_end_idx = idx + 1
+            continue
+
+        section_id = _match_section_id(line) or _match_appendix_section_id(line)
+        is_backmatter = _is_toc_backmatter_entry(line)
+
+        if section_id or is_backmatter:
+            if _looks_like_body_start(lines, idx):
+                break
+            if section_id:
+                toc_ids.add(section_id)
+            toc_end_idx = idx + 1
+            previous_was_toc_entry = True
+            continue
+
+        if _is_toc_continuation_line(line, previous_was_toc_entry=previous_was_toc_entry):
+            toc_end_idx = idx + 1
+            previous_was_toc_entry = True
+            continue
+
+        break
+
+    start_offset = offsets[toc_start_idx]
+    end_offset = offsets[toc_end_idx] if toc_end_idx < len(offsets) else len(text)
+    toc_text = text[start_offset:end_offset]
+    confidence = 1.0 if toc_ids else 0.6
+    reason = "detected TOC block" if toc_ids else "detected TOC heading without numbered entries"
+    return TocAnalysis(
+        start_offset=start_offset,
+        end_offset=end_offset,
+        toc_text=toc_text,
+        toc_ids=toc_ids,
+        confidence=confidence,
+        reason=reason,
+    )
+
 def _extract_toc_sections(text: str) -> set[str] | None:
     """
     Finds the Table of Contents and extracts the section IDs listed within it.
     Returns a set of section IDs (e.g. {'s1', 's2_1'}), or None if no ToC is found.
     """
-    lines = text.splitlines()
-    toc_ids = set()
-    in_toc = False
-
-    for line in lines:
-        stripped = line.strip()
-        if not in_toc and stripped.lower() == "table of contents":
-            in_toc = True
-            continue
-        
-        if in_toc:
-            if not stripped:
-                continue
-                
-            if _BOILERPLATE_HEADINGS.match(stripped) and stripped.lower() != "table of contents":
-                break
-            
-            if _RE_SECTION_HEADING.match(line):
-                # If it's a section heading, it might be the start of the actual document body.
-                # TOC entries typically end with a page number, often preceded by dots or spaces.
-                # If it doesn't look like a TOC entry, we've left the TOC.
-                if not re.search(r'(?:\.[\s\.]*\.|\s{3,})\s*\d+\s*$', line):
-                    break
-            
-            # Extract section numbers. e.g. "   1. Introduction" or "   A. Appendix"
-            match = re.match(rf"^\s*(?P<num>{_SECTION_NUMBER_PATTERN})\s+", line)
-            if match:
-                num = match.group("num").rstrip(".")
-                toc_ids.add(f"s{num.replace('.', '_')}")
-
-    return toc_ids if toc_ids else None
+    analysis = _analyze_toc(text)
+    return analysis.toc_ids if analysis and analysis.toc_ids else None
 
 
 
@@ -179,21 +386,24 @@ def _extract_toc_sections(text: str) -> set[str] | None:
 
 def _strip_boilerplate(text: str) -> str:
     """
-    Remove well-known boilerplate sections (Status of This Memo, ToC, Copyright).
-    We find the heading and consume text until the next top-level section.
+    Remove well-known boilerplate sections (Status of This Memo, Copyright,
+    Abstract, etc.). Table of Contents removal is handled by _analyze_toc.
     """
+    toc_analysis = _analyze_toc(text)
+    if toc_analysis is not None:
+        text = _strip_span(text, toc_analysis.start_offset, toc_analysis.end_offset)
+
     lines = text.splitlines()
     result = []
     skip = False
 
     for line in lines:
-        if _BOILERPLATE_HEADINGS.match(line.strip()):
+        if _NON_TOC_BOILERPLATE_HEADINGS.match(line.strip()):
             skip = True
             continue
         # A new numbered section heading ends skip mode
-        if skip and _RE_SECTION_HEADING.match(line):
-            if not re.search(r'(?:\.[\s\.]*\.|\s{3,})\s*\d+\s*$', line):
-                skip = False
+        if skip and (_match_section_id(line) or _RE_APPENDIX_HEADING.match(line.strip())):
+            skip = False
         if not skip:
             result.append(line)
 
@@ -246,7 +456,7 @@ def _split_into_sections(text: str) -> list[Section]:
     starting from section 1.
     """
     sections: list[Section] = []
-    matches = list(_RE_SECTION_HEADING.finditer(text))
+    matches = _iter_section_heading_matches(text)
 
     if not matches:
         # No sections found — treat entire text as a single section

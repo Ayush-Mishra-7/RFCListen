@@ -138,6 +138,37 @@ class TestRFC8446:
         assert len(figures) >= 1, "TLS 1.3 has protocol diagrams"
 
 
+# ── RFC 9945: Unpaginated TOC — Duplicate Heading Regression ─────────────────
+
+class TestRFC9945:
+    """RFC 9945 (IETF Community Moderation) — TOC entries omit page numbers."""
+
+    @pytest.fixture(scope="class")
+    def parsed(self):
+        return _get_parsed(9945)
+
+    def test_common_fields(self, parsed):
+        _assert_common(parsed, 9945)
+
+    def test_expected_nested_sections_exist(self, parsed):
+        headings = [s["heading"] for s in parsed["sections"] if s["type"] == "text"]
+        assert "1. Introduction" in headings
+        assert "1.1. Terminology Note" in headings
+        assert "1.2. General Philosophy" in headings
+        assert "2.1.1. Team Diversity" in headings
+
+    def test_no_duplicate_early_toc_headings(self, parsed):
+        headings = [s["heading"] for s in parsed["sections"][:12] if s["type"] == "text"]
+        assert headings.count("1. Introduction") == 1
+        assert headings.count("1.1. Terminology Note") == 1
+        assert headings.count("1.2. General Philosophy") == 1
+
+    def test_first_section_has_real_content(self, parsed):
+        first_text = next(s for s in parsed["sections"] if s["type"] == "text")
+        assert first_text["heading"] == "1. Introduction"
+        assert len(first_text["content"].split()) > 15
+
+
 # ── RFC 1149: IP over Avian Carriers — Short & Humorous ──────────────────────
 
 class TestRFC1149:
@@ -168,19 +199,19 @@ class TestRFC1149:
 class TestCrossRFC:
     """Smoke tests across all four target RFCs."""
 
-    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149])
+    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9945])
     def test_every_section_has_valid_type(self, rfc_number):
         data = _get_parsed(rfc_number)
         for section in data["sections"]:
             assert section["type"] in VALID_TYPES, \
                 f"RFC {rfc_number}: section '{section['heading']}' has invalid type '{section['type']}'"
 
-    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149])
+    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9945])
     def test_rfc_number_matches(self, rfc_number):
         data = _get_parsed(rfc_number)
         assert data["rfcNumber"] == rfc_number
 
-    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149])
+    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9945])
     def test_sections_have_required_keys(self, rfc_number):
         data = _get_parsed(rfc_number)
         required_keys = {"id", "heading", "content", "type"}

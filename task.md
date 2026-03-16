@@ -33,6 +33,7 @@
   - [x] Detect and remove "Status of This Memo" section
   - [x] Detect and remove "Copyright Notice" section
   - [x] Detect and remove "Table of Contents" section
+  - [x] Refactor TOC stripping to use a single block detector for paginated and unpaginated TOCs
 - [x] **Section detection**: Regex-match numbered section headings and record as named sections
 - [x] **Paragraph normalization**: Join soft-wrapped lines; collapse multiple blank lines
 - [x] **ASCII figure detection**: Density-based heuristic (box chars + drawing-char ratio)
@@ -59,6 +60,7 @@
   - [x] Test table detection
   - [x] Test paragraph join logic
   - [x] Add regression coverage for RFC 2328-style subsection parsing
+  - [x] Add regression coverage for RFC 9945-style unpaginated TOCs and wrapped TOC entries
 
 ### 1.3 Backend API Server (`backend/server.py`)
 - [x] Create FastAPI server with CORS middleware

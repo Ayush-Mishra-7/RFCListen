@@ -83,6 +83,74 @@ Table of Contents
         Definition details.
 """
 
+RFC9945_TOC_SNIPPET = """\
+RFC 9945                                                  February 2026
+
+                             IETF Community Moderation
+
+Table of Contents
+
+    1.  Introduction
+      1.1.  Terminology Note
+      1.2.  General Philosophy
+    2.  IETF Moderator Team
+      2.1.  Composition
+         2.1.1.  Team Diversity
+      2.2.  Training
+    8.  References
+      8.1.  Normative References
+      8.2.  Informative References
+    Appendix A.  Motivation
+      A.1.  Background
+    Appendix B.  Non-Normative Examples of Disruptive Behavior
+    Acknowledgments
+
+1.  Introduction
+
+    This memo establishes a policy for the moderation of disruptive
+    participation across the IETF's various public contribution channels.
+
+1.1.  Terminology Note
+
+    In this document, the term "administrator" refers to people assigned
+    to manage a public participation channel.
+
+1.2.  General Philosophy
+
+    The cornerstone of this policy is that individuals are responsible
+    for furthering the goals of the IETF.
+
+2.  IETF Moderator Team
+
+    This memo defines a consistent approach to moderating the IETF's
+    various public online fora.
+
+2.1.  Composition
+
+    The IESG appoints and recalls moderators.
+
+2.1.1.  Team Diversity
+
+    Due to the global nature of the IETF, the membership of this team
+    should reflect a diversity of time zones.
+"""
+
+WRAPPED_TOC_SNIPPET = """\
+Table of Contents
+
+    1.  This is a very long section heading that wraps onto
+         a continuation line in the table of contents
+    2.  Second section
+
+1.  This is a very long section heading that wraps onto
+
+    This is real body prose and not a table of contents entry.
+
+2.  Second section
+
+    More body prose.
+"""
+
 PAGE_BREAK_TEXT = "First line.\n\x0cAuthor Name\nRFC Title\nSecond line."
 
 BOILERPLATE_TEXT = """\
@@ -124,6 +192,10 @@ Table of Contents
 """
         result = _extract_toc_sections(text)
         assert result == {"s1", "s2", "s2_1", "sA", "sA_1"}
+
+    def test_extracts_unpaginated_toc_ids(self):
+        result = _extract_toc_sections(RFC9945_TOC_SNIPPET)
+        assert {"s1", "s1_1", "s1_2", "s2", "s2_1", "s2_1_1", "s2_2", "sA", "sA_1", "sB"} <= result
         
     def test_returns_none_if_no_toc(self):
         text = "1. Introduction\n\n   Content."
@@ -145,6 +217,17 @@ class TestBoilerplateStripping:
         result = _strip_boilerplate(text)
         assert "1. Intro" not in result
         assert "Content here." in result
+
+    def test_removes_unpaginated_table_of_contents(self):
+        result = _strip_boilerplate(RFC9945_TOC_SNIPPET)
+        assert "Table of Contents" not in result
+        assert "Terminology Note\n     1.2." not in result
+        assert result.count("1.1.  Terminology Note") == 1
+
+    def test_removes_wrapped_table_of_contents(self):
+        result = _strip_boilerplate(WRAPPED_TOC_SNIPPET)
+        assert "continuation line in the table of contents" not in result
+        assert "This is real body prose" in result
 
 
 class TestSectionSplitting:
@@ -246,6 +329,20 @@ class TestFullParser:
         assert "s1" in ids
         assert "s1_1" in ids
         assert "s1_2" in ids
+
+    def test_rfc9945_toc_headings_do_not_duplicate_body_sections(self):
+        result = parse_rfc(9945, RFC9945_TOC_SNIPPET)
+        headings = [s["heading"] for s in result["sections"] if s["type"] == "text"]
+        assert headings.count("1. Introduction") == 1
+        assert headings.count("1.1. Terminology Note") == 1
+        assert headings.count("1.2. General Philosophy") == 1
+        assert headings.count("2.1.1. Team Diversity") == 1
+
+    def test_rfc9945_first_section_contains_real_prose(self):
+        result = parse_rfc(9945, RFC9945_TOC_SNIPPET)
+        first_section = result["sections"][0]
+        assert first_section["heading"] == "1. Introduction"
+        assert "This memo establishes a policy" in first_section["content"]
 
 
 class TestAbstractAndMetadataStripping:
