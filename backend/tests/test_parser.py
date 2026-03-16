@@ -55,6 +55,34 @@ Table of Contents
    to fit into a layered hierarchy of protocols.
 """
 
+RFC2328_SNIPPET = """\
+RFC 2328                                                   April 1998
+
+                             OSPF Version 2
+
+Status of this Memo
+
+    This document specifies an Internet standards track protocol.
+
+Table of Contents
+
+    1        Introduction ........................................... 6
+    1.1      Protocol Overview ...................................... 6
+    1.2      Definitions of commonly used terms ..................... 8
+
+1.  Introduction
+
+    Intro text.
+
+    1.1.  Protocol overview
+
+        Overview details.
+
+    1.2  Definitions of commonly used terms
+
+        Definition details.
+"""
+
 PAGE_BREAK_TEXT = "First line.\n\x0cAuthor Name\nRFC Title\nSecond line."
 
 BOILERPLATE_TEXT = """\
@@ -150,6 +178,21 @@ class TestSectionSplitting:
         assert "s1_1" in ids
         assert "s1_2" in ids
 
+    def test_subsection_headings_without_trailing_dot(self):
+        text = (
+            "1.  Introduction\n\n"
+            "   Overview paragraph.\n\n"
+            "    1.1  Protocol overview\n\n"
+            "   Details here.\n\n"
+            "    1.2  Definitions\n\n"
+            "   More details.\n"
+        )
+        sections = _split_into_sections(text)
+        ids = [s.id for s in sections]
+        assert "s1" in ids
+        assert "s1_1" in ids
+        assert "s1_2" in ids
+
     def test_single_section_document(self):
         text = "Just a plain document with no section headings."
         sections = _split_into_sections(text)
@@ -196,6 +239,13 @@ class TestFullParser:
         result = parse_rfc(793, RFC793_SNIPPET)
         full_text = " ".join(s["content"] for s in result["sections"])
         assert "This document specifies a standard" not in full_text
+
+    def test_rfc2328_subsections_survive_toc_filtering(self):
+        result = parse_rfc(2328, RFC2328_SNIPPET)
+        ids = [s["id"] for s in result["sections"]]
+        assert "s1" in ids
+        assert "s1_1" in ids
+        assert "s1_2" in ids
 
 
 class TestAbstractAndMetadataStripping:

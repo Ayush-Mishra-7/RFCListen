@@ -51,6 +51,11 @@ _RE_PAGE_BREAK = re.compile(
 # Page footer: entire line containing [Page N] (includes author/status text)
 _RE_PAGE_FOOTER = re.compile(r"^.*\[Page\s+\d+\]\s*$", re.MULTILINE)
 
+# Shared section number pattern used by both body heading detection and
+# ToC extraction. Supports styles such as "1.", "1.1.", "1.1", "A.",
+# and "A.1".
+_SECTION_NUMBER_PATTERN = r"(?:\d+(?:\.\d+)*\.?|[A-Z](?:\.\d+)*\.?)"
+
 # Pattern-based page footer + header (no form-feed)
 # Matches: footer line with [Page N], optional blank lines, RFC header line
 _RE_PAGE_FOOTER_HEADER = re.compile(
@@ -61,11 +66,12 @@ _RE_PAGE_FOOTER_HEADER = re.compile(
 )
 
 # Numbered section headings: "1.  Title", "2.1.  Title", "A.  Appendix"
-# Allow up to 6 leading spaces so indented sub-section headings are captured
-# (e.g. RFC 2328 uses "    1.1.  Protocol overview").
+# Allow indented sub-section headings and both dotted/undotted numbering
+# variants that appear across RFC body text and tables of contents.
 _RE_SECTION_HEADING = re.compile(
-    r"^\s{0,6}"                                       # optional leading indent
-    r"(?P<num>(?:\d+\.)+\s{1,3}|[A-Z]\.\s{1,3})"  # section number
+    r"^\s{0,8}"                                       # optional leading indent
+    rf"(?P<num>{_SECTION_NUMBER_PATTERN})"             # section number
+    r"\s{1,3}"
     r"(?P<title>[A-Za-z][^\n]{2,})",                  # title (starts letter)
     re.MULTILINE,
 )
@@ -160,9 +166,9 @@ def _extract_toc_sections(text: str) -> set[str] | None:
                     break
             
             # Extract section numbers. e.g. "   1. Introduction" or "   A. Appendix"
-            match = re.match(r"^\s*(?P<num>\d+(?:\.\d+)*|[A-Z](?:\.\d+)*)\.?\s+", line)
+            match = re.match(rf"^\s*(?P<num>{_SECTION_NUMBER_PATTERN})\s+", line)
             if match:
-                num = match.group("num")
+                num = match.group("num").rstrip(".")
                 toc_ids.add(f"s{num.replace('.', '_')}")
 
     return toc_ids if toc_ids else None

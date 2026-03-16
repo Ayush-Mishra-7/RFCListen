@@ -58,6 +58,7 @@
   - [x] Test ASCII diagram detection
   - [x] Test table detection
   - [x] Test paragraph join logic
+  - [x] Add regression coverage for RFC 2328-style subsection parsing
 
 ### 1.3 Backend API Server (`backend/server.py`)
 - [x] Create FastAPI server with CORS middleware

@@ -25,7 +25,7 @@ const API_BASE = (window.location.hostname === 'localhost' || window.location.ho
   : 'https://rfclisten-api.onrender.com/api';
 const STORAGE_KEY = 'rfclisten_state';
 const RECENTS_KEY = 'rfclisten_recents';
-const MAX_RECENTS = 5;
+const MAX_RECENTS = 10;
 const DEFAULT_EDGE_VOICE_ID = 'en-US-BrianMultilingualNeural';
 
 // ── 2. State ──────────────────────────────────────────────────────────────────
@@ -66,7 +66,6 @@ function _persistState() {
       selectedVoiceURI: state.selectedVoiceURI,
       ttsEngine: state.ttsEngine || 'edge',
       rfcVoiceLocks: state.rfcVoiceLocks || {},
-      sortOrder: state.sortOrder || 'desc',
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persist));
   } catch (_) { /* ignore */ }
@@ -88,11 +87,6 @@ function loadFromStorage() {
     const recentsRaw = localStorage.getItem(RECENTS_KEY);
     if (recentsRaw) {
       state.recentRFCs = JSON.parse(recentsRaw);
-      // Trim to current MAX_RECENTS (may have been larger before)
-      if (state.recentRFCs.length > MAX_RECENTS) {
-        state.recentRFCs = state.recentRFCs.slice(0, MAX_RECENTS);
-        _persistRecents();
-      }
     }
   } catch (_) { /* ignore */ }
 }
@@ -131,7 +125,6 @@ class Player {
     this._audio = new Audio();
     this._playbackToken = 0;
     this._hasLoadedEdgeAudio = false;
-    this._prefetchCache = {};  // { sectionIdx: true } — tracks prefetched sections
     this._syncDiagnostics = {
       mode: 'none',
       sectionIdx: -1,
@@ -153,7 +146,6 @@ class Player {
     this._pauseCharIdx = 0;
     this._charOffset = 0;
     this._isPaused = false;
-    this._prefetchCache = {};
   }
 
   play() {
@@ -194,16 +186,6 @@ class Player {
       this._audio.pause();
     } else {
       window.speechSynthesis.pause();
-      // Browser TTS pause() is unreliable — retry until it actually pauses
-      let retries = 0;
-      const retryPause = setInterval(() => {
-        retries++;
-        if (!window.speechSynthesis.speaking || window.speechSynthesis.paused || retries >= 10) {
-          clearInterval(retryPause);
-          return;
-        }
-        window.speechSynthesis.pause();
-      }, 50);
     }
     setState({ isPlaying: false });
     renderPlayerState();
@@ -286,7 +268,6 @@ class Player {
     this._pauseCharIdx = 0;
     this._charOffset = 0;
     this._lastBoundaryChar = 0;
-    this._prefetchCache = {};
     clearWordHighlights();
     setState({ isPlaying: false });
   }
@@ -462,12 +443,12 @@ class Player {
         ? state.selectedVoiceURI
         : '';
 
-    // Build direct audio streaming URL and boundaries URL
-    const vParam = selectedEdgeVoice ? `?voice=${encodeURIComponent(selectedEdgeVoice)}` : '';
-    const audioUrl = `${API_BASE}/rfc/${rfcNumber}/tts/${sectionIdx}${vParam}`;
-    const boundariesUrl = `${API_BASE}/rfc/${rfcNumber}/tts/${sectionIdx}/boundaries${vParam}`;
+    let packageUrl = `${API_BASE}/rfc/${rfcNumber}/tts/${sectionIdx}/package`;
+    if (selectedEdgeVoice) {
+      packageUrl += `?voice=${encodeURIComponent(selectedEdgeVoice)}`;
+    }
 
-    // Reset word boundaries — linear fallback used until real data arrives
+    // Fetch audio+boundaries package from a single backend synthesis path.
     this._wordBoundaries = [];
     this._syncDiagnostics = {
       mode: 'loading',
@@ -478,7 +459,7 @@ class Player {
       rejectedCount: 0,
     };
 
-    // Show loading toast (dismissed when audio starts playing)
+    // Show loading toast
     let loadingToast = document.createElement('div');
     loadingToast.id = 'tts-loading';
     loadingToast.className = 'toast toast-info';
@@ -499,50 +480,13 @@ class Player {
     this._audio.addEventListener('canplay', removeLoading);
     this._audio.addEventListener('playing', removeLoading);
 
-    // 1) Point <audio>.src directly at the streaming endpoint
-    this._audio.src = audioUrl;
-    this._hasLoadedEdgeAudio = true;
-    this._audio.playbackRate = state.playbackRate;
-    this._audio.play().catch(e => {
-      removeLoading();
-      if (e.name !== 'AbortError') {
-        console.warn('Audio playback failed', e);
-        showToast('Audio failed to load. Skipping section.', 'error');
-        this._speakSection(sectionIdx + 1);
-      }
-    });
-
-    // 2) Fetch word boundaries in parallel (non-blocking)
-    this._fetchBoundariesAsync(sectionIdx, boundariesUrl, token);
-
-    // 3) Prefetch next section's audio in the background
-    this._prefetchNextSection(sectionIdx);
-  }
-
-  /**
-   * Fetch word boundary timing data for the current section.
-   * Retries up to 6 times (~3 s) if synthesis is still in progress.
-   * Once available, upgrades highlighting from linear fallback to precise.
-   */
-  _fetchBoundariesAsync(sectionIdx, url, token, retryCount = 0) {
-    const MAX_RETRIES = 6;
-    const RETRY_DELAY_MS = 500;
-
-    fetch(url)
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(data => {
+    fetch(packageUrl)
+      .then(res => res.ok ? res.json() : Promise.reject(new Error(`Package fetch failed: ${res.status}`)))
+      .then(pkg => {
         if (token !== this._playbackToken) return;
 
-        // If synthesis still in progress, retry
-        if (data.pending && retryCount < MAX_RETRIES) {
-          setTimeout(() => this._fetchBoundariesAsync(sectionIdx, url, token, retryCount + 1), RETRY_DELAY_MS);
-          return;
-        }
-
         const section = this._sectionQueue[sectionIdx];
-        const boundaries = data.boundaries || [];
-        if (!boundaries.length) return;  // nothing to upgrade
-
+        const boundaries = pkg?.boundaries || [];
         const mapped = section
           ? this._mapBoundariesToChars(section.content, boundaries)
           : { mappedBoundaries: [], stats: null };
@@ -557,65 +501,35 @@ class Player {
           rejectedCount: mapped.stats?.rejectedCount ?? 0,
         };
 
-        console.info('[RFCListen Sync] Boundaries loaded', {
-          rfcNumber: state.currentRFC?.rfcNumber,
+        console.info('[RFCListen Sync]', {
+          rfcNumber,
           sectionIdx,
           sync: this._syncDiagnostics,
-          retriesUsed: retryCount,
+          packageDiagnostics: pkg?.diagnostics || null,
+          fromCache: pkg?.fromCache,
         });
+
+        if (!pkg?.audioUrl) {
+          throw new Error('Missing audioUrl in TTS package response');
+        }
+
+        const apiOrigin = API_BASE.replace(/\/api$/, '');
+        this._audio.src = pkg.audioUrl.startsWith('http')
+          ? pkg.audioUrl
+          : `${apiOrigin}${pkg.audioUrl}`;
+        this._hasLoadedEdgeAudio = true;
+        this._audio.playbackRate = state.playbackRate;
+
+        return this._audio.play();
       })
-      .catch(() => {
-        // Silently fail — linear fallback will continue working
-        console.warn('[RFCListen] Boundaries fetch failed, using linear fallback');
+      .catch(e => {
+        removeLoading();
+        console.warn('Audio playback failed', e);
+        if (e.name !== 'AbortError') {
+          showToast('TTS package failed to load. Skipping section.', 'error');
+          this._speakSection(sectionIdx + 1);
+        }
       });
-  }
-
-  /**
-   * Prefetch the next section's audio by hitting the /package endpoint.
-   * This triggers backend synthesis + caching (audio + word boundaries)
-   * and returns only a small JSON payload (~1 KB) — the actual MP3 is NOT
-   * downloaded, it stays cached server-side for instant serving when
-   * the section starts playing.
-   */
-  _prefetchNextSection(currentIdx) {
-    const nextIdx = currentIdx + 1;
-    if (nextIdx >= this._sectionQueue.length) return;
-    if (this._prefetchCache[nextIdx]) return;  // already prefetched
-
-    const section = this._sectionQueue[nextIdx];
-    // Skip sections that will be auto-skipped during playback
-    const h = (section.heading || '').toLowerCase().trim();
-    const skip = h === 'references' || h === 'normative references' ||
-      h === 'informative references' || h.includes('appendix') ||
-      /^[a-z]\.\s/i.test(section.heading || '');
-    if (skip) {
-      // Mark as "prefetched" and try the one after
-      this._prefetchCache[nextIdx] = true;
-      this._prefetchNextSection(nextIdx);
-      return;
-    }
-
-    if (!section.content || !section.content.trim()) return;
-
-    const rfcNumber = state.currentRFC?.rfcNumber;
-    if (!rfcNumber) return;
-
-    const selectedEdgeVoice =
-      state.selectedVoiceURI && state.edgeVoices.some(v => v.id === state.selectedVoiceURI)
-        ? state.selectedVoiceURI
-        : '';
-    const vParam = selectedEdgeVoice ? `?voice=${encodeURIComponent(selectedEdgeVoice)}` : '';
-    const url = `${API_BASE}/rfc/${rfcNumber}/tts/${nextIdx}/package${vParam}`;
-
-    // Fire-and-forget GET to the /package endpoint — triggers synthesis + caching
-    // on the backend and returns a lightweight JSON response to the browser
-    fetch(url)
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(() => {
-        this._prefetchCache[nextIdx] = true;
-        console.info(`[RFCListen Prefetch] Section ${nextIdx} cached`);
-      })
-      .catch(() => {});  // Silently fail — not critical
   }
 
   _mapBoundariesToChars(content, boundaries) {
@@ -744,10 +658,10 @@ function renderRFCList(rfcs) {
       role="option"
       data-rfc="${rfc.rfcNumber}"
       tabindex="0"
-      aria-label="RFC ${rfc.rfcNumber}: ${escHtml(rfc.title || `RFC ${rfc.rfcNumber}`)}"
+      aria-label="RFC ${rfc.rfcNumber}: ${escHtml(rfc.title)}"
     >
       <span class="rfc-item-number">RFC ${rfc.rfcNumber}</span>
-      <span class="rfc-item-title">${escHtml(rfc.title || `RFC ${rfc.rfcNumber}`)}</span>
+      <span class="rfc-item-title">${escHtml(rfc.title)}</span>
       <span class="rfc-item-meta">${rfc.status && rfc.status !== 'Unknown' ? escHtml(rfc.status) : ''}${rfc.published ? (rfc.status && rfc.status !== 'Unknown' ? ' · ' : '') + _formatRfcDate(rfc.published) : ''}</span>
     </li>
   `).join('');
@@ -764,9 +678,9 @@ function renderRecentsList() {
 
   container.innerHTML = state.recentRFCs.map(r => `
     <div class="recent-item" data-rfc="${r.rfcNumber}" tabindex="0" role="button"
-         aria-label="Resume RFC ${r.rfcNumber}: ${escHtml(r.title || `RFC ${r.rfcNumber}`)}">
+         aria-label="Resume RFC ${r.rfcNumber}: ${escHtml(r.title)}">
       <span class="recent-number">RFC ${r.rfcNumber}</span>
-      <span class="recent-title">${escHtml(r.title || `RFC ${r.rfcNumber}`)}</span>
+      <span class="recent-title">${escHtml(r.title)}</span>
       <span class="recent-time">${_timeAgo(r.lastPlayed)}</span>
     </div>
   `).join('');
@@ -776,7 +690,7 @@ function renderRFCContent(rfc) {
   // Header
   document.getElementById('rfc-header').classList.remove('hidden');
   document.getElementById('rfc-badge').textContent = `RFC ${rfc.rfcNumber}`;
-  document.getElementById('rfc-title').textContent = rfc.title || `RFC ${rfc.rfcNumber}`;
+  document.getElementById('rfc-title').textContent = rfc.title;
 
   // Content
   const content = document.getElementById('rfc-content');
@@ -1276,37 +1190,11 @@ function _formatRfcDate(isoStr) {
 // ── 6. Event Wiring ───────────────────────────────────────────────────────────
 
 function wireEvents() {
-  // Mobile drawer logic
-  const overlay = document.getElementById('mobile-overlay');
-  function closeDrawers() {
-    document.body.classList.remove('sidebar-open', 'nav-open');
-    if (overlay) overlay.classList.remove('overlay-visible');
-  }
-
-  const btnMenu = document.getElementById('btn-mobile-menu');
-  if (btnMenu) {
-    btnMenu.addEventListener('click', () => {
-      document.body.classList.toggle('sidebar-open');
-      if (overlay) overlay.classList.toggle('overlay-visible', document.body.classList.contains('sidebar-open'));
-    });
-  }
-
-  const btnToc = document.getElementById('btn-mobile-toc');
-  if (btnToc) {
-    btnToc.addEventListener('click', () => {
-      document.body.classList.toggle('nav-open');
-      if (overlay) overlay.classList.toggle('overlay-visible', document.body.classList.contains('nav-open'));
-    });
-  }
-
-  if (overlay) overlay.addEventListener('click', closeDrawers);
-
   // RFC list click
   document.getElementById('rfc-list').addEventListener('click', async (e) => {
     const item = e.target.closest('.rfc-list-item');
     if (!item || item.classList.contains('skeleton-item')) return;
     const rfcNum = Number(item.dataset.rfc);
-    closeDrawers();
     await loadRFC(rfcNum);
   });
 
@@ -1314,10 +1202,7 @@ function wireEvents() {
   document.getElementById('rfc-list').addEventListener('keydown', async (e) => {
     if (e.code === 'Enter') {
       const item = e.target.closest('.rfc-list-item');
-      if (item) {
-        closeDrawers();
-        await loadRFC(Number(item.dataset.rfc));
-      }
+      if (item) await loadRFC(Number(item.dataset.rfc));
     }
   });
 
@@ -1327,7 +1212,6 @@ function wireEvents() {
     recents.addEventListener('click', async (e) => {
       const item = e.target.closest('.recent-item');
       if (!item) return;
-      closeDrawers();
       await loadRFC(Number(item.dataset.rfc));
     });
   }
@@ -1420,9 +1304,6 @@ function wireEvents() {
     const item = e.target.closest('.section-nav-item');
     if (!item) return;
     const idx = Number(item.dataset.sectionIdx);
-    document.body.classList.remove('sidebar-open', 'nav-open');
-    const overlay = document.getElementById('mobile-overlay');
-    if (overlay) overlay.classList.remove('overlay-visible');
     player.jumpToSection(idx);
   });
 
@@ -1430,12 +1311,7 @@ function wireEvents() {
   document.getElementById('sections-list').addEventListener('keydown', (e) => {
     if (e.code === 'Enter') {
       const item = e.target.closest('.section-nav-item');
-      if (item) {
-        document.body.classList.remove('sidebar-open', 'nav-open');
-        const overlay = document.getElementById('mobile-overlay');
-        if (overlay) overlay.classList.remove('overlay-visible');
-        player.jumpToSection(Number(item.dataset.sectionIdx));
-      }
+      if (item) player.jumpToSection(Number(item.dataset.sectionIdx));
     }
   });
 
@@ -1562,7 +1438,7 @@ async function loadRFC(rfcNumber) {
     if (rfc.pdfOnly) {
       setState({ currentRFC: null, currentSectionIdx: 0 });
 
-      document.getElementById('rfc-title').textContent = rfc.title || `RFC ${rfcNumber}`;
+      document.getElementById('rfc-title').textContent = rfc.title;
 
       // Render PDF-only content view
       document.getElementById('rfc-content').innerHTML = `
@@ -1616,7 +1492,7 @@ async function loadRFC(rfcNumber) {
       el.classList.toggle('active', Number(el.dataset.rfc) === rfcNumber);
     });
 
-    showToast(`Loaded RFC ${rfcNumber}: ${rfc.title || `RFC ${rfcNumber}`}`, 'success');
+    showToast(`Loaded RFC ${rfcNumber}: ${rfc.title}`, 'success');
   } catch (err) {
     console.error(err);
     showToast(`Could not load RFC ${rfcNumber}. It may not exist or the backend timed out.`);
@@ -1637,12 +1513,6 @@ async function init() {
     engineSelect.value = state.ttsEngine;
   }
   document.getElementById('speed-select').value = String(state.playbackRate);
-
-  // Sync sort dropdown with persisted state
-  const sortSelect = document.getElementById('sort-order');
-  if (sortSelect && state.sortOrder) {
-    sortSelect.value = state.sortOrder;
-  }
 
   // Fetch Edge voices in background, then populate UI
   fetchEdgeVoices().then(() => {
