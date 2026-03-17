@@ -151,6 +151,76 @@ Table of Contents
     More body prose.
 """
 
+RFC9930_TOC_SNIPPET = """\
+Table of Contents
+
+     1.  Introduction
+         1.1.  Interoperability Issues
+         1.2.  Requirements Language
+         1.3.  Terminology
+     2.  Protocol Overview
+         2.1.  Architectural Model
+         2.2.  Protocol-Layering Model
+         2.3.  Outer TLVs Versus Inner TLVs
+     3.  TEAP Protocol
+         3.1.  Version Negotiation
+         3.2.  TEAP Authentication Phase 1: Tunnel Establishment
+         3.3.  Server Certificate Requirements
+         3.4.  Server Certificate Validation
+             3.4.1.  Client Certificates Sent During Phase 1
+         3.5.  Resumption
+             3.5.1.  TLS Session Resumption Using Server State
+             3.5.2.  TLS Session Resumption Using Client State
+         3.6.  TEAP Authentication Phase 2: Tunneled Authentication
+             3.6.1.  Inner Method Ordering
+             3.6.2.  Inner EAP Authentication
+             3.6.3.  Inner Password Authentication
+             3.6.4.  EAP-MSCHAPv2
+             3.6.5.  Limitations on Inner Methods
+             3.6.6.  Protected Termination and Acknowledged Result
+                             Indication
+         3.7.  Determining Peer-Id and Server-Id
+         3.8.  TEAP Session Identifier
+     4.  Message Formats
+         4.1.  TEAP Message Format
+     9.  References
+         9.1.  Normative References
+         9.2.  Informative References
+     Appendix A.  Evaluation Against Tunnel-Based EAP Method
+                     Requirements
+     Acknowledgments
+     Contributors
+     Author's Address
+
+1.  Introduction
+
+     A tunnel-based Extensible Authentication Protocol (EAP) method is an
+     EAP method that establishes a secure tunnel and executes other EAP
+    methods under the protection of that secure tunnel.
+
+    This document also defines cryptographic derivations for use with TLS
+    1.2.  When TLS 1.3 is used, the definitions of cryptographic
+    derivations in RFC 9427 MUST be used instead of the ones given here.
+
+1.1.  Interoperability Issues
+
+     TEAP is intended to improve interoperability among tunnel-based EAP
+     deployments.
+
+1.2.  Requirements Language
+
+     The key words "MUST", "MUST NOT", and "SHOULD" in this document are
+     to be interpreted as described in BCP 14.
+
+1.3.  Terminology
+
+     This section defines the terms used throughout TEAP.
+
+2.  Protocol Overview
+
+     This section introduces the TEAP protocol model.
+"""
+
 PAGE_BREAK_TEXT = "First line.\n\x0cAuthor Name\nRFC Title\nSecond line."
 
 BOILERPLATE_TEXT = """\
@@ -196,6 +266,10 @@ Table of Contents
     def test_extracts_unpaginated_toc_ids(self):
         result = _extract_toc_sections(RFC9945_TOC_SNIPPET)
         assert {"s1", "s1_1", "s1_2", "s2", "s2_1", "s2_1_1", "s2_2", "sA", "sA_1", "sB"} <= result
+
+    def test_extracts_ids_from_rfc9930_wrapped_toc(self):
+        result = _extract_toc_sections(RFC9930_TOC_SNIPPET)
+        assert {"s1", "s1_1", "s1_2", "s1_3", "s2", "s3_6_6", "s3_7", "s4_1", "s9_2", "sA"} <= result
         
     def test_returns_none_if_no_toc(self):
         text = "1. Introduction\n\n   Content."
@@ -228,6 +302,12 @@ class TestBoilerplateStripping:
         result = _strip_boilerplate(WRAPPED_TOC_SNIPPET)
         assert "continuation line in the table of contents" not in result
         assert "This is real body prose" in result
+
+    def test_removes_rfc9930_wrapped_toc_tail(self):
+        result = _strip_boilerplate(RFC9930_TOC_SNIPPET)
+        assert "Protected Termination and Acknowledged Result" not in result
+        assert "Indication\n     3.7." not in result
+        assert result.lstrip().startswith("1.  Introduction")
 
 
 class TestSectionSplitting:
@@ -343,6 +423,27 @@ class TestFullParser:
         first_section = result["sections"][0]
         assert first_section["heading"] == "1. Introduction"
         assert "This memo establishes a policy" in first_section["content"]
+
+    def test_rfc9930_starts_at_introduction(self):
+        result = parse_rfc(9930, RFC9930_TOC_SNIPPET)
+        headings = [s["heading"] for s in result["sections"] if s["type"] == "text"]
+        assert headings[:4] == [
+            "1. Introduction",
+            "1.1. Interoperability Issues",
+            "1.2. Requirements Language",
+            "1.3. Terminology",
+        ]
+
+    def test_rfc9930_does_not_start_with_leftover_toc_tail(self):
+        result = parse_rfc(9930, RFC9930_TOC_SNIPPET)
+        first_section = next(s for s in result["sections"] if s["type"] == "text")
+        assert first_section["heading"] != "3.7. Determining Peer-Id and Server-Id"
+        assert "Indication" not in first_section["content"]
+
+    def test_inline_version_numbers_do_not_create_false_headings(self):
+        result = parse_rfc(9930, RFC9930_TOC_SNIPPET)
+        headings = [s["heading"] for s in result["sections"] if s["type"] == "text"]
+        assert not any(h.startswith("1.2. When TLS 1.3 is used") for h in headings)
 
 
 class TestAbstractAndMetadataStripping:

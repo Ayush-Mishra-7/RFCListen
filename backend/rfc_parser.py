@@ -20,6 +20,7 @@ Output schema:
 See Agent.md for full parser specification.
 """
 import re
+from bisect import bisect_right
 from dataclasses import dataclass, asdict, field
 from typing import Literal
 
@@ -64,7 +65,7 @@ _RE_PAGE_FOOTER = re.compile(r"^.*\[Page\s+\d+\]\s*$", re.MULTILINE)
 # Shared section number pattern used by both body heading detection and
 # ToC extraction. Supports styles such as "1.", "1.1.", "1.1", "A.",
 # and "A.1".
-_SECTION_NUMBER_PATTERN = r"(?:\d+(?:\.\d+)*\.?|[A-Z](?:\.\d+)*\.?)"
+_SECTION_NUMBER_PATTERN = r"(?:\d+(?:\.\d+)*\.?|[A-Z]\.|[A-Z](?:\.\d+)+\.?)"
 
 # Pattern-based page footer + header (no form-feed)
 # Matches: footer line with [Page N], optional blank lines, RFC header line
@@ -79,7 +80,7 @@ _RE_PAGE_FOOTER_HEADER = re.compile(
 # Allow indented sub-section headings and both dotted/undotted numbering
 # variants that appear across RFC body text and tables of contents.
 _RE_SECTION_HEADING = re.compile(
-    r"^\s{0,8}"                                       # optional leading indent
+    r"^[ \t]{0,8}"                                   # optional leading indent
     rf"(?P<num>{_SECTION_NUMBER_PATTERN})"             # section number
     r"\s{1,3}"
     r"(?P<title>[A-Za-z][^\n]{2,})",                  # title (starts letter)
@@ -212,15 +213,48 @@ def _match_appendix_section_id(line: str) -> str | None:
 
 def _iter_section_heading_matches(text: str) -> list[re.Match[str]]:
     """Return only plausible numbered-section matches from the RFC body."""
+    lines_with_endings = text.splitlines(keepends=True)
+    line_starts: list[int] = []
+    cursor = 0
+    for line in lines_with_endings:
+        line_starts.append(cursor)
+        cursor += len(line)
+
+    def has_blank_line_before(match_start: int) -> bool:
+        if match_start == 0:
+            return True
+        line_idx = bisect_right(line_starts, match_start) - 1
+        if line_idx <= 0:
+            return True
+        return lines_with_endings[line_idx - 1].strip() == ""
+
     return [
         match for match in _RE_SECTION_HEADING.finditer(text)
         if _is_plausible_section_number(match.group("num"))
+        and has_blank_line_before(match.start())
     ]
 
 
 def _is_toc_backmatter_entry(line: str) -> bool:
     stripped = line.strip().rstrip(":.").lower()
     return stripped in _TOC_BACKMATTER_HEADINGS
+
+
+def _looks_like_toc_title_fragment(line: str) -> bool:
+    stripped = line.strip()
+    if not stripped:
+        return False
+    if not bool(re.search(r"[A-Za-z]", stripped)):
+        return False
+    if stripped.endswith((".", ";", ":", ")")):
+        return False
+
+    words = stripped.split()
+    if len(words) >= 2:
+        return True
+
+    token = words[0]
+    return len(token) >= 4 and token[-1].isalnum()
 
 
 def _is_toc_continuation_line(line: str, previous_was_toc_entry: bool) -> bool:
@@ -233,10 +267,8 @@ def _is_toc_continuation_line(line: str, previous_was_toc_entry: bool) -> bool:
         return False
     if _RE_RESIDUAL_PAGE_ARTIFACT.match(stripped):
         return False
-    if stripped.endswith((".", ";", ":", ")")):
-        return False
     indent = len(line) - len(line.lstrip())
-    return indent >= 2 and len(stripped.split()) >= 2
+    return indent >= 2 and _looks_like_toc_title_fragment(line)
 
 
 def _looks_like_body_prose(line: str) -> bool:

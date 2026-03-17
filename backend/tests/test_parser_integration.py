@@ -169,6 +169,35 @@ class TestRFC9945:
         assert len(first_text["content"].split()) > 15
 
 
+# ── RFC 9930: Wrapped TOC Continuation Regression ───────────────────────────
+
+class TestRFC9930:
+    """RFC 9930 (TEAP) — wrapped TOC continuation must not leak into body."""
+
+    @pytest.fixture(scope="class")
+    def parsed(self):
+        return _get_parsed(9930)
+
+    def test_common_fields(self, parsed):
+        _assert_common(parsed, 9930)
+
+    def test_first_text_section_is_introduction(self, parsed):
+        first_text = next(s for s in parsed["sections"] if s["type"] == "text")
+        assert first_text["heading"] == "1. Introduction"
+
+    def test_expected_early_headings_exist(self, parsed):
+        headings = [s["heading"] for s in parsed["sections"] if s["type"] == "text"]
+        assert "1.1. Interoperability Issues" in headings
+        assert "1.2. Requirements Language" in headings
+        assert "1.3. Terminology" in headings
+        assert "2. Protocol Overview" in headings
+
+    def test_does_not_start_with_rfc9930_toc_tail(self, parsed):
+        headings = [s["heading"] for s in parsed["sections"][:8] if s["type"] == "text"]
+        assert headings[0] != "3.7. Determining Peer-Id and Server-Id"
+        assert headings.count("1. Introduction") == 1
+
+
 # ── RFC 1149: IP over Avian Carriers — Short & Humorous ──────────────────────
 
 class TestRFC1149:
@@ -199,19 +228,19 @@ class TestRFC1149:
 class TestCrossRFC:
     """Smoke tests across all four target RFCs."""
 
-    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9945])
+    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9930, 9945])
     def test_every_section_has_valid_type(self, rfc_number):
         data = _get_parsed(rfc_number)
         for section in data["sections"]:
             assert section["type"] in VALID_TYPES, \
                 f"RFC {rfc_number}: section '{section['heading']}' has invalid type '{section['type']}'"
 
-    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9945])
+    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9930, 9945])
     def test_rfc_number_matches(self, rfc_number):
         data = _get_parsed(rfc_number)
         assert data["rfcNumber"] == rfc_number
 
-    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9945])
+    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9930, 9945])
     def test_sections_have_required_keys(self, rfc_number):
         data = _get_parsed(rfc_number)
         required_keys = {"id", "heading", "content", "type"}
