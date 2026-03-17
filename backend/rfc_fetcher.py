@@ -7,6 +7,11 @@ Caches plain-text files to disk to avoid redundant network calls.
 """
 import os
 import re
+import subprocess
+import sys
+import threading
+import time
+from datetime import UTC, datetime
 import httpx
 from pathlib import Path
 from dotenv import load_dotenv
@@ -15,7 +20,15 @@ import json
 
 DATATRACKER_BASE = "https://datatracker.ietf.org"
 RFC_TEXT_BASE = "https://www.ietf.org/rfc"  # rfc-editor.org has Cloudflare bot protection
-CACHE_DIR = Path(os.getenv("RFC_CACHE_DIR", "./cache"))
+_BASE_DIR = Path(__file__).resolve().parent
+_cache_dir_raw = os.getenv("RFC_CACHE_DIR")
+CACHE_DIR = Path(_cache_dir_raw) if _cache_dir_raw else (_BASE_DIR / "cache")
+if not CACHE_DIR.is_absolute():
+    CACHE_DIR = (_BASE_DIR / CACHE_DIR).resolve()
+INDEX_MAX_AGE_SECONDS = int(os.getenv("RFC_INDEX_MAX_AGE_SECONDS", "86400"))
+INDEX_REFRESH_MIN_INTERVAL_SECONDS = int(
+    os.getenv("RFC_INDEX_REFRESH_MIN_INTERVAL_SECONDS", "3600")
+)
 
 # rfc-editor.org blocks the default httpx user-agent (403).
 _HEADERS = {
@@ -38,37 +51,174 @@ def _client(**kwargs) -> httpx.AsyncClient:
 
 
 _RFC_INDEX = None
+_RFC_INDEX_MTIME = None
+_RFC_INDEX_REFRESH_LOCK = threading.Lock()
+_RFC_INDEX_LAST_REFRESH_ATTEMPT = 0.0
+_RFC_INDEX_LAST_REFRESH_ATTEMPT_AT = None
+_RFC_INDEX_LAST_REFRESH_COMPLETED_AT = None
+_RFC_INDEX_LAST_REFRESH_ERROR = None
+
+
+def _get_index_path() -> Path:
+    return CACHE_DIR / "rfc_index.json"
+
+
+def _get_refresh_script_path() -> Path:
+    return Path(__file__).parent / "scripts" / "refresh_rfc_data.py"
+
+
+def _get_mtime(path: Path) -> float | None:
+    if not path.exists():
+        return None
+    return path.stat().st_mtime
+
+
+def _to_iso8601(timestamp: float | None) -> str | None:
+    if timestamp is None:
+        return None
+    return datetime.fromtimestamp(timestamp, tz=UTC).isoformat().replace("+00:00", "Z")
+
+
+def _is_index_stale(index_path: Path) -> bool:
+    mtime = _get_mtime(index_path)
+    if mtime is None:
+        return True
+    return (time.time() - mtime) > INDEX_MAX_AGE_SECONDS
+
+
+def _run_refresh_script(blocking: bool) -> bool:
+    global _RFC_INDEX_LAST_REFRESH_COMPLETED_AT, _RFC_INDEX_LAST_REFRESH_ERROR
+
+    script = _get_refresh_script_path()
+    if not script.exists():
+        print(f"Index refresh script not found at {script}")
+        return False
+
+    command = [sys.executable, str(script)]
+
+    if blocking:
+        try:
+            subprocess.run(command, check=True, timeout=300)
+            _RFC_INDEX_LAST_REFRESH_COMPLETED_AT = time.time()
+            _RFC_INDEX_LAST_REFRESH_ERROR = None
+        except Exception as exc:
+            _RFC_INDEX_LAST_REFRESH_ERROR = str(exc)
+            raise
+        return True
+
+    def _background_refresh() -> None:
+        global _RFC_INDEX, _RFC_INDEX_MTIME, _RFC_INDEX_LAST_REFRESH_COMPLETED_AT, _RFC_INDEX_LAST_REFRESH_ERROR
+        try:
+            subprocess.run(command, check=True, timeout=300)
+            _RFC_INDEX = None
+            _RFC_INDEX_MTIME = None
+            _RFC_INDEX_LAST_REFRESH_COMPLETED_AT = time.time()
+            _RFC_INDEX_LAST_REFRESH_ERROR = None
+            print("RFC index refresh completed in background.")
+        except Exception as exc:
+            _RFC_INDEX_LAST_REFRESH_ERROR = str(exc)
+            print(f"Background RFC index refresh failed: {exc}")
+        finally:
+            _RFC_INDEX_REFRESH_LOCK.release()
+
+    thread = threading.Thread(target=_background_refresh, daemon=True)
+    thread.start()
+    return True
+
+
+def _maybe_refresh_index(index_path: Path, blocking: bool) -> bool:
+    global _RFC_INDEX_LAST_REFRESH_ATTEMPT, _RFC_INDEX_LAST_REFRESH_ATTEMPT_AT
+
+    if not _is_index_stale(index_path):
+        return False
+
+    if blocking:
+        with _RFC_INDEX_REFRESH_LOCK:
+            _RFC_INDEX_LAST_REFRESH_ATTEMPT_AT = time.time()
+            _run_refresh_script(blocking=True)
+            _RFC_INDEX_LAST_REFRESH_ATTEMPT = time.monotonic()
+            return True
+
+    now = time.monotonic()
+    if (now - _RFC_INDEX_LAST_REFRESH_ATTEMPT) < INDEX_REFRESH_MIN_INTERVAL_SECONDS:
+        return False
+
+    if not _RFC_INDEX_REFRESH_LOCK.acquire(blocking=False):
+        return False
+
+    _RFC_INDEX_LAST_REFRESH_ATTEMPT = now
+    _RFC_INDEX_LAST_REFRESH_ATTEMPT_AT = time.time()
+    if _run_refresh_script(blocking=False):
+        return True
+
+    _RFC_INDEX_REFRESH_LOCK.release()
+    return False
+
+
+def kickoff_index_refresh() -> None:
+    """Start a background refresh when the cached RFC index is stale."""
+    index_path = _get_index_path()
+    try:
+        _maybe_refresh_index(index_path, blocking=False)
+    except Exception as exc:
+        print(f"Failed to start background RFC index refresh: {exc}")
+
+
+def get_index_status() -> dict:
+    """Return cache freshness and refresh metadata for the RFC index."""
+    index_path = _get_index_path()
+    xml_path = CACHE_DIR / "rfc_index.xml"
+    index_mtime = _get_mtime(index_path)
+    xml_mtime = _get_mtime(xml_path)
+    now = time.time()
+    age_seconds = None if index_mtime is None else max(0.0, now - index_mtime)
+
+    return {
+        "cachePath": str(index_path),
+        "xmlCachePath": str(xml_path),
+        "exists": index_path.exists(),
+        "xmlExists": xml_path.exists(),
+        "stale": _is_index_stale(index_path),
+        "ageSeconds": None if age_seconds is None else round(age_seconds, 1),
+        "maxAgeSeconds": INDEX_MAX_AGE_SECONDS,
+        "refreshIntervalSeconds": INDEX_REFRESH_MIN_INTERVAL_SECONDS,
+        "lastUpdatedAt": _to_iso8601(index_mtime),
+        "xmlLastUpdatedAt": _to_iso8601(xml_mtime),
+        "lastRefreshAttemptAt": _to_iso8601(_RFC_INDEX_LAST_REFRESH_ATTEMPT_AT),
+        "lastRefreshCompletedAt": _to_iso8601(_RFC_INDEX_LAST_REFRESH_COMPLETED_AT),
+        "refreshInProgress": _RFC_INDEX_REFRESH_LOCK.locked(),
+        "lastRefreshError": _RFC_INDEX_LAST_REFRESH_ERROR,
+    }
 
 def _load_index():
-    global _RFC_INDEX
-    if _RFC_INDEX is not None:
-        return _RFC_INDEX
-        
-    index_path = CACHE_DIR / "rfc_index.json"
+    global _RFC_INDEX, _RFC_INDEX_MTIME
+
+    index_path = _get_index_path()
+
     if not index_path.exists():
-        # Attempt to auto-generate the index at startup
         print("Warning: rfc_index.json not found in cache. Attempting to generate...")
         try:
-            import subprocess, sys
-            script = Path(__file__).parent / "scripts" / "update_rfc_index.py"
-            if script.exists():
-                subprocess.run(
-                    [sys.executable, str(script)],
-                    check=True,
-                    timeout=120,
-                )
-                print("rfc_index.json generated successfully.")
-            else:
-                print(f"Index script not found at {script}")
+            _maybe_refresh_index(index_path, blocking=True)
+            print("rfc_index.json generated successfully.")
         except Exception as e:
             print(f"Failed to auto-generate rfc_index.json: {e}")
-    
+    else:
+        try:
+            _maybe_refresh_index(index_path, blocking=False)
+        except Exception as e:
+            print(f"Failed to trigger background RFC index refresh: {e}")
+
     if not index_path.exists():
         print("Error: rfc_index.json still not available. RFC list will be empty.")
         return []
-        
+
+    current_mtime = _get_mtime(index_path)
+    if _RFC_INDEX is not None and _RFC_INDEX_MTIME == current_mtime:
+        return _RFC_INDEX
+
     with open(index_path, "r", encoding="utf-8") as f:
         _RFC_INDEX = json.load(f)
+    _RFC_INDEX_MTIME = current_mtime
     return _RFC_INDEX
 
 async def get_rfc_list(page: int = 1, limit: int = 50, search: str = "", sort: str = "desc") -> dict:

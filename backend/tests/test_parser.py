@@ -13,6 +13,7 @@ from rfc_parser import (
     _strip_boilerplate,
     _split_into_sections,
     _strip_rfc_metadata,
+    _extract_title,
     _normalise_prose,
     parse_rfc,
 )
@@ -221,6 +222,175 @@ Table of Contents
      This section introduces the TEAP protocol model.
 """
 
+RFC9901_TOC_SNIPPET = """\
+Table of Contents
+
+    9.  Security Considerations
+      9.8.  Distribution and Rotation of Issuer Signature Verification
+                Key
+      9.9.  Forwarding Credentials
+      9.10. Integrity of SD-JWTs and SD-JWT+KBs
+      9.11. Explicit Typing
+    10. Privacy Considerations
+
+1.  Introduction
+
+    This specification defines selective disclosure for JSON Web Tokens.
+
+1.1.  Feature Summary
+
+    1.  SD-JWT is a composite structure, consisting of a JWS plus
+         optional Disclosures.
+"""
+
+RFC9898_TOC_SNIPPET = """\
+Table of Contents
+
+    3.  Review of ND Mitigation Solutions
+      3.9.  Gratuitous Neighbor Discovery (GRAND)
+      3.10. Source Address Validation Improvement (SAVI) and Router
+                Advertisement Guard (RA-Guard)
+      3.11. Dealing with NCE Exhaustion Attacks per RFC 6583
+      3.12. Registering Self-Generated IPv6 Addresses Using DHCPv6 per
+                RFC 9686
+      3.13. Enhanced DAD
+    4.  Guidelines for Prevention of Potential ND Issues
+
+1.  Introduction
+
+    Neighbor Discovery (ND) specifies IPv6 node behavior on a link.
+
+    1.  LLA DAD: The host forms a Link-Local Address (LLA) and performs
+         Duplicate Address Detection.
+"""
+
+RFC9908_TOC_SNIPPET = """\
+Table of Contents
+
+     1.  Introduction
+     2.  Terminology
+     3.  CSR Attributes Handling
+         3.1.  Extensions to RFC 7030, Section 2.6
+         3.2.  Extensions to RFC 7030, Section 4.5.2
+         3.3.  Update to RFC 9148
+         3.4.  Use of CSR Templates
+     4.  Coexistence with Existing Implementations
+     5.  Examples Using the Original Approach in RFC 7030
+         5.1.  Require an RFC 8994 / ACP subjectAltName with Specific
+                     otherName
+             5.1.1.  Base64-Encoded Example
+             5.1.2.  ASN.1 DUMP Output
+     6.  Security Considerations
+
+1.  Introduction
+
+     This document updates RFC 7030 and clarifies how the Certificate
+     Signing Request (CSR) Attributes Response can be used.
+"""
+
+RFC9915_TOC_SNIPPET = """\
+Table of Contents
+
+     7.  DHCP Constants
+         7.1.  Multicast Addresses
+         7.2.  UDP Ports
+         7.3.  DHCP Message Types
+         7.4.  DHCP Option Codes
+         7.5.  Status Codes
+         7.6.  Transmission and Retransmission Parameters
+         7.7.  Representation of Time Values and \"Infinity\" as a Time
+                     Value
+     8.  Client/Server Message Formats
+     9.  Relay Agent/Server Message Formats
+         9.1.  Relay-forward Message
+         9.2.  Relay-reply Message
+     10. Representation and Use of Domain Names
+     11. DHCP Unique Identifier (DUID)
+         11.1.  DUID Contents
+         11.2.  DUID Based on Link-Layer Address Plus Time (DUID-LLT)
+         11.3.  DUID Assigned by Vendor Based on Enterprise Number
+                        (DUID-EN)
+         11.4.  DUID Based on Link-Layer Address (DUID-LL)
+         11.5.  DUID Based on Universally Unique Identifier (DUID-UUID)
+     12. Identity Association
+
+1.  Introduction
+
+     This document specifies DHCP for IPv6 (DHCPv6), a client/server
+     protocol that provides managed configuration of devices.
+"""
+
+RFC9908_TITLE_SNIPPET = """\
+Internet Engineering Task Force (IETF)                M. Richardson, Ed.
+Request for Comments: 9908                      Sandelman Software Works
+Updates: 7030, 9148                                             O. Friel
+Category: Standards Track                                          Cisco
+ISSN: 2070-1721                                            D. von Oheimb
+                                                                                      Siemens
+                                                                                  D. Harkins
+                                                                    The Industrial Lounge
+                                                                                January 2026
+
+    Clarification and Enhancement of the CSR Attributes Definition in
+                                          RFC 7030
+
+Abstract
+"""
+
+RFC9915_TITLE_SNIPPET = """\
+Internet Engineering Task Force (IETF)                      T. Mrugalski
+Request for Comments: 9915                                           ISC
+STD: 102                                                         B. Volz
+Obsoletes: 8415                                   Individual Contributor
+Category: Standards Track                                  M. Richardson
+ISSN: 2070-1721                                                      SSW
+                                                                                     S. Jiang
+                                                                                          BUPT
+                                                                                  T. Winters
+                                                                                      QA Cafe
+                                                                                January 2026
+
+            Dynamic Host Configuration Protocol for IPv6 (DHCPv6)
+
+Abstract
+"""
+
+APPENDIX_BODY_SNIPPET = """\
+1.  Introduction
+
+    Introductory content.
+
+Appendix A.  Supplementary Material
+
+    Appendix content.
+
+A.1.  Background
+
+    Background content.
+
+Appendix B.  Additional Notes
+
+    More appendix content.
+"""
+
+VISUAL_SPLIT_SNIPPET = """\
+1.  Introduction
+
+    Opening prose.
+
+    +--------+
+    | Box 1  |
+    +--------+
+
+    Middle prose.
+
+    +--------+
+    | Box 2  |
+    +--------+
+
+    Closing prose.
+"""
+
 PAGE_BREAK_TEXT = "First line.\n\x0cAuthor Name\nRFC Title\nSecond line."
 
 BOILERPLATE_TEXT = """\
@@ -270,6 +440,22 @@ Table of Contents
     def test_extracts_ids_from_rfc9930_wrapped_toc(self):
         result = _extract_toc_sections(RFC9930_TOC_SNIPPET)
         assert {"s1", "s1_1", "s1_2", "s1_3", "s2", "s3_6_6", "s3_7", "s4_1", "s9_2", "sA"} <= result
+
+    def test_extracts_ids_from_rfc9901_short_word_wrapped_toc(self):
+        result = _extract_toc_sections(RFC9901_TOC_SNIPPET)
+        assert {"s9", "s9_8", "s9_9", "s9_10", "s9_11", "s10"} <= result
+
+    def test_extracts_ids_from_rfc9898_wrapped_toc(self):
+        result = _extract_toc_sections(RFC9898_TOC_SNIPPET)
+        assert {"s3", "s3_9", "s3_10", "s3_11", "s3_12", "s3_13", "s4"} <= result
+
+    def test_extracts_ids_from_rfc9908_single_word_wrapped_toc(self):
+        result = _extract_toc_sections(RFC9908_TOC_SNIPPET)
+        assert {"s5", "s5_1", "s5_1_1", "s5_1_2", "s6"} <= result
+
+    def test_extracts_ids_from_rfc9915_punctuation_wrapped_toc(self):
+        result = _extract_toc_sections(RFC9915_TOC_SNIPPET)
+        assert {"s11", "s11_3", "s11_4", "s11_5", "s12"} <= result
         
     def test_returns_none_if_no_toc(self):
         text = "1. Introduction\n\n   Content."
@@ -307,6 +493,30 @@ class TestBoilerplateStripping:
         result = _strip_boilerplate(RFC9930_TOC_SNIPPET)
         assert "Protected Termination and Acknowledged Result" not in result
         assert "Indication\n     3.7." not in result
+        assert result.lstrip().startswith("1.  Introduction")
+
+    def test_removes_rfc9901_wrapped_toc_tail(self):
+        result = _strip_boilerplate(RFC9901_TOC_SNIPPET)
+        assert "9.9.  Forwarding Credentials" not in result
+        assert "9.10. Integrity of SD-JWTs and SD-JWT+KBs" not in result
+        assert result.lstrip().startswith("1.  Introduction")
+
+    def test_removes_rfc9898_wrapped_toc_tail(self):
+        result = _strip_boilerplate(RFC9898_TOC_SNIPPET)
+        assert "3.10. Source Address Validation Improvement (SAVI) and Router" not in result
+        assert "3.11. Dealing with NCE Exhaustion Attacks per RFC 6583" not in result
+        assert result.lstrip().startswith("1.  Introduction")
+
+    def test_removes_rfc9908_wrapped_toc_tail(self):
+        result = _strip_boilerplate(RFC9908_TOC_SNIPPET)
+        assert "5.1.1.  Base64-Encoded Example" not in result
+        assert "5.1.2.  ASN.1 DUMP Output" not in result
+        assert result.lstrip().startswith("1.  Introduction")
+
+    def test_removes_rfc9915_wrapped_toc_tail(self):
+        result = _strip_boilerplate(RFC9915_TOC_SNIPPET)
+        assert "11.4.  DUID Based on Link-Layer Address (DUID-LL)" not in result
+        assert "11.5.  DUID Based on Universally Unique Identifier (DUID-UUID)" not in result
         assert result.lstrip().startswith("1.  Introduction")
 
 
@@ -362,6 +572,31 @@ class TestSectionSplitting:
         assert len(sections) == 1
         assert sections[0].id == "s0"
 
+    def test_indented_numbered_list_items_do_not_become_headings(self):
+        text = (
+            "1.  Introduction\n\n"
+            "   Introductory text.\n\n"
+            "   1.  First step in a numbered list\n"
+            "       More detail.\n\n"
+            "   2.  Second step in a numbered list\n"
+            "       More detail.\n\n"
+            "1.1.  Details\n\n"
+            "   Section details.\n"
+        )
+        sections = _split_into_sections(text)
+        headings = [s.heading for s in sections]
+        assert headings == ["1. Introduction", "1.1. Details"]
+
+    def test_appendix_headings_become_sections(self):
+        sections = _split_into_sections(APPENDIX_BODY_SNIPPET)
+        headings = [s.heading for s in sections]
+        assert headings == [
+            "1. Introduction",
+            "A. Supplementary Material",
+            "A.1. Background",
+            "B. Additional Notes",
+        ]
+
 
 class TestProseNormalisation:
     def test_joins_wrapped_lines(self):
@@ -390,6 +625,17 @@ class TestFullParser:
         result = parse_rfc(793, RFC793_SNIPPET)
         types = [s["type"] for s in result["sections"]]
         assert "figure" in types, "Expected at least one figure section from ASCII art"
+
+    def test_split_prose_chunks_get_unique_continued_headings_and_ids(self):
+        result = parse_rfc(1, VISUAL_SPLIT_SNIPPET)
+        text_sections = [s for s in result["sections"] if s["type"] == "text"]
+        assert [s["heading"] for s in text_sections] == [
+            "1. Introduction",
+            "1. Introduction (continued)",
+            "1. Introduction (continued 2)",
+        ]
+        assert [s["id"] for s in text_sections] == ["s1", "s1_cont1", "s1_cont2"]
+        assert len({s["id"] for s in result["sections"]}) == len(result["sections"])
 
     def test_toc_stripped(self):
         result = parse_rfc(793, RFC793_SNIPPET)
@@ -440,10 +686,59 @@ class TestFullParser:
         assert first_section["heading"] != "3.7. Determining Peer-Id and Server-Id"
         assert "Indication" not in first_section["content"]
 
+    def test_rfc9901_starts_at_introduction_after_toc_strip(self):
+        result = parse_rfc(9901, RFC9901_TOC_SNIPPET)
+        first_section = next(s for s in result["sections"] if s["type"] == "text")
+        assert first_section["heading"] == "1. Introduction"
+
+    def test_rfc9898_starts_at_introduction_after_toc_strip(self):
+        result = parse_rfc(9898, RFC9898_TOC_SNIPPET)
+        first_section = next(s for s in result["sections"] if s["type"] == "text")
+        assert first_section["heading"] == "1. Introduction"
+
+    def test_rfc9908_starts_at_introduction_after_toc_strip(self):
+        result = parse_rfc(9908, RFC9908_TOC_SNIPPET)
+        first_section = next(s for s in result["sections"] if s["type"] == "text")
+        assert first_section["heading"] == "1. Introduction"
+
+    def test_rfc9915_starts_at_introduction_after_toc_strip(self):
+        result = parse_rfc(9915, RFC9915_TOC_SNIPPET)
+        first_section = next(s for s in result["sections"] if s["type"] == "text")
+        assert first_section["heading"] == "1. Introduction"
+
+    def test_rfc9901_numbered_body_list_does_not_create_false_headings(self):
+        result = parse_rfc(9901, RFC9901_TOC_SNIPPET)
+        headings = [s["heading"] for s in result["sections"] if s["type"] == "text"]
+        assert "1. SD-JWT is a composite structure, consisting of a JWS plus" not in headings
+
+    def test_rfc9898_numbered_body_list_does_not_create_false_headings(self):
+        result = parse_rfc(9898, RFC9898_TOC_SNIPPET)
+        headings = [s["heading"] for s in result["sections"] if s["type"] == "text"]
+        assert "1. LLA DAD: The host forms a Link-Local Address (LLA) and performs" not in headings
+
+    def test_rfc9908_does_not_start_with_leftover_toc_tail(self):
+        result = parse_rfc(9908, RFC9908_TOC_SNIPPET)
+        first_section = next(s for s in result["sections"] if s["type"] == "text")
+        assert first_section["heading"] != "5.1.1. Base64-Encoded Example"
+        assert "5.1.2. ASN.1 DUMP Output" not in first_section["content"]
+
+    def test_rfc9915_does_not_start_with_leftover_toc_tail(self):
+        result = parse_rfc(9915, RFC9915_TOC_SNIPPET)
+        first_section = next(s for s in result["sections"] if s["type"] == "text")
+        assert first_section["heading"] != "11.4. DUID Based on Link-Layer Address (DUID-LL)"
+        assert "11.5. DUID Based on Universally Unique Identifier (DUID-UUID)" not in first_section["content"]
+
     def test_inline_version_numbers_do_not_create_false_headings(self):
         result = parse_rfc(9930, RFC9930_TOC_SNIPPET)
         headings = [s["heading"] for s in result["sections"] if s["type"] == "text"]
         assert not any(h.startswith("1.2. When TLS 1.3 is used") for h in headings)
+
+    def test_appendix_sections_are_preserved(self):
+        result = parse_rfc(9945, APPENDIX_BODY_SNIPPET)
+        headings = [s["heading"] for s in result["sections"] if s["type"] == "text"]
+        assert "A. Supplementary Material" in headings
+        assert "A.1. Background" in headings
+        assert "B. Additional Notes" in headings
 
 
 class TestAbstractAndMetadataStripping:
@@ -523,4 +818,14 @@ This document is based on earlier editions.
         result = _strip_boilerplate(text)
         assert "based on earlier editions" not in result
         assert "Content here" in result
+
+
+class TestTitleExtraction:
+    def test_rfc9908_title_extracted_from_multiline_title_block(self):
+        result = _extract_title(RFC9908_TITLE_SNIPPET)
+        assert result == "Clarification and Enhancement of the CSR Attributes Definition in RFC 7030"
+
+    def test_rfc9915_title_extracted_without_returning_date(self):
+        result = _extract_title(RFC9915_TITLE_SNIPPET)
+        assert result == "Dynamic Host Configuration Protocol for IPv6 (DHCPv6)"
 

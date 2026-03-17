@@ -110,9 +110,30 @@ The backend is containerized with Docker and configured for [Render](https://ren
 4. Configure environment variables in the Render dashboard:
    - `PORT=3000`
    - `RFC_CACHE_DIR=/app/cache`
+   - `RFC_INDEX_MAX_AGE_SECONDS=86400`
+   - `RFC_INDEX_REFRESH_MIN_INTERVAL_SECONDS=3600`
    - `ALLOWED_ORIGINS=https://your-frontend-domain.com,http://localhost:8080`
 
 Or use the included `render.yaml` for one-click Blueprint deploy.
+
+### Scheduled RFC Refresh
+
+RFC metadata is cached locally and refreshed in two ways:
+
+1. The backend will trigger a background refresh when the local RFC index is older than `RFC_INDEX_MAX_AGE_SECONDS`.
+2. The GitHub Actions workflow at `.github/workflows/refresh-rfc-data.yml` runs daily and can also be triggered manually.
+
+To refresh all cached RFC metadata and regenerate the frontend fast-start list locally, run:
+
+```bash
+python backend/scripts/refresh_rfc_data.py
+```
+
+That script updates:
+
+1. `backend/cache/rfc_index.xml`
+2. `backend/cache/rfc_index.json`
+3. `frontend/top-rfcs.json`
 
 ### Frontend (GitHub Pages)
 
@@ -143,8 +164,20 @@ cp .env.example .env
 |----------|-------------|---------|
 | `PORT` | Backend server port | `3000` |
 | `RFC_CACHE_DIR` | Directory for cached RFC texts | `./cache` |
+| `RFC_INDEX_MAX_AGE_SECONDS` | Max age of the RFC metadata index before a background refresh starts | `86400` |
+| `RFC_INDEX_REFRESH_MIN_INTERVAL_SECONDS` | Minimum delay between automatic refresh attempts | `3600` |
 | `ALLOWED_ORIGINS` | CORS origins (comma-separated) | `http://localhost:8080` |
 | `GOOGLE_TTS_API_KEY` | (Optional) Google Cloud TTS key | — |
+
+## Cache Status Endpoints
+
+The backend now exposes RFC index cache freshness information through:
+
+1. `GET /`
+2. `GET /api/status`
+3. `GET /api/rfc-index/status`
+
+The RFC index status payload includes whether the cache is stale, when it was last updated, whether a background refresh is currently running, and the last refresh attempt/completion timestamps.
 
 ---
 

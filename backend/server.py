@@ -30,8 +30,36 @@ app.add_middleware(
 from routes import rfcs  # noqa: E402
 app.include_router(rfcs.router, prefix="/api")
 
+from rfc_fetcher import get_index_status, kickoff_index_refresh  # noqa: E402
+
+
+@app.on_event("startup")
+async def start_background_index_refresh():
+    """Kick off an RFC index refresh in the background when the cache is stale."""
+    kickoff_index_refresh()
+
 
 @app.get("/", tags=["health"])
 async def health_check():
     """Simple health check endpoint."""
-    return {"status": "ok", "service": "RFCListen API"}
+    return {
+        "status": "ok",
+        "service": "RFCListen API",
+        "rfcIndex": get_index_status(),
+    }
+
+
+@app.get("/api/status", tags=["health"])
+async def api_status():
+    """Return API health plus RFC index cache status."""
+    return {
+        "status": "ok",
+        "service": "RFCListen API",
+        "rfcIndex": get_index_status(),
+    }
+
+
+@app.get("/api/rfc-index/status", tags=["health"])
+async def rfc_index_status():
+    """Return the current RFC index cache freshness and refresh state."""
+    return get_index_status()

@@ -89,8 +89,8 @@ _RE_SECTION_HEADING = re.compile(
 
 _RE_TOC_HEADING = re.compile(r"^\s*Table of Contents\s*$", re.IGNORECASE)
 _RE_APPENDIX_HEADING = re.compile(
-    r"^\s*Appendix\s+(?P<num>[A-Z](?:\.\d+)*)\.?\s+(?P<title>[^\n]{2,})$",
-    re.IGNORECASE,
+    r"^[ \t]*Appendix\s+(?P<num>[A-Z](?:\.\d+)*)\.?\s+(?P<title>[^\n]{2,})$",
+    re.IGNORECASE | re.MULTILINE,
 )
 _RE_TOC_PAGE_NUMBER = re.compile(r'(?:\.[\s\.]*\.|\s{3,})\s*\d+\s*$')
 _RE_RESIDUAL_PAGE_ARTIFACT = re.compile(
@@ -114,6 +114,7 @@ _NON_TOC_BOILERPLATE_HEADINGS = re.compile(
 _TOC_BACKMATTER_HEADINGS = {
     "acknowledgments",
     "acknowledgements",
+    "contributors",
     "references",
     "normative references",
     "informative references",
@@ -211,6 +212,64 @@ def _match_appendix_section_id(line: str) -> str | None:
     return f"s{num.replace('.', '_')}"
 
 
+def _leading_indent(line: str) -> int:
+    return len(line) - len(line.lstrip())
+
+
+def _parse_section_path(num: str) -> tuple[int | str, ...]:
+    parts: list[int | str] = []
+    for part in num.rstrip(".").split("."):
+        if not part:
+            continue
+        if part.isdigit():
+            parts.append(int(part))
+        else:
+            parts.append(part.upper())
+    return tuple(parts)
+
+
+def _is_next_section_part(previous: int | str, current: int | str) -> bool:
+    if isinstance(previous, int) and isinstance(current, int):
+        return current == previous + 1
+    if isinstance(previous, str) and isinstance(current, str):
+        return len(previous) == 1 and len(current) == 1 and ord(current) == ord(previous) + 1
+    return False
+
+
+def _is_plausible_heading_transition(
+    previous_path: tuple[int | str, ...] | None,
+    current_path: tuple[int | str, ...],
+    indent: int,
+) -> bool:
+    if not current_path:
+        return False
+    if len(current_path) == 1 and indent > 0:
+        return False
+    if previous_path is None:
+        return True
+
+    previous_depth = len(previous_path)
+    current_depth = len(current_path)
+
+    if current_depth == previous_depth + 1:
+        return current_path[:-1] == previous_path and current_path[-1] == 1
+
+    max_shared_depth = min(previous_depth, current_depth)
+    for shared_depth in range(max_shared_depth, 0, -1):
+        if previous_path[:shared_depth - 1] != current_path[:shared_depth - 1]:
+            continue
+        if not _is_next_section_part(previous_path[shared_depth - 1], current_path[shared_depth - 1]):
+            continue
+        if current_depth != shared_depth:
+            continue
+        return True
+
+    if isinstance(previous_path[0], int) and isinstance(current_path[0], str):
+        return current_path == ("A",)
+
+    return False
+
+
 def _iter_section_heading_matches(text: str) -> list[re.Match[str]]:
     """Return only plausible numbered-section matches from the RFC body."""
     lines_with_endings = text.splitlines(keepends=True)
@@ -228,11 +287,26 @@ def _iter_section_heading_matches(text: str) -> list[re.Match[str]]:
             return True
         return lines_with_endings[line_idx - 1].strip() == ""
 
-    return [
-        match for match in _RE_SECTION_HEADING.finditer(text)
-        if _is_plausible_section_number(match.group("num"))
-        and has_blank_line_before(match.start())
-    ]
+    matches: list[re.Match[str]] = []
+    previous_path: tuple[int | str, ...] | None = None
+
+    for match in _RE_SECTION_HEADING.finditer(text):
+        num = match.group("num")
+        if not _is_plausible_section_number(num):
+            continue
+        if not has_blank_line_before(match.start()):
+            continue
+
+        line_idx = bisect_right(line_starts, match.start()) - 1
+        indent = _leading_indent(lines_with_endings[line_idx]) if line_idx >= 0 else 0
+        current_path = _parse_section_path(num)
+        if not _is_plausible_heading_transition(previous_path, current_path, indent):
+            continue
+
+        matches.append(match)
+        previous_path = current_path
+
+    return matches
 
 
 def _is_toc_backmatter_entry(line: str) -> bool:
@@ -246,18 +320,25 @@ def _looks_like_toc_title_fragment(line: str) -> bool:
         return False
     if not bool(re.search(r"[A-Za-z]", stripped)):
         return False
-    if stripped.endswith((".", ";", ":", ")")):
+    if stripped.endswith((".", ";", ":")):
         return False
 
     words = stripped.split()
     if len(words) >= 2:
         return True
 
-    token = words[0]
-    return len(token) >= 4 and token[-1].isalnum()
+    token = words[0].strip("([{<'\"")
+    token = token.rstrip(")]}>,'\"")
+    if len(token) < 3:
+        return False
+    return token[0].isalpha()
 
 
-def _is_toc_continuation_line(line: str, previous_was_toc_entry: bool) -> bool:
+def _is_toc_continuation_line(
+    line: str,
+    previous_was_toc_entry: bool,
+    previous_entry_indent: int | None = None,
+) -> bool:
     if not previous_was_toc_entry:
         return False
     stripped = line.strip()
@@ -267,8 +348,12 @@ def _is_toc_continuation_line(line: str, previous_was_toc_entry: bool) -> bool:
         return False
     if _RE_RESIDUAL_PAGE_ARTIFACT.match(stripped):
         return False
-    indent = len(line) - len(line.lstrip())
-    return indent >= 2 and _looks_like_toc_title_fragment(line)
+    indent = _leading_indent(line)
+    if indent < 2:
+        return False
+    if previous_entry_indent is not None and indent < previous_entry_indent + 4:
+        return False
+    return _looks_like_toc_title_fragment(line)
 
 
 def _looks_like_body_prose(line: str) -> bool:
@@ -303,6 +388,7 @@ def _looks_like_body_start(lines: list[str], idx: int) -> bool:
     line = lines[idx]
     if not (_match_section_id(line) or _match_appendix_section_id(line) or _is_toc_backmatter_entry(line)):
         return False
+    entry_indent = _leading_indent(line)
 
     look_idx = idx + 1
     saw_blank = False
@@ -327,7 +413,11 @@ def _looks_like_body_start(lines: list[str], idx: int) -> bool:
             continue
         if _match_section_id(next_line) or _match_appendix_section_id(next_line) or _is_toc_backmatter_entry(next_line):
             return False
-        if _is_toc_continuation_line(next_line, previous_was_toc_entry=True):
+        if _is_toc_continuation_line(
+            next_line,
+            previous_was_toc_entry=True,
+            previous_entry_indent=entry_indent,
+        ):
             return False
         if _looks_like_body_prose(next_line):
             return True
@@ -358,6 +448,7 @@ def _analyze_toc(text: str) -> TocAnalysis | None:
     toc_ids: set[str] = set()
     toc_end_idx = toc_start_idx + 1
     previous_was_toc_entry = False
+    previous_entry_indent: int | None = None
 
     for idx in range(toc_start_idx + 1, len(lines)):
         line = lines[idx]
@@ -381,9 +472,14 @@ def _analyze_toc(text: str) -> TocAnalysis | None:
                 toc_ids.add(section_id)
             toc_end_idx = idx + 1
             previous_was_toc_entry = True
+            previous_entry_indent = _leading_indent(line)
             continue
 
-        if _is_toc_continuation_line(line, previous_was_toc_entry=previous_was_toc_entry):
+        if _is_toc_continuation_line(
+            line,
+            previous_was_toc_entry=previous_was_toc_entry,
+            previous_entry_indent=previous_entry_indent,
+        ):
             toc_end_idx = idx + 1
             previous_was_toc_entry = True
             continue
@@ -488,7 +584,7 @@ def _split_into_sections(text: str) -> list[Section]:
     starting from section 1.
     """
     sections: list[Section] = []
-    matches = _iter_section_heading_matches(text)
+    matches = _iter_body_heading_matches(text)
 
     if not matches:
         # No sections found — treat entire text as a single section
@@ -499,18 +595,63 @@ def _split_into_sections(text: str) -> list[Section]:
     # Skip everything before the first numbered section heading.
 
     for i, match in enumerate(matches):
-        heading_num = match.group("num").strip().rstrip(".")
-        heading_title = match.group("title").strip()
+        heading_num = match[2].strip().rstrip(".")
+        heading_title = match[3].strip()
         heading = f"{heading_num}. {heading_title}"
 
-        start = match.end()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        start = match[1]
+        end = matches[i + 1][0] if i + 1 < len(matches) else len(text)
         content = text[start:end].strip()
 
         section_id = f"s{heading_num.replace('.', '_')}"
         sections.append(Section(id=section_id, heading=heading, content=content))
 
     return sections
+
+
+def _iter_body_heading_matches(text: str) -> list[tuple[int, int, str, str]]:
+    """Return plausible body headings including appendix headings."""
+    lines_with_endings = text.splitlines(keepends=True)
+    line_starts: list[int] = []
+    cursor = 0
+    for line in lines_with_endings:
+        line_starts.append(cursor)
+        cursor += len(line)
+
+    def has_blank_line_before(match_start: int) -> bool:
+        if match_start == 0:
+            return True
+        line_idx = bisect_right(line_starts, match_start) - 1
+        if line_idx <= 0:
+            return True
+        return lines_with_endings[line_idx - 1].strip() == ""
+
+    candidates: list[tuple[int, int, str, str]] = []
+    for match in _RE_SECTION_HEADING.finditer(text):
+        candidates.append((match.start(), match.end(), match.group("num"), match.group("title")))
+    for match in _RE_APPENDIX_HEADING.finditer(text):
+        candidates.append((match.start(), match.end(), match.group("num"), match.group("title")))
+    candidates.sort(key=lambda item: item[0])
+
+    matches: list[tuple[int, int, str, str]] = []
+    previous_path: tuple[int | str, ...] | None = None
+
+    for start, end, num, title in candidates:
+        if not _is_plausible_section_number(num):
+            continue
+        if not has_blank_line_before(start):
+            continue
+
+        line_idx = bisect_right(line_starts, start) - 1
+        indent = _leading_indent(lines_with_endings[line_idx]) if line_idx >= 0 else 0
+        current_path = _parse_section_path(num)
+        if not _is_plausible_heading_transition(previous_path, current_path, indent):
+            continue
+
+        matches.append((start, end, num, title))
+        previous_path = current_path
+
+    return matches
 
 
 # ── Step 4: Classify figures / tables; normalise paragraphs ──────────────────
@@ -543,7 +684,16 @@ def _extract_visual_blocks(
     lines = section.content.splitlines()
     sub = []
     current_prose: list[str] = []
+    prose_chunk_index = 0
     i = 0
+
+    def flush_current_prose() -> None:
+        nonlocal current_prose, prose_chunk_index
+        if not current_prose:
+            return
+        sub.append(_prose_section(section, "\n".join(current_prose), prose_chunk_index))
+        prose_chunk_index += 1
+        current_prose = []
 
     while i < len(lines):
         line = lines[i]
@@ -554,9 +704,7 @@ def _extract_visual_blocks(
             if len(block) >= 3:
                 fig_count += 1
                 # Flush prose so far
-                if current_prose:
-                    sub.append(_prose_section(section, "\n".join(current_prose)))
-                    current_prose = []
+                flush_current_prose()
                 raw = "\n".join(block)
                 announcement = (
                     f"[Figure {fig_count} — refer to the application to view this diagram]"
@@ -578,9 +726,7 @@ def _extract_visual_blocks(
             block, i = _consume_block(lines, i, lambda l: bool(_TABLE_LINE.match(l)))
             if len(block) >= 3:
                 tbl_count += 1
-                if current_prose:
-                    sub.append(_prose_section(section, "\n".join(current_prose)))
-                    current_prose = []
+                flush_current_prose()
                 raw = "\n".join(block)
                 announcement = (
                     f"[Table {tbl_count} — refer to the application to view this table]"
@@ -601,8 +747,7 @@ def _extract_visual_blocks(
         i += 1
 
     # Flush remaining prose
-    if current_prose:
-        sub.append(_prose_section(section, "\n".join(current_prose)))
+    flush_current_prose()
 
     # If nothing was split out, return the cleaned original section
     if not sub:
@@ -648,11 +793,20 @@ def _consume_block(
     return block, i
 
 
-def _prose_section(parent: Section, content: str) -> Section:
+def _prose_section(parent: Section, content: str, prose_chunk_index: int = 0) -> Section:
     """Create a prose sub-section inheriting metadata from the parent."""
+    if prose_chunk_index == 0:
+        section_id = parent.id
+        heading = parent.heading
+    else:
+        section_id = f"{parent.id}_cont{prose_chunk_index}"
+        if prose_chunk_index == 1:
+            heading = f"{parent.heading} (continued)"
+        else:
+            heading = f"{parent.heading} (continued {prose_chunk_index})"
     return Section(
-        id=parent.id,
-        heading=parent.heading,
+        id=section_id,
+        heading=heading,
         content=_normalise_prose(content),
         type="text",
     )
@@ -752,40 +906,76 @@ def _extract_title(raw_text: str) -> str:
     """
     _META_PATTERNS = re.compile(
         r"^("
-        r"RFC[\s:]+\d|Request for Comments|Network Working Group|"
+        r"RFC\s+\d+\b.*\d{4}$|Request for Comments|Network Working Group|"
         r"Internet Engineering Task Force|Category:|ISSN:|STD:|BCP:|"
         r"Updates:|Obsoletes:|Status of|Copyright|"
         r"prepared\s+for|by\s+|"
-        r"\w+\s+\w+\s+\d{4}$"  # "Author Name  Month YYYY"
+        r"(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}$"
         r")",
         re.IGNORECASE,
     )
-    candidates = []
-    for line in raw_text.splitlines()[:25]:
+    heading_markers = {"abstract", "status of this memo", "table of contents", "copyright notice"}
+    lines = raw_text.splitlines()[:40]
+    cutoff = len(lines)
+    for idx, line in enumerate(lines):
+        if line.strip().lower() in heading_markers:
+            cutoff = idx
+            break
+
+    blocks: list[list[tuple[str, int]]] = []
+    current_block: list[tuple[str, int]] = []
+    for line in lines[:cutoff]:
         stripped = line.strip()
-        if not stripped or len(stripped) < 8:
+        if not stripped:
+            if current_block:
+                blocks.append(current_block)
+                current_block = []
             continue
         if _META_PATTERNS.match(stripped):
+            if current_block:
+                blocks.append(current_block)
+                current_block = []
             continue
-        # Compute "centeredness" — highly indented lines are likely titles
-        leading = len(line) - len(line.lstrip())
-        # Only consider reasonably indented lines (likely centered titles)
-        if leading >= 10:
-            candidates.append((leading, stripped))
+        current_block.append((stripped, len(line) - len(line.lstrip())))
+    if current_block:
+        blocks.append(current_block)
 
-    if not candidates:
-        # Fallback: first long non-metadata line in the first 30 lines
-        for line in raw_text.splitlines()[:30]:
-            stripped = line.strip()
-            if len(stripped) > 10 and not _META_PATTERNS.match(stripped):
-                return stripped
-        return ""
+    def score_block(block: list[tuple[str, int]]) -> tuple[int, int, int]:
+        text_parts = [text for text, _ in block]
+        full_text = " ".join(text_parts)
+        total_length = sum(len(text) for text in text_parts)
+        max_length = max((len(text) for text in text_parts), default=0)
+        avg_indent = sum(indent for _, indent in block) // len(block)
+        short_indented_lines = sum(
+            1
+            for text, indent in block
+            if indent >= 20 and len(text.split()) <= 4 and len(text) <= 30
+        )
+        has_date = any(_META_PATTERNS.match(text) for text in text_parts)
+        score = total_length
+        if max_length >= 30:
+            score += 15
+        if len(block) <= 3:
+            score += 8
+        if avg_indent >= 3:
+            score += 6
+        if re.search(r"[a-z]", full_text):
+            score += 10
+        score -= short_indented_lines * 12
+        if has_date:
+            score -= 20
+        return score, max_length, -len(block)
 
-    # Among centered candidates, prefer the first one (titles appear before
-    # subtitles / author info lines which may be even more centered)
-    for _, text in candidates:
-        if len(text) > 10:
-            return text
-    return candidates[0][1]
+    if blocks:
+        best_block = max(blocks, key=score_block)
+        best_text = " ".join(text for text, _ in best_block).strip()
+        if len(best_text) > 10:
+            return best_text
+
+    for line in raw_text.splitlines()[:30]:
+        stripped = line.strip()
+        if len(stripped) > 10 and not _META_PATTERNS.match(stripped):
+            return stripped
+    return ""
 
 

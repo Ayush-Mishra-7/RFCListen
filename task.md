@@ -26,6 +26,7 @@
 - [x] Implement `getRFCText(rfcNumber)` — fetch plain text from rfc-editor.org
 - [x] Add filesystem cache (`./cache/rfcXXXX.txt`) to avoid redundant fetches
 - [x] Handle error cases: RFC not found (404), network timeout, malformed response
+- [x] Add stale-index mitigation with automatic background refresh and a daily refresh script for RFC metadata/static list generation
 
 ### 1.2 RFC Parser (`backend/rfc_parser.py`)
 - [x] **Page break cleanup**: Strip repeated page headers/footers (`[Page N]`)
@@ -67,6 +68,7 @@
 - [x] `GET /api/rfcs?page=1&limit=50&search=` — RFC list with search/filter
 - [x] `GET /api/rfc/:number/metadata` — RFC metadata
 - [x] `GET /api/rfc/:number/parsed` — Parsed RFC JSON
+- [x] Add RFC index cache health/status endpoints for freshness and refresh visibility
 - [x] Add CORS headers for frontend dev server
 - [x] `tts_service.py` — TTS abstraction layer (Cloud TTS hook ready)
 

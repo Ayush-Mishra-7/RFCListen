@@ -3,7 +3,6 @@ import json
 import os
 from pathlib import Path
 
-# Important: Run this script from the backend directory
 import sys
 BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BACKEND_DIR)
@@ -14,7 +13,7 @@ FRONTEND_DIR = Path(BACKEND_DIR).parent / "frontend"
 OUTPUT_FILE = FRONTEND_DIR / "top-rfcs.json"
 
 async def generate_static_json():
-    print("Fetching top 50 RFCs from IETF Datatracker...")
+    print("Generating top 50 RFCs from the local RFC index cache...")
     try:
         # Fetch page 1, 50 limits (the default for the UI)
         data = await get_rfc_list(page=1, limit=50)

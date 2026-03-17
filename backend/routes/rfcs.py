@@ -71,6 +71,11 @@ async def rfc_parsed(rfc_number: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Parser error: {e}")
 
+    meta = await get_rfc_metadata(rfc_number)
+    meta_title = (meta or {}).get("title", "").strip()
+    if meta_title:
+        parsed["title"] = meta_title
+
     return parsed
 
 

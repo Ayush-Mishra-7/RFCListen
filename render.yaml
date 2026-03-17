@@ -16,5 +16,9 @@ services:
         value: "3000"
       - key: RFC_CACHE_DIR
         value: "/app/cache"
+      - key: RFC_INDEX_MAX_AGE_SECONDS
+        value: "86400"
+      - key: RFC_INDEX_REFRESH_MIN_INTERVAL_SECONDS
+        value: "3600"
       - key: ALLOWED_ORIGINS
         value: "https://ayush-mishra-7.github.io,http://localhost:8080,http://127.0.0.1:8080"

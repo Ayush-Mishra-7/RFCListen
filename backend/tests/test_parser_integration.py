@@ -10,14 +10,13 @@ Requires:  Backend server running on port 3000
 Known parser limitations (documented, not asserted):
   - Title extraction uses a centered-line heuristic that can misfire on some
     RFCs (e.g. RFC 2616 picks up an author name).
-  - Section IDs may have duplicates when figure/table child sections inherit
-    the parent section's ID scheme.
 """
 import pytest
 import httpx
+import os
 
-API_BASE = "http://localhost:3000/api"
-TIMEOUT = 30.0  # some RFCs are large / first fetch is uncached
+API_BASE = os.getenv("RFC_API_BASE", "http://localhost:3000/api")
+TIMEOUT = float(os.getenv("RFC_API_TEST_TIMEOUT", "30.0"))  # some RFCs are large / first fetch is uncached
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -223,24 +222,78 @@ class TestRFC1149:
         assert len(text_sections) >= 1
 
 
+# ── RFC 9908: EST CSR Attributes Clarification ──────────────────────────────
+
+class TestRFC9908:
+    """RFC 9908 — wrapped TOC fix, title extraction, and appendix handling."""
+
+    @pytest.fixture(scope="class")
+    def parsed(self):
+        return _get_parsed(9908)
+
+    def test_common_fields(self, parsed):
+        _assert_common(parsed, 9908)
+
+    def test_title_extracted(self, parsed):
+        assert parsed["title"] == "Clarification and Enhancement of the CSR Attributes Definition in RFC 7030"
+
+    def test_first_text_section_is_introduction(self, parsed):
+        first_text = next(s for s in parsed["sections"] if s["type"] == "text")
+        assert first_text["heading"] == "1. Introduction"
+
+    def test_appendix_heading_present(self, parsed):
+        headings = [s["heading"] for s in parsed["sections"] if s["type"] == "text"]
+        assert "A. ASN.1 Module" in headings
+
+
+# ── RFC 9915: DHCPv6 ────────────────────────────────────────────────────────
+
+class TestRFC9915:
+    """RFC 9915 — wrapped TOC fix, title extraction, and appendix handling."""
+
+    @pytest.fixture(scope="class")
+    def parsed(self):
+        return _get_parsed(9915)
+
+    def test_common_fields(self, parsed):
+        _assert_common(parsed, 9915)
+
+    def test_title_extracted(self, parsed):
+        assert parsed["title"] == "Dynamic Host Configuration Protocol for IPv6 (DHCPv6)"
+
+    def test_first_text_section_is_introduction(self, parsed):
+        first_text = next(s for s in parsed["sections"] if s["type"] == "text")
+        assert first_text["heading"] == "1. Introduction"
+
+    def test_appendix_headings_present(self, parsed):
+        headings = [s["heading"] for s in parsed["sections"] if s["type"] == "text"]
+        assert "A. Summary of Changes from RFC 8415" in headings
+        assert "B. Appearance of Options in Message Types" in headings
+        assert "C. Appearance of Options in the \"options\" Field of DHCP" in headings
+
+    def test_section_ids_are_unique(self, parsed):
+        ids = [s["id"] for s in parsed["sections"]]
+        assert len(ids) == len(set(ids))
+
+
 # ── Cross-RFC Smoke Tests ─────────────────────────────────────────────────────
 
 class TestCrossRFC:
     """Smoke tests across all four target RFCs."""
 
-    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9930, 9945])
+    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9908, 9915, 9930, 9945])
     def test_every_section_has_valid_type(self, rfc_number):
         data = _get_parsed(rfc_number)
         for section in data["sections"]:
             assert section["type"] in VALID_TYPES, \
                 f"RFC {rfc_number}: section '{section['heading']}' has invalid type '{section['type']}'"
 
-    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9930, 9945])
+    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9908, 9915, 9930, 9945])
     def test_rfc_number_matches(self, rfc_number):
         data = _get_parsed(rfc_number)
         assert data["rfcNumber"] == rfc_number
 
-    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9930, 9945])
+    @pytest.mark.parametrize("rfc_number", [793, 2616, 8446, 1149, 9908, 9915, 9930, 9945])
     def test_sections_have_required_keys(self, rfc_number):
         data = _get_parsed(rfc_number)
         required_keys = {"id", "heading", "content", "type"}

@@ -7,6 +7,7 @@ import httpx
 
 CACHE_DIR = Path(__file__).parent.parent / "cache"
 INDEX_FILE = CACHE_DIR / "rfc_index.json"
+XML_CACHE_FILE = CACHE_DIR / "rfc_index.xml"
 XML_URL = "https://www.ietf.org/rfc/rfc-index.xml"
 
 # Map old XML status to our UI standard
@@ -32,6 +33,8 @@ async def update_index():
         response = await client.get(XML_URL)
         response.raise_for_status()
         xml_data = response.content
+
+    XML_CACHE_FILE.write_bytes(xml_data)
 
     print("Parsing XML data...")
     root = ET.fromstring(xml_data)
@@ -89,7 +92,8 @@ async def update_index():
     
     with open(INDEX_FILE, "w", encoding="utf-8") as f:
         json.dump(rfcs, f, indent=2, ensure_ascii=False)
-        
+
+    print(f"XML cache successfully saved to {XML_CACHE_FILE}")
     print(f"Index successfully saved to {INDEX_FILE}")
 
 if __name__ == "__main__":

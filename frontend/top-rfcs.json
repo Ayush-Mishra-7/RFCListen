@@ -1,5 +1,5 @@
 {
-  "count": 9726,
+  "count": 9732,
   "page": 1,
   "limit": 50,
   "rfcs": [
@@ -26,6 +26,38 @@
       "abstract": "This document specifies a Standards Track version of the Proportional Rate Reduction (PRR) algorithm that obsoletes the Experimental version described in RFC 6937.  PRR regulates the amount of data sent by TCP or other transport protocols during fast recovery.  PRR accurately regulates the actual flight size through recovery such that at the end of recovery it will be as close as possible to the slow start threshold (ssthresh), as determined by the congestion control algorithm.",
       "status": "Proposed Standard",
       "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9936,
+      "name": "rfc9936",
+      "title": "Use of ML-KEM in the Cryptographic Message Syntax (CMS)",
+      "abstract": "Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM) is a quantum-resistant Key Encapsulation Mechanism (KEM).  Three parameter sets for the ML-KEM algorithm are specified by the US National Institute of Standards and Technology (NIST) in FIPS 203.  In order of increasing security strength (and decreasing performance), these parameter sets are ML-KEM-512, ML-KEM-768, and ML-KEM-1024.  This document specifies the conventions for using ML-KEM with the Cryptographic Message Syntax (CMS) using the KEMRecipientInfo structure defined in \"Using Key Encapsulation Mechanism (KEM) Algorithms in the Cryptographic Message Syntax (CMS)\" (RFC 9629).",
+      "status": "Proposed Standard",
+      "published": "2026-03-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9935,
+      "name": "rfc9935",
+      "title": "Internet X.509 Public Key Infrastructure - Algorithm Identifiers for the Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM)",
+      "abstract": "The Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM) is a quantum-resistant Key Encapsulation Mechanism.  This document specifies the conventions for using the ML-KEM in X.509 Public Key Infrastructure.  The conventions for the subject public keys and private keys are also specified.",
+      "status": "Proposed Standard",
+      "published": "2026-03-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9934,
+      "name": "rfc9934",
+      "title": "Privacy-Enhanced Mail (PEM) File Format for Encrypted ClientHello (ECH)",
+      "abstract": "Encrypted ClientHello (ECH) key pairs need to be configured into TLS servers, which can be built using different TLS libraries.  This document specifies a standard file format for this purpose, similar to how RFC 7468 defines other Privacy-Enhanced Mail (PEM) file formats.",
+      "status": "Proposed Standard",
+      "published": "2026-03-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9931,
+      "name": "rfc9931",
+      "title": "Security Considerations for Optimistic Protocol Transitions in HTTP/1.1",
+      "abstract": "In HTTP/1.1, the client can request a change to a new protocol on the existing connection.  This document discusses the security considerations that apply to data sent by the client before this request is confirmed and adds new requirements to RFCs 9112 and 9298 to avoid related security issues.",
+      "status": "Proposed Standard",
+      "published": "2026-03-01T00:00:00Z"
     },
     {
       "rfcNumber": 9930,
@@ -82,6 +114,14 @@
       "abstract": "FNV (Fowler/Noll/Vo) is a fast, non-cryptographic hash algorithm with good dispersion that has been widely used and is referenced in a number of standards documents.  The purpose of this document is to make information on FNV and open-source code performing all specified sizes of FNV conveniently available to the Internet community.",
       "status": "Informational",
       "published": "2026-02-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9922,
+      "name": "rfc9922",
+      "title": "A Common YANG Data Model for Scheduling",
+      "abstract": "This document defines common types and groupings that are meant to be used for scheduling purposes, such as events, policies, services, or resources based on date and time.  For the sake of better modularity, the YANG module includes a set of recurrence-related groupings with varying levels of representation (i.e., from basic to advanced) to accommodate a variety of requirements.  It also defines groupings for validating requested schedules and reporting scheduling statuses.",
+      "status": "Proposed Standard",
+      "published": "2026-03-01T00:00:00Z"
     },
     {
       "rfcNumber": 9921,
@@ -361,46 +401,6 @@
       "title": "Use of Password-Based Message Authentication Code 1 (PBMAC1) in PKCS #12 Syntax",
       "abstract": "This document specifies additions and amendments to RFCs 7292 and 8018.  It also obsoletes the RFC 9579.  It defines a way to use the Password-Based Message Authentication Code 1 (PBMAC1), defined in RFC 8018, inside the PKCS #12 syntax.  The purpose of this specification is to permit the use of more modern Password-Based Key Derivation Functions (PBKDFs) and allow for regulatory compliance.",
       "status": "Informational",
-      "published": "2025-09-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9878,
-      "name": "rfc9878",
-      "title": "Updates to Private Header (P-Header) Extension Usage in Session Initiation Protocol (SIP) Requests and Responses",
-      "abstract": "The Third Generation Partnership Project (3GPP) has identified cases where different SIP private header extensions referred to as \"P-\" header fields, and defined in RFC 7315, need to be included in SIP requests and responses where they were not allowed according to RFC 7315. This document updates RFC 7315, in order to allow inclusion of the affected \"P-\" header fields in such requests and responses. This document obsoletes RFC 7976. The changes related to RFC 7976 involve the inclusion of the P-Visited-Network-ID header field in SIP responses. This document also makes updates to RFC 7315 in order to fix misalignments that occurred when RFC 3455 was obsoleted by RFC 7315.",
-      "status": "Informational",
-      "published": "2025-11-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9877,
-      "name": "rfc9877",
-      "title": "Registration Data Access Protocol (RDAP) Extension for Geofeed Data",
-      "abstract": "This document defines a new Registration Data Access Protocol (RDAP) extension, \"geofeed1\", for indicating that an RDAP server hosts geofeed URLs for its IP network objects.  It also defines a new media type and a new link relation type for the associated link objects included in responses.",
-      "status": "Proposed Standard",
-      "published": "2025-10-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9876,
-      "name": "rfc9876",
-      "title": "Updates to the IANA Registration Procedures for Constrained Application Protocol (CoAP) Content-Formats",
-      "abstract": "This document updates RFC 7252 by modifying the registration procedures for the \"CoAP Content-Formats\" IANA registry, within the \"Constrained RESTful Environments (CoRE) Parameters\" registry group.  This document also introduces a new column, \"Media Type\", to the registry.  Furthermore, this document reserves Content-Format identifiers 64998 and 64999 for use in documentation.",
-      "status": "Proposed Standard",
-      "published": "2025-11-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9875,
-      "name": "rfc9875",
-      "title": "HTTP Cache Groups",
-      "abstract": "This specification introduces a means of describing the relationships between stored responses in HTTP caches, grouping them by associating a stored response with one or more strings.",
-      "status": "Proposed Standard",
-      "published": "2025-10-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9874,
-      "name": "rfc9874",
-      "title": "Best Practices for Deletion of Domain and Host Objects in the Extensible Provisioning Protocol (EPP)",
-      "abstract": "The Extensible Provisioning Protocol (EPP) includes commands for clients to delete domain and host objects, both of which are used to publish information in the Domain Name System (DNS).  EPP also includes guidance for deletions that is intended to avoid DNS resolution disruptions and maintain data consistency.  However, operational relationships between objects can make that guidance difficult to implement.  Some EPP clients have developed operational practices to delete those objects that have unintended impacts on DNS resolution and security.  This document describes best current practices and proposes new potential practices to delete domain and host objects that reduce the risk of DNS resolution failure and maintain client-server data consistency.",
-      "status": "Best Current Practice",
       "published": "2025-09-01T00:00:00Z"
     }
   ],
