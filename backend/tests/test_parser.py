@@ -84,6 +84,31 @@ Table of Contents
         Definition details.
 """
 
+RFC2328_APPENDIX_TOC_TAIL_SNIPPET = """\
+Table of Contents
+
+    16.8     Equal-cost multipath ................................. 178
+             Footnotes ............................................ 179
+             References ........................................... 183
+    A        OSPF data formats .................................... 185
+    A.1      Encapsulation of OSPF packets ........................ 185
+    G.3      Incomplete resolution of virtual next hops ........... 241
+    G.4      Routing table lookup ................................. 241
+             Security Considerations .............................. 243
+             Author's Address ..................................... 243
+             Full Copyright Statement ............................. 244
+
+1.  Introduction
+
+    This document is a specification of the Open Shortest Path First
+    (OSPF) TCP/IP internet routing protocol.
+
+    1.1.  Protocol overview
+
+        OSPF routes IP packets based solely on the destination IP
+        address found in the IP packet header.
+"""
+
 OLD_RFC12_PAGE_BREAK_SNIPPET = """\
 Network Working Group                                       M. Wingfield
 Request for Comments: 12  REVISED                         26 August 1969
@@ -487,6 +512,10 @@ Table of Contents
     def test_extracts_ids_from_rfc9915_punctuation_wrapped_toc(self):
         result = _extract_toc_sections(RFC9915_TOC_SNIPPET)
         assert {"s11", "s11_3", "s11_4", "s11_5", "s12"} <= result
+
+    def test_extracts_ids_from_bare_appendix_toc_entries(self):
+        result = _extract_toc_sections(RFC2328_APPENDIX_TOC_TAIL_SNIPPET)
+        assert {"s16_8", "sA", "sA_1", "sG_3", "sG_4"} <= result
         
     def test_returns_none_if_no_toc(self):
         text = "1. Introduction\n\n   Content."
@@ -548,6 +577,13 @@ class TestBoilerplateStripping:
         result = _strip_boilerplate(RFC9915_TOC_SNIPPET)
         assert "11.4.  DUID Based on Link-Layer Address (DUID-LL)" not in result
         assert "11.5.  DUID Based on Universally Unique Identifier (DUID-UUID)" not in result
+        assert result.lstrip().startswith("1.  Introduction")
+
+    def test_removes_rfc2328_appendix_toc_tail(self):
+        result = _strip_boilerplate(RFC2328_APPENDIX_TOC_TAIL_SNIPPET)
+        assert "A        OSPF data formats" not in result
+        assert "G.4      Routing table lookup" not in result
+        assert "Author's Address" not in result
         assert result.lstrip().startswith("1.  Introduction")
 
 
@@ -686,6 +722,11 @@ class TestFullParser:
         assert "s1" in ids
         assert "s1_1" in ids
         assert "s1_2" in ids
+
+    def test_rfc2328_appendix_toc_tail_starts_at_introduction(self):
+        result = parse_rfc(2328, RFC2328_APPENDIX_TOC_TAIL_SNIPPET)
+        headings = [s["heading"] for s in result["sections"] if s["type"] == "text"]
+        assert headings[:2] == ["1. Introduction", "1.1. Protocol overview"]
 
     def test_rfc9945_toc_headings_do_not_duplicate_body_sections(self):
         result = parse_rfc(9945, RFC9945_TOC_SNIPPET)

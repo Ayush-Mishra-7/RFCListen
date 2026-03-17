@@ -97,6 +97,7 @@ _RE_RESIDUAL_PAGE_ARTIFACT = re.compile(
     r"^\s*(?:RFC\s+\d+.*|.*\[Page\s+\d+\].*)\s*$",
     re.IGNORECASE,
 )
+_RE_TOC_APPENDIX_ENTRY = re.compile(r"^\s*(?P<num>[A-Z])\.?\s{2,}(?P<title>[A-Za-z][^\n]{2,})$")
 
 # Boilerplate section headings to strip entirely
 _BOILERPLATE_HEADINGS = re.compile(
@@ -210,6 +211,18 @@ def _match_appendix_section_id(line: str) -> str | None:
         return None
     num = match.group("num").rstrip(".")
     return f"s{num.replace('.', '_')}"
+
+
+def _match_toc_section_id(line: str) -> str | None:
+    section_id = _match_section_id(line) or _match_appendix_section_id(line)
+    if section_id is not None:
+        return section_id
+    if _RE_TOC_PAGE_NUMBER.search(line) is None:
+        return None
+    match = _RE_TOC_APPENDIX_ENTRY.match(line)
+    if not match:
+        return None
+    return f"s{match.group('num')}"
 
 
 def _leading_indent(line: str) -> int:
@@ -344,7 +357,7 @@ def _is_toc_continuation_line(
     stripped = line.strip()
     if not stripped:
         return False
-    if _match_section_id(line) or _match_appendix_section_id(line) or _is_toc_backmatter_entry(line):
+    if _match_toc_section_id(line) or _is_toc_backmatter_entry(line):
         return False
     if _RE_RESIDUAL_PAGE_ARTIFACT.match(stripped):
         return False
@@ -360,7 +373,7 @@ def _looks_like_body_prose(line: str) -> bool:
     stripped = line.strip()
     if not stripped:
         return False
-    if _match_section_id(line) or _match_appendix_section_id(line) or _is_toc_backmatter_entry(line):
+    if _match_toc_section_id(line) or _match_appendix_section_id(line) or _is_toc_backmatter_entry(line):
         return False
     if _RE_RESIDUAL_PAGE_ARTIFACT.match(stripped):
         return False
@@ -386,7 +399,7 @@ def _next_nonblank_lines(lines: list[str], start_idx: int, limit: int = 3) -> li
 
 def _looks_like_body_start(lines: list[str], idx: int) -> bool:
     line = lines[idx]
-    if not (_match_section_id(line) or _match_appendix_section_id(line) or _is_toc_backmatter_entry(line)):
+    if not (_match_toc_section_id(line) or _match_appendix_section_id(line) or _is_toc_backmatter_entry(line)):
         return False
     entry_indent = _leading_indent(line)
 
@@ -401,7 +414,7 @@ def _looks_like_body_start(lines: list[str], idx: int) -> bool:
 
     first_following = lines[look_idx]
     if saw_blank and not (
-        _match_section_id(first_following)
+        _match_toc_section_id(first_following)
         or _match_appendix_section_id(first_following)
         or _is_toc_backmatter_entry(first_following)
         or _RE_RESIDUAL_PAGE_ARTIFACT.match(first_following.strip())
@@ -411,7 +424,7 @@ def _looks_like_body_start(lines: list[str], idx: int) -> bool:
     for _, next_line in _next_nonblank_lines(lines, idx + 1, limit=3):
         if _RE_RESIDUAL_PAGE_ARTIFACT.match(next_line.strip()):
             continue
-        if _match_section_id(next_line) or _match_appendix_section_id(next_line) or _is_toc_backmatter_entry(next_line):
+        if _match_toc_section_id(next_line) or _match_appendix_section_id(next_line) or _is_toc_backmatter_entry(next_line):
             return False
         if _is_toc_continuation_line(
             next_line,
@@ -462,7 +475,7 @@ def _analyze_toc(text: str) -> TocAnalysis | None:
             toc_end_idx = idx + 1
             continue
 
-        section_id = _match_section_id(line) or _match_appendix_section_id(line)
+        section_id = _match_toc_section_id(line) or _match_appendix_section_id(line)
         is_backmatter = _is_toc_backmatter_entry(line)
 
         if section_id or is_backmatter:
