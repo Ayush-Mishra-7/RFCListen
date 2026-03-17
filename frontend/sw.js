@@ -2,13 +2,14 @@
  * sw.js — RFCListen Service Worker
  *
  * Caching strategy:
- *   - App shell (HTML, CSS, JS, JSON) → Cache first, pre-cached on install
+ *   - App shell core assets           → Pre-cached on install
  *   - Google Fonts                    → Stale-while-revalidate
+ *   - HTML, CSS, JS, manifest, JSON   → Network first, fall back to cache
  *   - API requests                    → Network first, fall back to cache
- *   - Everything else                 → Network only
+ *   - Images and remaining assets     → Cache first
  */
 
-const CACHE_NAME = 'rfclisten-v1';
+const CACHE_NAME = 'rfclisten-v3';
 
 const APP_SHELL = [
     './',
@@ -58,6 +59,13 @@ self.addEventListener('fetch', (event) => {
     // Skip non-GET requests (POST, etc.)
     if (event.request.method !== 'GET') return;
 
+    // Keep navigations fresh so normal browser sessions do not get pinned to
+    // an old app shell after deploys.
+    if (event.request.mode === 'navigate') {
+        event.respondWith(networkFirst(event.request));
+        return;
+    }
+
     // Strategy 1: Google Fonts — stale-while-revalidate
     if (
         url.hostname === 'fonts.googleapis.com' ||
@@ -73,7 +81,25 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Strategy 3: App shell & same-origin assets — cache first
+    // Strategy 3: JS/CSS/manifest/json should prefer fresh network responses,
+    // but still work from cache when offline.
+    if (
+        url.origin === self.location.origin &&
+        ['script', 'style', 'manifest'].includes(event.request.destination)
+    ) {
+        event.respondWith(networkFirst(event.request));
+        return;
+    }
+
+    if (
+        url.origin === self.location.origin &&
+        (url.pathname.endsWith('.json') || url.pathname.endsWith('.webmanifest'))
+    ) {
+        event.respondWith(networkFirst(event.request));
+        return;
+    }
+
+    // Strategy 4: Remaining same-origin assets — cache first
     if (url.origin === self.location.origin) {
         event.respondWith(cacheFirst(event.request));
         return;

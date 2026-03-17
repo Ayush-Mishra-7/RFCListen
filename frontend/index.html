@@ -164,8 +164,19 @@
     // Register service worker for PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('[PWA] Service worker registered:', reg.scope))
+        let hasRefreshedForNewWorker = false;
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (hasRefreshedForNewWorker) return;
+          hasRefreshedForNewWorker = true;
+          window.location.reload();
+        });
+
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+          .then(reg => {
+            console.log('[PWA] Service worker registered:', reg.scope);
+            return reg.update();
+          })
           .catch(err => console.warn('[PWA] SW registration failed:', err));
       });
     }

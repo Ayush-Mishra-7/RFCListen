@@ -226,6 +226,8 @@ body {
 }
 
 .rfc-item-title {
+  display: block;
+  min-width: 0;
   font-size: var(--text-sm);
   color: var(--text-primary);
   line-height: 1.4;
@@ -1129,6 +1131,18 @@ body {
     --sidebar-width: 260px;
   }
 
+  #rfc-header {
+    padding: var(--space-4) var(--space-4) var(--space-3);
+  }
+
+  #rfc-title {
+    font-size: var(--text-xl);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
   #main-panel {
     grid-template-columns: 1fr;
   }
@@ -1171,6 +1185,15 @@ body {
     grid-template-columns: 1fr;
   }
 
+  #rfc-header {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  #rfc-title {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-1);
+  }
+
   /* Left Sidebar Drawer */
   #sidebar {
     position: fixed;
@@ -1191,6 +1214,16 @@ body {
 
   .mobile-header-left {
     display: flex; /* Show menu+logo beneath 600px */
+  }
+
+  .rfc-list-item {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .rfc-item-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .player-options {

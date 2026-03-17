@@ -81,14 +81,103 @@ function loadFromStorage() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const saved = JSON.parse(raw);
+      const saved = normalizePersistedState(JSON.parse(raw));
       state = { ...state, ...saved };
     }
     const recentsRaw = localStorage.getItem(RECENTS_KEY);
     if (recentsRaw) {
-      state.recentRFCs = JSON.parse(recentsRaw);
+      state.recentRFCs = normalizeRecentRFCs(JSON.parse(recentsRaw));
     }
   } catch (_) { /* ignore */ }
+}
+
+function normalizePersistedState(saved) {
+  if (!saved || typeof saved !== 'object') {
+    return {};
+  }
+
+  const nextState = {};
+
+  if (isPersistedRFC(saved.currentRFC)) {
+    nextState.currentRFC = saved.currentRFC;
+    const maxSectionIdx = Math.max(saved.currentRFC.sections.length - 1, 0);
+    const restoredIdx = Number(saved.currentSectionIdx);
+    nextState.currentSectionIdx = Number.isInteger(restoredIdx)
+      ? Math.min(Math.max(restoredIdx, 0), maxSectionIdx)
+      : 0;
+  } else {
+    nextState.currentRFC = null;
+    nextState.currentSectionIdx = 0;
+  }
+
+  const playbackRate = Number(saved.playbackRate);
+  if (Number.isFinite(playbackRate) && playbackRate > 0) {
+    nextState.playbackRate = playbackRate;
+  }
+
+  if (typeof saved.selectedVoiceURI === 'string') {
+    nextState.selectedVoiceURI = saved.selectedVoiceURI;
+  }
+
+  if (saved.ttsEngine === 'edge' || saved.ttsEngine === 'browser') {
+    nextState.ttsEngine = saved.ttsEngine;
+  }
+
+  if (saved.rfcVoiceLocks && typeof saved.rfcVoiceLocks === 'object') {
+    nextState.rfcVoiceLocks = Object.fromEntries(
+      Object.entries(saved.rfcVoiceLocks)
+        .filter(([key, value]) => {
+          return /^\d+$/.test(key) &&
+            value &&
+            typeof value === 'object' &&
+            typeof value.voiceURI === 'string' &&
+            (value.ttsEngine === 'edge' || value.ttsEngine === 'browser');
+        })
+        .map(([key, value]) => [key, {
+          voiceURI: value.voiceURI,
+          ttsEngine: value.ttsEngine,
+        }])
+    );
+  }
+
+  return nextState;
+}
+
+function normalizeRecentRFCs(savedRecents) {
+  if (!Array.isArray(savedRecents)) {
+    return [];
+  }
+
+  return savedRecents
+    .filter(item => item && typeof item === 'object')
+    .filter(item => Number.isFinite(Number(item.rfcNumber)) && typeof item.title === 'string')
+    .map(item => ({
+      rfcNumber: Number(item.rfcNumber),
+      title: item.title,
+      lastPlayed: typeof item.lastPlayed === 'string' ? item.lastPlayed : new Date().toISOString(),
+    }))
+    .slice(0, MAX_RECENTS);
+}
+
+function isPersistedRFC(candidate) {
+  if (!candidate || typeof candidate !== 'object') {
+    return false;
+  }
+
+  if (!Number.isFinite(Number(candidate.rfcNumber)) || typeof candidate.title !== 'string') {
+    return false;
+  }
+
+  if (!Array.isArray(candidate.sections)) {
+    return false;
+  }
+
+  return candidate.sections.every(section => (
+    section &&
+    typeof section === 'object' &&
+    typeof section.heading === 'string' &&
+    typeof section.content === 'string'
+  ));
 }
 
 function addToRecents(rfcNumber, title) {
