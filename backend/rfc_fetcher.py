@@ -30,6 +30,24 @@ INDEX_REFRESH_MIN_INTERVAL_SECONDS = int(
     os.getenv("RFC_INDEX_REFRESH_MIN_INTERVAL_SECONDS", "3600")
 )
 
+
+def _parse_hidden_rfc_numbers(raw_value: str) -> set[int]:
+    hidden_numbers: set[int] = set()
+    for part in raw_value.split(","):
+        candidate = part.strip()
+        if not candidate:
+            continue
+        try:
+            hidden_numbers.add(int(candidate))
+        except ValueError:
+            continue
+    return hidden_numbers
+
+
+HIDDEN_RFC_NUMBERS = _parse_hidden_rfc_numbers(
+    os.getenv("RFC_HIDDEN_NUMBERS", "12,13")
+)
+
 # rfc-editor.org blocks the default httpx user-agent (403).
 _HEADERS = {
     "User-Agent": "RFCListen/0.1 (https://github.com/rfclisten; educational project)",
@@ -221,13 +239,21 @@ def _load_index():
     _RFC_INDEX_MTIME = current_mtime
     return _RFC_INDEX
 
+
+def _is_hidden_rfc(rfc_number: int | None) -> bool:
+    return rfc_number in HIDDEN_RFC_NUMBERS
+
+
+def _visible_rfcs(index: list[dict]) -> list[dict]:
+    return [rfc for rfc in index if not _is_hidden_rfc(rfc.get("rfcNumber"))]
+
 async def get_rfc_list(page: int = 1, limit: int = 50, search: str = "", sort: str = "desc") -> dict:
     """
     Fetch a paginated list of published RFCs from the local rfc_index.json.
 
     Returns a dict with keys: `count`, `rfcs` (list of metadata dicts), `next`, `previous`.
     """
-    index = _load_index()
+    index = _visible_rfcs(_load_index())
     
     # Filter
     filtered = index

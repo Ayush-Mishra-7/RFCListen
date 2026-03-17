@@ -84,6 +84,37 @@ Table of Contents
         Definition details.
 """
 
+OLD_RFC12_PAGE_BREAK_SNIPPET = """\
+Network Working Group                                       M. Wingfield
+Request for Comments: 12  REVISED                         26 August 1969
+
+                    IMP-HOST INTERFACE FLOW DIAGRAMS
+
+Wingfield                                                       [Page 1]
+\f
+RFC 12              IMP-HOST INTERFACE FLOW DIAGRAMS      26 August 1969
+
+IMP to HOST Message
+                       +----------+
+                       |  Start   |
+                       +----------+
+"""
+
+OLD_RFC13_PAGE_BREAK_SNIPPET = """\
+Network Working Group                                          Vint Cerf
+Request for Comments: 13                                       UCLA
+                                                          20 August 1969
+
+Referring to NWG/RFC: 11, it appears that file transmissions over
+auxiliary connections will require some mechanism to specify END-OF-FILE.
+
+                                                                [Page 1]
+\f
+RFC 13                         ZERO TEXT LENGTH EOF                   1969
+
+Follow-on content line.
+"""
+
 RFC9945_TOC_SNIPPET = """\
 RFC 9945                                                  February 2026
 
@@ -818,6 +849,32 @@ This document is based on earlier editions.
         result = _strip_boilerplate(text)
         assert "based on earlier editions" not in result
         assert "Content here" in result
+
+
+class TestOldRfcPageBreakHandling:
+    def test_strip_page_breaks_handles_rfc12_style_footer_and_header(self):
+        result = _strip_page_breaks(OLD_RFC12_PAGE_BREAK_SNIPPET)
+        assert "[Page 1]" not in result
+        assert "RFC 12              IMP-HOST INTERFACE FLOW DIAGRAMS" not in result
+        assert "IMP to HOST Message" in result
+
+    def test_strip_page_breaks_handles_rfc13_style_footer_and_header(self):
+        result = _strip_page_breaks(OLD_RFC13_PAGE_BREAK_SNIPPET)
+        assert "[Page 1]" not in result
+        assert "RFC 13                         ZERO TEXT LENGTH EOF" not in result
+        assert "Follow-on content line." in result
+
+    def test_parse_rfc_handles_old_rfc12_style_document(self):
+        result = parse_rfc(12, OLD_RFC12_PAGE_BREAK_SNIPPET)
+        assert result["rfcNumber"] == 12
+        assert len(result["sections"]) >= 1
+        assert "IMP to HOST Message" in result["sections"][0]["content"]
+
+    def test_parse_rfc_handles_old_rfc13_style_document(self):
+        result = parse_rfc(13, OLD_RFC13_PAGE_BREAK_SNIPPET)
+        assert result["rfcNumber"] == 13
+        assert len(result["sections"]) >= 1
+        assert "Follow-on content line." in result["sections"][0]["content"]
 
 
 class TestTitleExtraction:

@@ -39,6 +39,12 @@ async def start_background_index_refresh():
     kickoff_index_refresh()
 
 
+@app.on_event("shutdown")
+async def shutdown_background_workers():
+    """Release any background parsing workers on server shutdown."""
+    rfcs.shutdown_parse_executor()
+
+
 @app.get("/", tags=["health"])
 async def health_check():
     """Simple health check endpoint."""

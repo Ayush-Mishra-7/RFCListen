@@ -70,9 +70,9 @@ _SECTION_NUMBER_PATTERN = r"(?:\d+(?:\.\d+)*\.?|[A-Z]\.|[A-Z](?:\.\d+)+\.?)"
 # Pattern-based page footer + header (no form-feed)
 # Matches: footer line with [Page N], optional blank lines, RFC header line
 _RE_PAGE_FOOTER_HEADER = re.compile(
-    r"^[^\n]*\[Page\s+\d+\]\s*\n"     # footer: "Author   Standards Track   [Page 9]"
-    r"(?:\s*\n)*"                       # blank lines between footer and header
-    r"RFC\s+\d+[^\n]*\n",             # header: "RFC 2328   OSPF Version 2   April 1998"
+    r"^[^\n]*\[Page[ \t]+\d+\][ \t]*\n"  # footer: "Author   Standards Track   [Page 9]"
+    r"(?:[ \t]*\n)*"                         # blank lines between footer and header
+    r"RFC[ \t]+\d+[^\n]*\n",               # header: "RFC 2328   OSPF Version 2   April 1998"
     re.MULTILINE,
 )
 

@@ -830,6 +830,64 @@ function renderSectionProgress() {
   }
 }
 
+function isSidebarDrawerEnabled() {
+  return window.matchMedia('(max-width: 600px)').matches;
+}
+
+function isNavDrawerEnabled() {
+  return window.matchMedia('(max-width: 900px)').matches;
+}
+
+function syncMobileOverlay() {
+  const overlay = document.getElementById('mobile-overlay');
+  if (!overlay) return;
+
+  const isVisible = document.body.classList.contains('sidebar-open') ||
+    document.body.classList.contains('nav-open');
+
+  overlay.classList.toggle('overlay-visible', isVisible);
+  overlay.setAttribute('aria-hidden', String(!isVisible));
+}
+
+function closeSidebarDrawer() {
+  document.body.classList.remove('sidebar-open');
+  const button = document.getElementById('btn-mobile-menu');
+  if (button) button.setAttribute('aria-expanded', 'false');
+  syncMobileOverlay();
+}
+
+function closeNavDrawer() {
+  document.body.classList.remove('nav-open');
+  const button = document.getElementById('btn-mobile-toc');
+  if (button) button.setAttribute('aria-expanded', 'false');
+  syncMobileOverlay();
+}
+
+function toggleSidebarDrawer() {
+  if (!isSidebarDrawerEnabled()) return;
+
+  closeNavDrawer();
+  const isOpen = document.body.classList.toggle('sidebar-open');
+  const button = document.getElementById('btn-mobile-menu');
+  if (button) button.setAttribute('aria-expanded', String(isOpen));
+  syncMobileOverlay();
+}
+
+function toggleNavDrawer() {
+  if (!isNavDrawerEnabled()) return;
+
+  closeSidebarDrawer();
+  const isOpen = document.body.classList.toggle('nav-open');
+  const button = document.getElementById('btn-mobile-toc');
+  if (button) button.setAttribute('aria-expanded', String(isOpen));
+  syncMobileOverlay();
+}
+
+function closeMobileDrawers() {
+  closeSidebarDrawer();
+  closeNavDrawer();
+}
+
 function scrollToSection(idx) {
   const el = document.getElementById(`section-${idx}`);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1190,12 +1248,36 @@ function _formatRfcDate(isoStr) {
 // ── 6. Event Wiring ───────────────────────────────────────────────────────────
 
 function wireEvents() {
+  const mobileMenuButton = document.getElementById('btn-mobile-menu');
+  const mobileTocButton = document.getElementById('btn-mobile-toc');
+  const mobileOverlay = document.getElementById('mobile-overlay');
+
+  if (mobileMenuButton) {
+    mobileMenuButton.setAttribute('aria-expanded', 'false');
+    mobileMenuButton.addEventListener('click', toggleSidebarDrawer);
+  }
+
+  if (mobileTocButton) {
+    mobileTocButton.setAttribute('aria-expanded', 'false');
+    mobileTocButton.addEventListener('click', toggleNavDrawer);
+  }
+
+  if (mobileOverlay) {
+    mobileOverlay.addEventListener('click', closeMobileDrawers);
+  }
+
+  window.addEventListener('resize', () => {
+    if (!isSidebarDrawerEnabled()) closeSidebarDrawer();
+    if (!isNavDrawerEnabled()) closeNavDrawer();
+  });
+
   // RFC list click
   document.getElementById('rfc-list').addEventListener('click', async (e) => {
     const item = e.target.closest('.rfc-list-item');
     if (!item || item.classList.contains('skeleton-item')) return;
     const rfcNum = Number(item.dataset.rfc);
     await loadRFC(rfcNum);
+    closeSidebarDrawer();
   });
 
   // RFC list keyboard navigation (Enter to select)
@@ -1213,6 +1295,7 @@ function wireEvents() {
       const item = e.target.closest('.recent-item');
       if (!item) return;
       await loadRFC(Number(item.dataset.rfc));
+      closeSidebarDrawer();
     });
   }
 
@@ -1305,6 +1388,7 @@ function wireEvents() {
     if (!item) return;
     const idx = Number(item.dataset.sectionIdx);
     player.jumpToSection(idx);
+    closeNavDrawer();
   });
 
   // Section nav keyboard
@@ -1317,6 +1401,11 @@ function wireEvents() {
 
   // ── Keyboard shortcuts ──────────────────────────────────────────────────────
   document.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape') {
+      closeMobileDrawers();
+      return;
+    }
+
     // Skip when typing in inputs
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
 

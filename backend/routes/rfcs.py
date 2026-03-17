@@ -1,13 +1,87 @@
 """
 Routes — /api/rfcs
 """
-from fastapi import APIRouter, HTTPException, Query
-from rfc_fetcher import get_rfc_list, get_rfc_metadata, get_rfc_text, get_rfc_pdf_url
-from rfc_parser import parse_rfc
-import httpx
+import asyncio
+import os
+from concurrent.futures import ProcessPoolExecutor, TimeoutError as FutureTimeoutError
+from concurrent.futures.process import BrokenProcessPool
+from multiprocessing import get_context
+from threading import Lock
 from urllib.parse import quote
 
+import httpx
+from fastapi import APIRouter, HTTPException, Query
+
+from rfc_fetcher import get_rfc_list, get_rfc_metadata, get_rfc_pdf_url, get_rfc_text
+from rfc_parser import parse_rfc
+
 router = APIRouter(tags=["rfcs"])
+
+_PARSE_TIMEOUT_SECONDS = float(os.getenv("RFC_PARSE_TIMEOUT_SECONDS", "8.0"))
+_PARSE_MAX_WORKERS = max(1, int(os.getenv("RFC_PARSE_MAX_WORKERS", "1")))
+_PARSE_EXECUTOR: ProcessPoolExecutor | None = None
+_PARSE_EXECUTOR_LOCK = Lock()
+
+
+class RFCParseTimeoutError(TimeoutError):
+    """Raised when RFC parsing exceeds the configured time budget."""
+
+
+def _create_parse_executor() -> ProcessPoolExecutor:
+    return ProcessPoolExecutor(
+        max_workers=_PARSE_MAX_WORKERS,
+        mp_context=get_context("spawn"),
+    )
+
+
+def _get_parse_executor() -> ProcessPoolExecutor:
+    global _PARSE_EXECUTOR
+    with _PARSE_EXECUTOR_LOCK:
+        if _PARSE_EXECUTOR is None:
+            _PARSE_EXECUTOR = _create_parse_executor()
+        return _PARSE_EXECUTOR
+
+
+def shutdown_parse_executor() -> None:
+    global _PARSE_EXECUTOR
+
+    with _PARSE_EXECUTOR_LOCK:
+        executor = _PARSE_EXECUTOR
+        _PARSE_EXECUTOR = None
+
+    if executor is None:
+        return
+
+    terminate_workers = getattr(executor, "terminate_workers", None)
+    if callable(terminate_workers):
+        terminate_workers()
+        return
+
+    executor.shutdown(wait=False, cancel_futures=True)
+
+
+def _parse_rfc_with_timeout(rfc_number: int, raw_text: str) -> dict:
+    future = _get_parse_executor().submit(parse_rfc, rfc_number, raw_text)
+    try:
+        return future.result(timeout=_PARSE_TIMEOUT_SECONDS)
+    except FutureTimeoutError as exc:
+        future.cancel()
+        shutdown_parse_executor()
+        raise RFCParseTimeoutError(
+            f"RFC {rfc_number} parsing exceeded {_PARSE_TIMEOUT_SECONDS:.1f}s"
+        ) from exc
+    except BrokenProcessPool:
+        shutdown_parse_executor()
+        raise
+
+
+async def _parse_rfc_or_raise(rfc_number: int, raw_text: str) -> dict:
+    try:
+        return await asyncio.to_thread(_parse_rfc_with_timeout, rfc_number, raw_text)
+    except RFCParseTimeoutError as exc:
+        raise HTTPException(status_code=504, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Parser error: {exc}") from exc
 
 
 @router.get("/rfcs")
@@ -66,10 +140,7 @@ async def rfc_parsed(rfc_number: int):
             raise HTTPException(status_code=404, detail=f"RFC {rfc_number} text not found")
         raise HTTPException(status_code=502, detail=f"Upstream error: {e}")
 
-    try:
-        parsed = parse_rfc(rfc_number, raw_text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Parser error: {e}")
+    parsed = await _parse_rfc_or_raise(rfc_number, raw_text)
 
     meta = await get_rfc_metadata(rfc_number)
     meta_title = (meta or {}).get("title", "").strip()
@@ -102,7 +173,7 @@ async def rfc_section_tts(
     except httpx.HTTPStatusError:
         raise HTTPException(status_code=404, detail=f"RFC {rfc_number} not found")
 
-    parsed = parse_rfc(rfc_number, raw_text)
+    parsed = await _parse_rfc_or_raise(rfc_number, raw_text)
     sections = parsed["sections"]
 
     if section_idx < 0 or section_idx >= len(sections):
@@ -160,7 +231,7 @@ async def rfc_section_boundaries(
     except httpx.HTTPStatusError:
         raise HTTPException(status_code=404, detail=f"RFC {rfc_number} not found")
 
-    parsed = parse_rfc(rfc_number, raw_text)
+    parsed = await _parse_rfc_or_raise(rfc_number, raw_text)
     sections = parsed["sections"]
 
     if section_idx < 0 or section_idx >= len(sections):
@@ -201,7 +272,7 @@ async def rfc_section_tts_package(
     except httpx.HTTPStatusError:
         raise HTTPException(status_code=404, detail=f"RFC {rfc_number} not found")
 
-    parsed = parse_rfc(rfc_number, raw_text)
+    parsed = await _parse_rfc_or_raise(rfc_number, raw_text)
     sections = parsed["sections"]
 
     if section_idx < 0 or section_idx >= len(sections):
