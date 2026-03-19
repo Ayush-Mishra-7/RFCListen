@@ -20,6 +20,14 @@
       "published": "2026-02-01T00:00:00Z"
     },
     {
+      "rfcNumber": 9938,
+      "name": "rfc9938",
+      "title": "A Framework for the Deterministic Networking (DetNet) Controller Plane",
+      "abstract": "This document provides a framework overview for the Deterministic Networking (DetNet) Controller Plane.  It discusses concepts and requirements for the DetNet Controller Plane, which could be the basis for a future solution specification.",
+      "status": "Informational",
+      "published": "2026-03-01T00:00:00Z"
+    },
+    {
       "rfcNumber": 9937,
       "name": "rfc9937",
       "title": "Proportional Rate Reduction (PRR)",
@@ -186,6 +194,14 @@
       "abstract": "This document updates RFC 7030, \"Enrollment over Secure Transport\" (EST), clarifying how the Certificate Signing Request (CSR) Attributes Response can be used by an EST server to specify both CSR attribute Object Identifiers (OIDs) and CSR attribute values, particularly X.509 extension values, that the server expects the client to include in a subsequent CSR request. RFC 9148 is derived from RFC 7030 and is also updated. RFC 7030 is ambiguous in its specification of the CSR Attributes Response. This has resulted in implementation challenges and implementor confusion because there was no universal understanding of what was specified. This document clarifies the encoding rules. This document also provides a new straightforward approach: using a template for CSR contents that may be partially filled in by the server. This also allows an EST server to specify a subject Distinguished Name (DN).",
       "status": "Proposed Standard",
       "published": "2026-01-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9907,
+      "name": "rfc9907",
+      "title": "Guidelines for Authors and Reviewers of Documents Containing YANG Data Models",
+      "abstract": "This document provides guidelines for authors and reviewers of specifications containing YANG data models, including IANA-maintained YANG modules. Recommendations and procedures are defined, which are intended to increase interoperability and usability of Network Configuration Protocol (NETCONF) and RESTCONF protocol implementations that utilize YANG modules. This document obsoletes RFC 8407; it also updates RFC 8126 by providing additional guidelines for writing the IANA considerations for RFCs that specify IANA-maintained YANG modules.",
+      "status": "Best Current Practice",
+      "published": "2026-03-01T00:00:00Z"
     },
     {
       "rfcNumber": 9906,
@@ -386,22 +402,6 @@
       "abstract": "Digital signatures are used within X.509 certificates and Certificate Revocation Lists (CRLs), and to sign messages.  This document specifies the conventions for using FIPS 204, the Module-Lattice-Based Digital Signature Algorithm (ML-DSA) in Internet X.509 certificates and CRLs.  The conventions for the associated signatures, subject public keys, and private key are also described.",
       "status": "Proposed Standard",
       "published": "2025-10-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9880,
-      "name": "rfc9880",
-      "title": "Semantic Definition Format (SDF) for Data and Interactions of Things",
-      "abstract": "The Semantic Definition Format (SDF) is a format for domain experts to use in the creation and maintenance of data and interaction models that describe Things, i.e., physical objects that are available for interaction over a network.  An SDF specification describes definitions of SDF Objects/SDF Things and their associated interactions (Events, Actions, and Properties), as well as the Data types for the information exchanged in those interactions.  Tools convert this format to database formats and other serializations as needed.",
-      "status": "Proposed Standard",
-      "published": "2026-01-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9879,
-      "name": "rfc9879",
-      "title": "Use of Password-Based Message Authentication Code 1 (PBMAC1) in PKCS #12 Syntax",
-      "abstract": "This document specifies additions and amendments to RFCs 7292 and 8018.  It also obsoletes the RFC 9579.  It defines a way to use the Password-Based Message Authentication Code 1 (PBMAC1), defined in RFC 8018, inside the PKCS #12 syntax.  The purpose of this specification is to permit the use of more modern Password-Based Key Derivation Functions (PBKDFs) and allow for regulatory compliance.",
-      "status": "Informational",
-      "published": "2025-09-01T00:00:00Z"
     }
   ],
   "next": "?limit=50&search=&sort=desc&page=2",
