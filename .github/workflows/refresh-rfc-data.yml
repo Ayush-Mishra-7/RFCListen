@@ -34,7 +34,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add backend/cache/rfc_index.json backend/cache/rfc_index.xml frontend/top-rfcs.json
+          git add -f backend/cache/rfc_index.json backend/cache/rfc_index.xml frontend/top-rfcs.json
           if git diff --cached --quiet; then
             echo "committed=false" >> "$GITHUB_OUTPUT"
           else
