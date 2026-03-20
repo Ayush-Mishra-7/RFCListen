@@ -323,7 +323,8 @@ def _iter_section_heading_matches(text: str) -> list[re.Match[str]]:
 
 
 def _is_toc_backmatter_entry(line: str) -> bool:
-    stripped = line.strip().rstrip(":.").lower()
+    cleaned = _RE_TOC_PAGE_NUMBER.sub("", line)
+    stripped = cleaned.strip().rstrip(":.").lower()
     return stripped in _TOC_BACKMATTER_HEADINGS
 
 

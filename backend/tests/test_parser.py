@@ -411,6 +411,26 @@ ISSN: 2070-1721                                                      SSW
 Abstract
 """
 
+RFC8190_TOC_SNIPPET = """\
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   2.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   3
+     2.1.  Definition of Globally Reachable  . . . . . . . . . . . .   3
+     2.2.  Updates to the IPv4 Special-Purpose Address Registry  . .   4
+     2.3.  Updates to the IPv6 Special-Purpose Address Registry  . .   4
+   3.  Security Considerations . . . . . . . . . . . . . . . . . . .   4
+   4.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   5
+     4.1.  Normative References  . . . . . . . . . . . . . . . . . .   5
+     4.2.  Informative References  . . . . . . . . . . . . . . . . .   5
+   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .   5
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   6
+
+1.  Introduction
+
+   In order to support new protocols and practices, the IETF...
+"""
+
 APPENDIX_BODY_SNIPPET = """\
 1.  Introduction
 
@@ -520,6 +540,10 @@ Table of Contents
     def test_returns_none_if_no_toc(self):
         text = "1. Introduction\n\n   Content."
         assert _extract_toc_sections(text) is None
+
+    def test_extracts_ids_from_rfc8190_backmatter_toc(self):
+        result = _extract_toc_sections(RFC8190_TOC_SNIPPET)
+        assert {"s1", "s2", "s2_1", "s2_2", "s2_3", "s3", "s4", "s4_1", "s4_2"} <= result
 
 
 
@@ -799,6 +823,12 @@ class TestFullParser:
         first_section = next(s for s in result["sections"] if s["type"] == "text")
         assert first_section["heading"] != "11.4. DUID Based on Link-Layer Address (DUID-LL)"
         assert "11.5. DUID Based on Universally Unique Identifier (DUID-UUID)" not in first_section["content"]
+
+    def test_rfc8190_starts_at_introduction_after_toc_strip(self):
+        result = parse_rfc(8190, RFC8190_TOC_SNIPPET)
+        first_section = next(s for s in result["sections"] if s["type"] == "text")
+        assert first_section["heading"] == "1. Introduction"
+        assert "In order to support" in first_section["content"]
 
     def test_inline_version_numbers_do_not_create_false_headings(self):
         result = parse_rfc(9930, RFC9930_TOC_SNIPPET)
