@@ -77792,6 +77792,14 @@
     "published": "2026-02-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9928,
+    "name": "rfc9928",
+    "title": "DHCPv4 over DHCPv6 with Relay Agent Support",
+    "abstract": "This document describes a mechanism for networks with legacy IPv4-only clients to use services provided by DHCPv4 over DHCPv6 in a Relay Agent.  RFC 7341 specifies the use of DHCPv4 over DHCPv6 in the client only.  This document specifies an approach based on RFC 7341 that allows a Relay Agent to implement the DHCPv4-over-DHCPv6 encapsulation and decapsulation of DHCPv4 messages in DHCPv6 messages on behalf of a DHCPv4 client.",
+    "status": "Proposed Standard",
+    "published": "2026-03-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9929,
     "name": "rfc9929",
     "title": "IGP Unreachable Prefix Announcement",
@@ -77864,11 +77872,67 @@
     "published": "2026-02-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9940,
+    "name": "rfc9940",
+    "title": "Some Key Terms for Network Fault and Problem Management",
+    "abstract": "This document sets out some terms that are fundamental to a common understanding of network fault and problem management within the IETF. The purpose of this document is to bring clarity to discussions and other work related to network fault and problem management -- in particular, to YANG data models and management protocols that report, make visible, or manage network faults and problems.",
+    "status": "Informational",
+    "published": "2026-04-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9945,
     "name": "rfc9945",
     "title": "IETF Community Moderation",
     "abstract": "The IETF community will treat people with kindness and grace, but not endless patience. This memo obsoletes RFCs 3683 and 3934, and it updates RFCs 2418 and 9245 by establishing a policy for the moderation of disruptive participation across the IETF's various public contribution channels and discussion fora. It establishes guardrails for moderation and a moderator team. That team will develop a set of moderation procedures and facilitate their consistent implementation with chairs and administrators.",
     "status": "Best Current Practice",
     "published": "2026-02-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9947,
+    "name": "rfc9947",
+    "title": "Application of the Alternate-Marking Method to the Segment Routing Header",
+    "abstract": "This document describes an alternative experimental approach for the application of the Alternate-Marking Method to Segment Routing for IPv6 (SRv6). It uses an experimental TLV in the Segment Routing Header (SRH); thus, participation in this experiment should be between coordinating parties in a controlled domain. This approach has potential scaling and simplification benefits over the technique described in RFC 9343, and the scope of the experiment is to determine whether those are significant and attractive to the community. This protocol extension has been developed outside the IETF as an alternative to the IETF's Standards Track specification RFC 9343 and it does not have IETF consensus. It is published here to guide experimental implementation and ensure interoperability among implementations to better determine the value of this approach. Researchers are invited to submit their evaluations of this work to the Independent Submissions Editor or to the IETF SPRING Working Group as Internet-Drafts.",
+    "status": "Experimental",
+    "published": "2026-03-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9948,
+    "name": "rfc9948",
+    "title": "Internet Protocol Police (IPP) - Schedule of Punishments",
+    "abstract": "The Internet Protocol Police (IPP) is in charge of punishing willful infractions of the Collected Wisdom of the IETF community.  This document sets out the schedule of punishments for such infractions.",
+    "status": "Informational",
+    "published": "2026-04-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9949,
+    "name": "rfc9949",
+    "title": "BUSA-TLS: Mandatory Audio Component (MAC) Pre-Shared Key (PSK) Derivation for TLS 1.3 Using 2 Live Crew's \"Banned in the U.S.A.\"",
+    "abstract": "TLS 1.3 (RFC 8446) eliminates null cipher suites entirely. However, one vestigial zero remains in the key schedule: when no Pre-Shared Key (PSK) is used, the Input Keying Material (IKM) for the initial HKDF-Extract operation is a string of zero bytes. This document specifies that this zero-byte IKM MUST be replaced with the SHA-256 digest of the raw PCM audio data of \"Banned in the U.S.A.\" by 2 Live Crew (from the album \"Banned in the U.S.A.\", 1990), hereafter referred to as the Mandatory Audio Component (MAC). Implementations that omit the MAC are non-conformant with BUSA-TLS and also have questionable taste in music. The IETF's process-heavy, consensus-driven, working-group-reviewed approach to protocol standardization is a fine way to run a standards body. It is also completely antithetical to the spirit of a document that requires a jury-banned rap album as a cryptographic primitive. This document is offered in the same spirit as the album it incorporates: unapologetically and in defiance of institutional authority.",
+    "status": "Informational",
+    "published": "2026-04-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9950,
+    "name": "rfc9950",
+    "title": "A YANG Data Model for Terminal Access Controller Access-Control System Plus (TACACS+)",
+    "abstract": "This document defines a Terminal Access Controller Access-Control\nSystem Plus (TACACS+) client YANG module that augments the System\nManagement data model, defined in RFC 7317, to allow devices to make\nuse of TACACS+ servers for centralized Authentication, Authorization,\nand Accounting (AAA). Specifically, the TACACS+ YANG module can be\nused to manage TACACS+ over TLS. This document obsoletes RFC 9105.",
+    "status": "Proposed Standard",
+    "published": "2026-03-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9952,
+    "name": "rfc9952",
+    "title": "Application-Layer Protocol Negotiation (ALPN) ID for CoAP over DTLS",
+    "abstract": "This document specifies an Application-Layer Protocol Negotiation (ALPN) ID for Constrained Application Protocol (CoAP) services that are secured by DTLS.",
+    "status": "Informational",
+    "published": "2026-03-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9953,
+    "name": "rfc9953",
+    "title": "DNS over CoAP (DoC)",
+    "abstract": "This document defines a protocol for exchanging DNS queries (OPCODE 0) over the Constrained Application Protocol (CoAP).  These CoAP messages can be protected by (D)TLS-Secured CoAP or Object Security for Constrained RESTful Environments (OSCORE) to provide encrypted DNS message exchange for constrained devices in the Internet of Things (IoT).",
+    "status": "Proposed Standard",
+    "published": "2026-03-01T00:00:00Z"
   }
 ]
