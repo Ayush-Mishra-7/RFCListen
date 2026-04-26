@@ -1,5 +1,5 @@
 {
-  "count": 9745,
+  "count": 9748,
   "page": 1,
   "limit": 50,
   "rfcs": [
@@ -18,6 +18,14 @@
       "abstract": "This document specifies an Application-Layer Protocol Negotiation (ALPN) ID for Constrained Application Protocol (CoAP) services that are secured by DTLS.",
       "status": "Informational",
       "published": "2026-03-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9951,
+      "name": "rfc9951",
+      "title": "Export of Delay Performance Metrics in IP Flow Information Export (IPFIX)",
+      "abstract": "This document specifies new IP Flow Information Export (IPFIX) Information Elements to export the On-Path delay at each Operations, Administration, and Maintenance (OAM) transit and decapsulating nodes.  The On-Path delay is defined as the delay between the OAM header encapsulating node and each OAM header transit and OAM header decapsulating nodes.  This delay measurement is computed by an On-Path Telemetry protocol and is exported by the IPFIX process.",
+      "status": "Proposed Standard",
+      "published": "2026-04-01T00:00:00Z"
     },
     {
       "rfcNumber": 9950,
@@ -50,6 +58,14 @@
       "abstract": "This document describes an alternative experimental approach for the application of the Alternate-Marking Method to Segment Routing for IPv6 (SRv6). It uses an experimental TLV in the Segment Routing Header (SRH); thus, participation in this experiment should be between coordinating parties in a controlled domain. This approach has potential scaling and simplification benefits over the technique described in RFC 9343, and the scope of the experiment is to determine whether those are significant and attractive to the community. This protocol extension has been developed outside the IETF as an alternative to the IETF's Standards Track specification RFC 9343 and it does not have IETF consensus. It is published here to guide experimental implementation and ensure interoperability among implementations to better determine the value of this approach. Researchers are invited to submit their evaluations of this work to the Independent Submissions Editor or to the IETF SPRING Working Group as Internet-Drafts.",
       "status": "Experimental",
       "published": "2026-03-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9946,
+      "name": "rfc9946",
+      "title": "The UDP Speed Test Protocol (UDPSTP) for One-Way IP Capacity Metric Measurement",
+      "abstract": "This document addresses the problem of protocol support for measuring One-Way IP Capacity metrics specified by RFC 9097.  The Method of Measurement discussed in that RFC requires a feedback channel from the receiver to control the sender's transmission rate in near real-time.  This document defines the UDP Speed Test Protocol (UDPSTP) for conducting measurements as described in RFC 9097 and other related measurements.",
+      "status": "Proposed Standard",
+      "published": "2026-04-01T00:00:00Z"
     },
     {
       "rfcNumber": 9945,
@@ -384,22 +400,6 @@
       "name": "rfc9897",
       "title": "Datagram Congestion Control Protocol (DCCP) Extensions for Multipath Operation with Multiple Addresses",
       "abstract": "Datagram Congestion Control Protocol (DCCP) communications, as defined in RFC 4340, are inherently restricted to a single path per connection, despite the availability of multiple network paths between peers. The ability to utilize multiple paths simultaneously for a DCCP session can enhance network resource utilization, improve throughput, and increase resilience to network failures, ultimately enhancing the user experience. Use cases for Multipath DCCP (MP-DCCP) include mobile devices (e.g., handsets and vehicles) and residential home gateways that maintain simultaneous connections to distinct network types such as cellular and Wireless Local Area Networks (WLANs) or cellular and fixed access networks. Compared to existing multipath transport protocols, such as Multipath TCP (MPTCP), MP-DCCP is particularly suited for latency-sensitive applications with varying requirements for reliability and in-order delivery. This document specifies a set of protocol extensions to DCCP that enable multipath operations. These extensions maintain the same service model as DCCP while introducing mechanisms to establish and utilize multiple concurrent DCCP flows across different network paths.",
-      "status": "Proposed Standard",
-      "published": "2026-01-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9896,
-      "name": "rfc9896",
-      "title": "SVG in RFCs",
-      "abstract": "This document defines policy for the inclusion of Scalable Vector Graphics (SVG) in the definitive versions of RFCs and relevant publication formats. It contains policy requirements from RFC 7996 but removes all requirements related to using a specific SVG profile or implementation code. It also makes the RFC Production Center (RPC) responsible for decisions about SVG tooling and implementation. This document obsoletes RFC 7996.",
-      "status": "Informational",
-      "published": "2026-01-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9895,
-      "name": "rfc9895",
-      "title": "Dynamic Link Exchange Protocol (DLEP) IEEE 802.1Q Aware Credit Window Extension",
-      "abstract": "This document defines an extension to the Dynamic Link Exchange Protocol (DLEP) that enables an Ethernet IEEE 802.1Q aware credit window scheme for destination-specific and shared flow control.",
       "status": "Proposed Standard",
       "published": "2026-01-01T00:00:00Z"
     }

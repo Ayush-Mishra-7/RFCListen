@@ -76632,6 +76632,14 @@
     "published": "2025-04-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9768,
+    "name": "rfc9768",
+    "title": "More Accurate Explicit Congestion Notification (AccECN) Feedback in TCP",
+    "abstract": "Explicit Congestion Notification (ECN) is a mechanism by which network nodes can mark IP packets instead of dropping them to indicate incipient congestion to the endpoints.  Receivers with an ECN-capable transport protocol feed back this information to the sender.  ECN was originally specified for TCP in such a way that only one feedback signal can be transmitted per Round-Trip Time (RTT).  More recently defined mechanisms like Congestion Exposure (ConEx), Data Center TCP (DCTCP), or Low Latency, Low Loss, and Scalable Throughput (L4S) need more accurate ECN feedback information whenever more than one marking is received in one RTT.  This document updates the original ECN specification defined in RFC 3168 by specifying a scheme that provides more than one feedback signal per RTT in the TCP header, called More Accurate ECN (AccECN).  Given TCP header space is scarce, it allocates a reserved header bit previously assigned to the ECN-nonce.  It also overloads the two existing ECN flags in the TCP header.  The resulting extra space is additionally exploited to feed back the IP-ECN field received during the TCP connection establishment.  Supplementary feedback information can optionally be provided in two new TCP Option alternatives, which are never used on the TCP SYN.  The document also specifies the treatment of this updated TCP wire protocol by middleboxes.",
+    "status": "Proposed Standard",
+    "published": "2026-04-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9769,
     "name": "rfc9769",
     "title": "NTP Interleaved Modes",
@@ -77928,6 +77936,14 @@
     "published": "2026-02-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9946,
+    "name": "rfc9946",
+    "title": "The UDP Speed Test Protocol (UDPSTP) for One-Way IP Capacity Metric Measurement",
+    "abstract": "This document addresses the problem of protocol support for measuring One-Way IP Capacity metrics specified by RFC 9097.  The Method of Measurement discussed in that RFC requires a feedback channel from the receiver to control the sender's transmission rate in near real-time.  This document defines the UDP Speed Test Protocol (UDPSTP) for conducting measurements as described in RFC 9097 and other related measurements.",
+    "status": "Proposed Standard",
+    "published": "2026-04-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9947,
     "name": "rfc9947",
     "title": "Application of the Alternate-Marking Method to the Segment Routing Header",
@@ -77958,6 +77974,14 @@
     "abstract": "This document defines a Terminal Access Controller Access-Control\nSystem Plus (TACACS+) client YANG module that augments the System\nManagement data model, defined in RFC 7317, to allow devices to make\nuse of TACACS+ servers for centralized Authentication, Authorization,\nand Accounting (AAA). Specifically, the TACACS+ YANG module can be\nused to manage TACACS+ over TLS. This document obsoletes RFC 9105.",
     "status": "Proposed Standard",
     "published": "2026-03-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9951,
+    "name": "rfc9951",
+    "title": "Export of Delay Performance Metrics in IP Flow Information Export (IPFIX)",
+    "abstract": "This document specifies new IP Flow Information Export (IPFIX) Information Elements to export the On-Path delay at each Operations, Administration, and Maintenance (OAM) transit and decapsulating nodes.  The On-Path delay is defined as the delay between the OAM header encapsulating node and each OAM header transit and OAM header decapsulating nodes.  This delay measurement is computed by an On-Path Telemetry protocol and is exported by the IPFIX process.",
+    "status": "Proposed Standard",
+    "published": "2026-04-01T00:00:00Z"
   },
   {
     "rfcNumber": 9952,
