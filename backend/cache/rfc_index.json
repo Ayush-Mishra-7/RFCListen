@@ -77998,5 +77998,13 @@
     "abstract": "This document defines a protocol for exchanging DNS queries (OPCODE 0) over the Constrained Application Protocol (CoAP).  These CoAP messages can be protected by (D)TLS-Secured CoAP or Object Security for Constrained RESTful Environments (OSCORE) to provide encrypted DNS message exchange for constrained devices in the Internet of Things (IoT).",
     "status": "Proposed Standard",
     "published": "2026-03-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9963,
+    "name": "rfc9963",
+    "title": "Legacy RSASSA-PKCS1-v1_5 Code Points for TLS 1.3",
+    "abstract": "This document allocates code points for the use of RSASSA-PKCS1-v1_5 with client certificates in TLS 1.3.  This removes an obstacle for some deployments to migrate to TLS 1.3.",
+    "status": "Proposed Standard",
+    "published": "2026-04-01T00:00:00Z"
   }
 ]

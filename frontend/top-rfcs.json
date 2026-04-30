@@ -1,8 +1,16 @@
 {
-  "count": 9748,
+  "count": 9749,
   "page": 1,
   "limit": 50,
   "rfcs": [
+    {
+      "rfcNumber": 9963,
+      "name": "rfc9963",
+      "title": "Legacy RSASSA-PKCS1-v1_5 Code Points for TLS 1.3",
+      "abstract": "This document allocates code points for the use of RSASSA-PKCS1-v1_5 with client certificates in TLS 1.3.  This removes an obstacle for some deployments to migrate to TLS 1.3.",
+      "status": "Proposed Standard",
+      "published": "2026-04-01T00:00:00Z"
+    },
     {
       "rfcNumber": 9953,
       "name": "rfc9953",
@@ -394,14 +402,6 @@
       "abstract": "The Neighbor Discovery (ND) protocol is a critical component of the\nIPv6 architecture. The protocol uses multicast in many messages. It\nalso assumes a security model where all nodes on a link are trusted.\nSuch a design might be inefficient in some scenarios (e.g., use of\nmulticast in wireless networks) or when nodes are not trustworthy\n(e.g., public access networks). These security and operational issues\nand the associated mitigation solutions are documented in more than\ntwenty RFCs. There is a need to track these issues and solutions in a\nsingle document. To that aim, this document summarizes the published ND issues and\nthen describes how all these issues originate from three causes.\nAddressing the issues is made simpler by addressing the causes. This\ndocument also analyzes the mitigation solutions and demonstrates that\nisolating hosts into different subnets and links can help to address\nthe three causes. Guidance is provided for selecting a suitable\nisolation method to prevent potential ND issues.",
       "status": "Informational",
       "published": "2025-11-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9897,
-      "name": "rfc9897",
-      "title": "Datagram Congestion Control Protocol (DCCP) Extensions for Multipath Operation with Multiple Addresses",
-      "abstract": "Datagram Congestion Control Protocol (DCCP) communications, as defined in RFC 4340, are inherently restricted to a single path per connection, despite the availability of multiple network paths between peers. The ability to utilize multiple paths simultaneously for a DCCP session can enhance network resource utilization, improve throughput, and increase resilience to network failures, ultimately enhancing the user experience. Use cases for Multipath DCCP (MP-DCCP) include mobile devices (e.g., handsets and vehicles) and residential home gateways that maintain simultaneous connections to distinct network types such as cellular and Wireless Local Area Networks (WLANs) or cellular and fixed access networks. Compared to existing multipath transport protocols, such as Multipath TCP (MPTCP), MP-DCCP is particularly suited for latency-sensitive applications with varying requirements for reliability and in-order delivery. This document specifies a set of protocol extensions to DCCP that enable multipath operations. These extensions maintain the same service model as DCCP while introducing mechanisms to establish and utilize multiple concurrent DCCP flows across different network paths.",
-      "status": "Proposed Standard",
-      "published": "2026-01-01T00:00:00Z"
     }
   ],
   "next": "?limit=50&search=&sort=desc&page=2",
