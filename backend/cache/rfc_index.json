@@ -78000,6 +78000,22 @@
     "published": "2026-03-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9960,
+    "name": "rfc9960",
+    "title": "Segment Routing Point-to-Multipoint Policy",
+    "abstract": "The Point-to-Multipoint (P2MP) Policy enables creation of P2MP trees for efficient multipoint packet delivery in a Segment Routing (SR) domain.  This document specifies the architecture, signaling, and procedures for SR P2MP Policies with Segment Routing over MPLS (SR-MPLS) and Segment Routing over IPv6 (SRv6).  It defines the SR P2MP Policy construct, candidate paths (CPs) of an SR P2MP Policy, and the instantiation of the P2MP tree instances (PTIs) of a CP using Replication segments.  Additionally, it describes the required extensions for a controller to support P2MP path computation and provisioning.  This document updates RFC 9524.",
+    "status": "Proposed Standard",
+    "published": "2026-04-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9961,
+    "name": "rfc9961",
+    "title": "MPLS Segment Routing Point-to-Multipoint (P2MP) Policy Ping",
+    "abstract": "Segment Routing (SR) Point-to-Multipoint (P2MP) Policies are used to define and manage explicit P2MP paths within a network. These policies are typically calculated via a controller-based mechanism and installed via, e.g., a Path Computation Element (PCE). In other cases, these policies can be installed using the Network Configuration Protocol (NETCONF) / YANG or a Command Line Interface (CLI). They are used to steer Multicast traffic along optimized paths from a Root to a set of Leaf routers. This document defines extensions to ping and traceroute mechanisms for an SR P2MP Policy with MPLS encapsulation to provide Operations, Administration, and Maintenance (OAM) capabilities. The extensions enable operators to verify connectivity, diagnose failures, and troubleshoot forwarding issues within SR P2MP Policy Multicast trees. By introducing new mechanisms for detecting failures and validating path integrity, this document enhances the operational robustness of P2MP Multicast deployments. Additionally, it ensures that existing MPLS and SR-based OAM tools can be effectively applied to networks utilizing SR P2MP Policies.",
+    "status": "Proposed Standard",
+    "published": "2026-04-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9963,
     "name": "rfc9963",
     "title": "Legacy RSASSA-PKCS1-v1_5 Code Points for TLS 1.3",

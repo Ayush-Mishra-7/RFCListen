@@ -1,5 +1,5 @@
 {
-  "count": 9749,
+  "count": 9751,
   "page": 1,
   "limit": 50,
   "rfcs": [
@@ -8,6 +8,22 @@
       "name": "rfc9963",
       "title": "Legacy RSASSA-PKCS1-v1_5 Code Points for TLS 1.3",
       "abstract": "This document allocates code points for the use of RSASSA-PKCS1-v1_5 with client certificates in TLS 1.3.  This removes an obstacle for some deployments to migrate to TLS 1.3.",
+      "status": "Proposed Standard",
+      "published": "2026-04-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9961,
+      "name": "rfc9961",
+      "title": "MPLS Segment Routing Point-to-Multipoint (P2MP) Policy Ping",
+      "abstract": "Segment Routing (SR) Point-to-Multipoint (P2MP) Policies are used to define and manage explicit P2MP paths within a network. These policies are typically calculated via a controller-based mechanism and installed via, e.g., a Path Computation Element (PCE). In other cases, these policies can be installed using the Network Configuration Protocol (NETCONF) / YANG or a Command Line Interface (CLI). They are used to steer Multicast traffic along optimized paths from a Root to a set of Leaf routers. This document defines extensions to ping and traceroute mechanisms for an SR P2MP Policy with MPLS encapsulation to provide Operations, Administration, and Maintenance (OAM) capabilities. The extensions enable operators to verify connectivity, diagnose failures, and troubleshoot forwarding issues within SR P2MP Policy Multicast trees. By introducing new mechanisms for detecting failures and validating path integrity, this document enhances the operational robustness of P2MP Multicast deployments. Additionally, it ensures that existing MPLS and SR-based OAM tools can be effectively applied to networks utilizing SR P2MP Policies.",
+      "status": "Proposed Standard",
+      "published": "2026-04-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9960,
+      "name": "rfc9960",
+      "title": "Segment Routing Point-to-Multipoint Policy",
+      "abstract": "The Point-to-Multipoint (P2MP) Policy enables creation of P2MP trees for efficient multipoint packet delivery in a Segment Routing (SR) domain.  This document specifies the architecture, signaling, and procedures for SR P2MP Policies with Segment Routing over MPLS (SR-MPLS) and Segment Routing over IPv6 (SRv6).  It defines the SR P2MP Policy construct, candidate paths (CPs) of an SR P2MP Policy, and the instantiation of the P2MP tree instances (PTIs) of a CP using Replication segments.  Additionally, it describes the required extensions for a controller to support P2MP path computation and provisioning.  This document updates RFC 9524.",
       "status": "Proposed Standard",
       "published": "2026-04-01T00:00:00Z"
     },
@@ -386,22 +402,6 @@
       "abstract": "This document releases IANA-assigned port numbers for services related to the Network Configuration Protocol (NETCONF) that have not been in use in production networks.",
       "status": "Proposed Standard",
       "published": "2025-12-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9899,
-      "name": "rfc9899",
-      "title": "Extensions to the YANG Data Model for Access Control Lists (ACLs)",
-      "abstract": "RFC 8519 defines a YANG data model for Access Control Lists (ACLs). This document specifies a set of extensions that fix many of the limitations of the ACL model as initially defined in RFC 8519. Specifically, it introduces augmentations to the ACL base model to enhance its functionality and applicability. This document also creates initial versions of IANA-maintained modules for ICMP types and IPv6 extension headers.",
-      "status": "Proposed Standard",
-      "published": "2025-12-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9898,
-      "name": "rfc9898",
-      "title": "Neighbor Discovery Considerations in IPv6 Deployments",
-      "abstract": "The Neighbor Discovery (ND) protocol is a critical component of the\nIPv6 architecture. The protocol uses multicast in many messages. It\nalso assumes a security model where all nodes on a link are trusted.\nSuch a design might be inefficient in some scenarios (e.g., use of\nmulticast in wireless networks) or when nodes are not trustworthy\n(e.g., public access networks). These security and operational issues\nand the associated mitigation solutions are documented in more than\ntwenty RFCs. There is a need to track these issues and solutions in a\nsingle document. To that aim, this document summarizes the published ND issues and\nthen describes how all these issues originate from three causes.\nAddressing the issues is made simpler by addressing the causes. This\ndocument also analyzes the mitigation solutions and demonstrates that\nisolating hosts into different subnets and links can help to address\nthe three causes. Guidance is provided for selecting a suitable\nisolation method to prevent potential ND issues.",
-      "status": "Informational",
-      "published": "2025-11-01T00:00:00Z"
     }
   ],
   "next": "?limit=50&search=&sort=desc&page=2",
