@@ -4318,6 +4318,7 @@
         <current-status>UNKNOWN</current-status>
         <publication-status>UNKNOWN</publication-status>
         <stream>Legacy</stream>
+        <errata-url>https://www.rfc-editor.org/errata/rfc117</errata-url>
         <doi>10.17487/RFC0117</doi>
     </rfc-entry>
     <rfc-entry>
@@ -9476,6 +9477,7 @@
         <current-status>UNKNOWN</current-status>
         <publication-status>UNKNOWN</publication-status>
         <stream>Legacy</stream>
+        <errata-url>https://www.rfc-editor.org/errata/rfc346</errata-url>
         <doi>10.17487/RFC0346</doi>
     </rfc-entry>
     <rfc-entry>
@@ -16105,7 +16107,6 @@
         <current-status>UNKNOWN</current-status>
         <publication-status>UNKNOWN</publication-status>
         <stream>Legacy</stream>
-        <errata-url>https://www.rfc-editor.org/errata/rfc672</errata-url>
         <doi>10.17487/RFC0672</doi>
     </rfc-entry>
     <rfc-not-issued-entry>
@@ -18702,6 +18703,7 @@
         <current-status>HISTORIC</current-status>
         <publication-status>UNKNOWN</publication-status>
         <stream>Legacy</stream>
+        <errata-url>https://www.rfc-editor.org/errata/rfc790</errata-url>
         <doi>10.17487/RFC0790</doi>
     </rfc-entry>
     <rfc-entry>
@@ -44598,9 +44600,6 @@
             <kw>Mail</kw>
         </keywords>
         <abstract><p>There is a need for human beings who use X.400 systems to be able to write down O/R names in a uniform way.  This memo is a discussion of this topic.  This memo provides information for the Internet Community.  It does not specify an Internet Standard of any kind.</p></abstract>
-        <see-also>
-            <doc-id>RTR0012</doc-id>
-        </see-also>
         <current-status>INFORMATIONAL</current-status>
         <publication-status>INFORMATIONAL</publication-status>
         <stream>Legacy</stream>
@@ -46756,6 +46755,7 @@
         <current-status>PROPOSED STANDARD</current-status>
         <publication-status>PROPOSED STANDARD</publication-status>
         <stream>Legacy</stream>
+        <errata-url>https://www.rfc-editor.org/errata/rfc1752</errata-url>
         <doi>10.17487/RFC1752</doi>
     </rfc-entry>
     <rfc-entry>
@@ -253620,6 +253620,7 @@
         <draft>draft-ietf-scim-core-schema-22</draft>
         <updated-by>
             <doc-id>RFC9865</doc-id>
+            <doc-id>RFC9967</doc-id>
         </updated-by>
         <current-status>PROPOSED STANDARD</current-status>
         <publication-status>PROPOSED STANDARD</publication-status>
@@ -253664,6 +253665,7 @@
         <draft>draft-ietf-scim-api-19</draft>
         <updated-by>
             <doc-id>RFC9865</doc-id>
+            <doc-id>RFC9967</doc-id>
         </updated-by>
         <current-status>PROPOSED STANDARD</current-status>
         <publication-status>PROPOSED STANDARD</publication-status>
@@ -278567,6 +278569,7 @@
         <draft>draft-ietf-tsvwg-ieee-802-11-11</draft>
         <updated-by>
             <doc-id>RFC8622</doc-id>
+            <doc-id>RFC9956</doc-id>
         </updated-by>
         <current-status>PROPOSED STANDARD</current-status>
         <publication-status>PROPOSED STANDARD</publication-status>
@@ -290135,7 +290138,6 @@
         <stream>IETF</stream>
         <area>sec</area>
         <wg_acronym>lamps</wg_acronym>
-        <errata-url>https://www.rfc-editor.org/errata/rfc8649</errata-url>
         <doi>10.17487/RFC8649</doi>
     </rfc-entry>
     <rfc-entry>
@@ -340333,6 +340335,42 @@ algorithms.</p></abstract>
         <doi>10.17487/RFC9941</doi>
     </rfc-entry>
     <rfc-entry>
+        <doc-id>RFC9944</doc-id>
+        <title>Device Schema Extensions to the System for Cross-Domain Identity Management (SCIM) Model</title>
+        <author>
+            <name>M. Shahzad</name>
+        </author>
+        <author>
+            <name>H. Iqbal</name>
+        </author>
+        <author>
+            <name>E. Lear</name>
+        </author>
+        <date>
+            <month>May</month>
+            <year>2026</year>
+        </date>
+        <format>
+            <file-format>HTML</file-format>
+            <file-format>TEXT</file-format>
+            <file-format>PDF</file-format>
+            <file-format>XML</file-format>
+        </format>
+        <page-count>63</page-count>
+        <keywords>
+            <kw>provisioning</kw>
+            <kw>CRUD</kw>
+        </keywords>
+        <abstract><p>The initial core schema for the System for Cross-domain Identity Management (SCIM) was designed for provisioning users.  This memo specifies schema extensions that enable provisioning of devices using various underlying bootstrapping systems such as Wi-Fi Easy Connect, FIDO device onboarding vouchers, Bluetooth Low Energy (BLE) passcodes, and MAC Authenticated Bypass (MAB).</p></abstract>
+        <draft>draft-ietf-scim-device-model-18</draft>
+        <current-status>PROPOSED STANDARD</current-status>
+        <publication-status>PROPOSED STANDARD</publication-status>
+        <stream>IETF</stream>
+        <area>sec</area>
+        <wg_acronym>scim</wg_acronym>
+        <doi>10.17487/RFC9944</doi>
+    </rfc-entry>
+    <rfc-entry>
         <doc-id>RFC9945</doc-id>
         <title>IETF Community Moderation</title>
         <author>
@@ -340697,6 +340735,134 @@ used to manage TACACS+ over TLS.</p><p> This document obsoletes RFC 9105.</p></a
         <doi>10.17487/RFC9953</doi>
     </rfc-entry>
     <rfc-entry>
+        <doc-id>RFC9956</doc-id>
+        <title>A Non-Queue-Building Per-Hop Behavior (NQB PHB) for Differentiated Services</title>
+        <author>
+            <name>G. White</name>
+        </author>
+        <author>
+            <name>T. Fossati</name>
+        </author>
+        <author>
+            <name>R. Geib</name>
+        </author>
+        <date>
+            <month>May</month>
+            <year>2026</year>
+        </date>
+        <format>
+            <file-format>HTML</file-format>
+            <file-format>TEXT</file-format>
+            <file-format>PDF</file-format>
+            <file-format>XML</file-format>
+        </format>
+        <page-count>32</page-count>
+        <keywords>
+            <kw>DS</kw>
+            <kw>DSCP</kw>
+            <kw>L4S</kw>
+            <kw>delay</kw>
+            <kw>jitter</kw>
+            <kw>delay variation</kw>
+            <kw>Queuing variation</kw>
+            <kw>One Way Delay</kw>
+            <kw>Round-Trip Time</kw>
+            <kw>RTT</kw>
+            <kw>Quality of Service</kw>
+            <kw>QoS</kw>
+            <kw>Quality of Experience</kw>
+            <kw>QoE</kw>
+        </keywords>
+        <abstract><p>This document specifies characteristics of a Non-Queue-Building Per-Hop Behavior (NQB PHB).  The NQB PHB provides a shallow-buffered, best-effort service as a complement to a Default deep-buffered, best-effort service for Internet services.  The purpose of this NQB PHB is to provide a separate queue that enables smooth (i.e., non-bursty), low-data-rate, application-limited traffic microflows, to avoid the delay, delay variation and loss that would ordinarily be caused by sharing a queue with bursty, capacity-seeking traffic.  This PHB is implemented without prioritization and can be implemented without rate policing, making it suitable for environments where the use of these features is restricted.  The NQB PHB has been developed primarily for use by access network segments, where queuing delay and queuing loss caused by Queue-Building (QB) protocols are manifested; however, its use is not limited to such segments.  In particular, the application of NQB PHB to cable broadband links, Wi-Fi links, and mobile network radio/core segments are discussed in this document.  This document recommends a specific Differentiated Services Code Point (DSCP) to identify NQB microflows and updates the guidance in RFC 8325 on mapping Differentiated Services (Diffserv or DS) to IEEE 802.11 for this codepoint.</p></abstract>
+        <draft>draft-ietf-tsvwg-nqb-33</draft>
+        <updates>
+            <doc-id>RFC8325</doc-id>
+        </updates>
+        <current-status>PROPOSED STANDARD</current-status>
+        <publication-status>PROPOSED STANDARD</publication-status>
+        <stream>IETF</stream>
+        <area>wit</area>
+        <wg_acronym>tsvwg</wg_acronym>
+        <doi>10.17487/RFC9956</doi>
+    </rfc-entry>
+    <rfc-entry>
+        <doc-id>RFC9957</doc-id>
+        <title>The DOCSIS Queue Protection Algorithm to Preserve Low Latency</title>
+        <author>
+            <name>B. Briscoe</name>
+            <title>Editor</title>
+        </author>
+        <author>
+            <name>G. White</name>
+        </author>
+        <date>
+            <month>May</month>
+            <year>2026</year>
+        </date>
+        <format>
+            <file-format>HTML</file-format>
+            <file-format>TEXT</file-format>
+            <file-format>PDF</file-format>
+            <file-format>XML</file-format>
+        </format>
+        <page-count>28</page-count>
+        <keywords>
+            <kw>Independent Submission Stream</kw>
+            <kw>ISE</kw>
+            <kw>Latency</kw>
+            <kw>Policing</kw>
+        </keywords>
+        <abstract><p>This Informational RFC explains the specification of the queue protection algorithm introduced into Data-Over-Cable Service Interface Specification (DOCSIS) technology at version 3.1.  A shared low-latency queue relies on the non-queue-building behaviour of every traffic flow using it.  However, some flows might not take such care, either accidentally or maliciously.  If a queue is about to exceed a threshold level of delay, the Queue Protection algorithm can rapidly detect the flows most likely to be responsible.  It can then prevent harm to other traffic in the low-latency queue by ejecting selected packets (or all packets) of these flows.  This document is designed for four audiences: a) congestion control designers who need to understand how to keep on the "good" side of the algorithm; b) implementers of the algorithm who want to understand it in more depth; c) designers of algorithms with similar goals, perhaps for non-DOCSIS scenarios; and d) researchers interested in evaluating the algorithm.</p></abstract>
+        <draft>draft-briscoe-docsis-q-protection-07</draft>
+        <current-status>INFORMATIONAL</current-status>
+        <publication-status>INFORMATIONAL</publication-status>
+        <stream>INDEPENDENT</stream>
+        <doi>10.17487/RFC9957</doi>
+    </rfc-entry>
+    <rfc-entry>
+        <doc-id>RFC9959</doc-id>
+        <title>Careful Resume: Convergence of Congestion Control from Retained State</title>
+        <author>
+            <name>N. Kuhn</name>
+        </author>
+        <author>
+            <name>E. Stephan</name>
+        </author>
+        <author>
+            <name>G. Fairhurst</name>
+        </author>
+        <author>
+            <name>R. Secchi</name>
+        </author>
+        <author>
+            <name>C. Huitema</name>
+        </author>
+        <date>
+            <month>May</month>
+            <year>2026</year>
+        </date>
+        <format>
+            <file-format>HTML</file-format>
+            <file-format>TEXT</file-format>
+            <file-format>PDF</file-format>
+            <file-format>XML</file-format>
+        </format>
+        <page-count>29</page-count>
+        <keywords>
+            <kw>Transport</kw>
+            <kw>Congestion Control</kw>
+            <kw>QUIC</kw>
+        </keywords>
+        <abstract><p>This document specifies a cautious method for Internet transports that enables fast startup of Congestion Control (CC) for a wide range of connections, known as "Careful Resume". It reuses a set of computed CC parameters that are based on previously observed path characteristics between the same pair of transport endpoints. These parameters are saved, allowing them to be later used to modify the CC behaviour of a subsequent connection.</p><p> This document describes the assumptions and defines the requirements for how a sender utilises these parameters to provide opportunities for a connection to more rapidly get up to speed and utilise available capacity. It discusses how the use of this method impacts the capacity at a shared network bottleneck and the safe response that is needed after any indication that the new rate is inappropriate.</p></abstract>
+        <draft>draft-ietf-tsvwg-careful-resume-24</draft>
+        <current-status>PROPOSED STANDARD</current-status>
+        <publication-status>PROPOSED STANDARD</publication-status>
+        <stream>IETF</stream>
+        <area>wit</area>
+        <wg_acronym>tsvwg</wg_acronym>
+        <doi>10.17487/RFC9959</doi>
+    </rfc-entry>
+    <rfc-entry>
         <doc-id>RFC9960</doc-id>
         <title>Segment Routing Point-to-Multipoint Policy</title>
         <author>
@@ -340790,6 +340956,37 @@ used to manage TACACS+ over TLS.</p><p> This document obsoletes RFC 9105.</p></a
         <doi>10.17487/RFC9961</doi>
     </rfc-entry>
     <rfc-entry>
+        <doc-id>RFC9962</doc-id>
+        <title>A Decentralized Locator/ID Separation Protocol Mapping System (LISP-Decent)</title>
+        <author>
+            <name>D. Farinacci</name>
+        </author>
+        <author>
+            <name>C. Cantrell</name>
+        </author>
+        <date>
+            <month>May</month>
+            <year>2026</year>
+        </date>
+        <format>
+            <file-format>HTML</file-format>
+            <file-format>TEXT</file-format>
+            <file-format>PDF</file-format>
+            <file-format>XML</file-format>
+        </format>
+        <page-count>15</page-count>
+        <abstract><p>This document describes how the Locator/ID Separation Protocol (LISP)
+Mapping System can be distributed for scale and decentralized for
+management, while maintaining trust among data plane nodes.  This is
+an Informational RFC and should be used by LISP-Decent
+implementations to interoperate with each other.</p></abstract>
+        <draft>draft-farinacci-lisp-decent-22</draft>
+        <current-status>INFORMATIONAL</current-status>
+        <publication-status>INFORMATIONAL</publication-status>
+        <stream>INDEPENDENT</stream>
+        <doi>10.17487/RFC9962</doi>
+    </rfc-entry>
+    <rfc-entry>
         <doc-id>RFC9963</doc-id>
         <title>Legacy RSASSA-PKCS1-v1_5 Code Points for TLS 1.3</title>
         <author>
@@ -340817,6 +341014,88 @@ used to manage TACACS+ over TLS.</p><p> This document obsoletes RFC 9105.</p></a
         <area>sec</area>
         <wg_acronym>tls</wg_acronym>
         <doi>10.17487/RFC9963</doi>
+    </rfc-entry>
+    <rfc-entry>
+        <doc-id>RFC9967</doc-id>
+        <title>System for Cross-Domain Identity Management (SCIM) Profile for Security Event Tokens (SETs)</title>
+        <author>
+            <name>P. Hunt</name>
+            <title>Editor</title>
+        </author>
+        <author>
+            <name>N. Cam-Winget</name>
+        </author>
+        <author>
+            <name>M. Kiser</name>
+        </author>
+        <author>
+            <name>J. Schreiber</name>
+        </author>
+        <date>
+            <month>May</month>
+            <year>2026</year>
+        </date>
+        <format>
+            <file-format>HTML</file-format>
+            <file-format>TEXT</file-format>
+            <file-format>PDF</file-format>
+            <file-format>XML</file-format>
+        </format>
+        <page-count>33</page-count>
+        <keywords>
+            <kw>Identity</kw>
+            <kw>Event</kw>
+            <kw>SET</kw>
+            <kw>Provisioning</kw>
+            <kw>Token</kw>
+            <kw>SCIM</kw>
+        </keywords>
+        <abstract><p>This specification defines a set of System for Cross-domain Identity Management (SCIM) Security Events using the Security Event Token (SET) specification (RFC 8417) to enable the asynchronous exchange of messages between SCIM service providers and receivers.</p><p> This specification updates RFC 7643 by defining additional attributes for the "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig" schema, and it updates RFC 7644 with an optional new asynchronous SCIM request capability.</p></abstract>
+        <draft>draft-ietf-scim-events-16</draft>
+        <updates>
+            <doc-id>RFC7643</doc-id>
+            <doc-id>RFC7644</doc-id>
+        </updates>
+        <current-status>PROPOSED STANDARD</current-status>
+        <publication-status>PROPOSED STANDARD</publication-status>
+        <stream>IETF</stream>
+        <area>sec</area>
+        <wg_acronym>scim</wg_acronym>
+        <doi>10.17487/RFC9967</doi>
+    </rfc-entry>
+    <rfc-entry>
+        <doc-id>RFC9968</doc-id>
+        <title>Report from the IAB Workshop on the Next Era of Network Management Operations (NEMOPS)</title>
+        <author>
+            <name>W. Hardaker</name>
+        </author>
+        <author>
+            <name>D. Dhody</name>
+        </author>
+        <date>
+            <month>May</month>
+            <year>2026</year>
+        </date>
+        <format>
+            <file-format>HTML</file-format>
+            <file-format>TEXT</file-format>
+            <file-format>PDF</file-format>
+            <file-format>XML</file-format>
+        </format>
+        <page-count>20</page-count>
+        <keywords>
+            <kw>YANG</kw>
+            <kw>NETCONF</kw>
+            <kw>RESTCONF</kw>
+            <kw>NMOPS</kw>
+            <kw>RFC3535</kw>
+        </keywords>
+        <abstract><p>The "Next Era of Network Management Operations (NEMOPS)" workshop was convened by the Internet Architecture Board (IAB) from December 3-5, 2024 as a three-day online meeting. It builds on a previous 2002 workshop, the outcome of which was documented in RFC 3535, identifying 14 operator requirements for consideration in future network management protocol design and related data models, along with some recommendations for the IETF. Much has changed in the Internet's operation and technological foundations since then. The NEMOPS workshop reviewed the past outcomes and discussed any operational barriers that prevented these technologies from being widely implemented. With the industry, network operators and protocol engineers working in collaboration, the workshop developed a suggested plan of action and network management recommendations for the IETF and IRTF. Building on RFC 3535, this document provides the report of the follow-up IAB workshop on network management.</p><p> Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB views and positions.</p></abstract>
+        <draft>draft-iab-nemops-workshop-report-04</draft>
+        <current-status>INFORMATIONAL</current-status>
+        <publication-status>INFORMATIONAL</publication-status>
+        <stream>IAB</stream>
+        <doi>10.17487/RFC9968</doi>
     </rfc-entry>
     <std-entry>
         <doc-id>STD0001</doc-id>
