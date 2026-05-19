@@ -1,24 +1,8 @@
 {
-  "count": 9758,
+  "count": 9751,
   "page": 1,
   "limit": 50,
   "rfcs": [
-    {
-      "rfcNumber": 9968,
-      "name": "rfc9968",
-      "title": "Report from the IAB Workshop on the Next Era of Network Management Operations (NEMOPS)",
-      "abstract": "The \"Next Era of Network Management Operations (NEMOPS)\" workshop was convened by the Internet Architecture Board (IAB) from December 3-5, 2024 as a three-day online meeting. It builds on a previous 2002 workshop, the outcome of which was documented in RFC 3535, identifying 14 operator requirements for consideration in future network management protocol design and related data models, along with some recommendations for the IETF. Much has changed in the Internet's operation and technological foundations since then. The NEMOPS workshop reviewed the past outcomes and discussed any operational barriers that prevented these technologies from being widely implemented. With the industry, network operators and protocol engineers working in collaboration, the workshop developed a suggested plan of action and network management recommendations for the IETF and IRTF. Building on RFC 3535, this document provides the report of the follow-up IAB workshop on network management. Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB views and positions.",
-      "status": "Informational",
-      "published": "2026-05-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9967,
-      "name": "rfc9967",
-      "title": "System for Cross-Domain Identity Management (SCIM) Profile for Security Event Tokens (SETs)",
-      "abstract": "This specification defines a set of System for Cross-domain Identity Management (SCIM) Security Events using the Security Event Token (SET) specification (RFC 8417) to enable the asynchronous exchange of messages between SCIM service providers and receivers. This specification updates RFC 7643 by defining additional attributes for the \"urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig\" schema, and it updates RFC 7644 with an optional new asynchronous SCIM request capability.",
-      "status": "Proposed Standard",
-      "published": "2026-05-01T00:00:00Z"
-    },
     {
       "rfcNumber": 9963,
       "name": "rfc9963",
@@ -26,14 +10,6 @@
       "abstract": "This document allocates code points for the use of RSASSA-PKCS1-v1_5 with client certificates in TLS 1.3.  This removes an obstacle for some deployments to migrate to TLS 1.3.",
       "status": "Proposed Standard",
       "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9962,
-      "name": "rfc9962",
-      "title": "A Decentralized Locator/ID Separation Protocol Mapping System (LISP-Decent)",
-      "abstract": "This document describes how the Locator/ID Separation Protocol (LISP)\nMapping System can be distributed for scale and decentralized for\nmanagement, while maintaining trust among data plane nodes.  This is\nan Informational RFC and should be used by LISP-Decent\nimplementations to interoperate with each other.",
-      "status": "Informational",
-      "published": "2026-05-01T00:00:00Z"
     },
     {
       "rfcNumber": 9961,
@@ -50,30 +26,6 @@
       "abstract": "The Point-to-Multipoint (P2MP) Policy enables creation of P2MP trees for efficient multipoint packet delivery in a Segment Routing (SR) domain.  This document specifies the architecture, signaling, and procedures for SR P2MP Policies with Segment Routing over MPLS (SR-MPLS) and Segment Routing over IPv6 (SRv6).  It defines the SR P2MP Policy construct, candidate paths (CPs) of an SR P2MP Policy, and the instantiation of the P2MP tree instances (PTIs) of a CP using Replication segments.  Additionally, it describes the required extensions for a controller to support P2MP path computation and provisioning.  This document updates RFC 9524.",
       "status": "Proposed Standard",
       "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9959,
-      "name": "rfc9959",
-      "title": "Careful Resume: Convergence of Congestion Control from Retained State",
-      "abstract": "This document specifies a cautious method for Internet transports that enables fast startup of Congestion Control (CC) for a wide range of connections, known as \"Careful Resume\". It reuses a set of computed CC parameters that are based on previously observed path characteristics between the same pair of transport endpoints. These parameters are saved, allowing them to be later used to modify the CC behaviour of a subsequent connection. This document describes the assumptions and defines the requirements for how a sender utilises these parameters to provide opportunities for a connection to more rapidly get up to speed and utilise available capacity. It discusses how the use of this method impacts the capacity at a shared network bottleneck and the safe response that is needed after any indication that the new rate is inappropriate.",
-      "status": "Proposed Standard",
-      "published": "2026-05-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9957,
-      "name": "rfc9957",
-      "title": "The DOCSIS Queue Protection Algorithm to Preserve Low Latency",
-      "abstract": "This Informational RFC explains the specification of the queue protection algorithm introduced into Data-Over-Cable Service Interface Specification (DOCSIS) technology at version 3.1.  A shared low-latency queue relies on the non-queue-building behaviour of every traffic flow using it.  However, some flows might not take such care, either accidentally or maliciously.  If a queue is about to exceed a threshold level of delay, the Queue Protection algorithm can rapidly detect the flows most likely to be responsible.  It can then prevent harm to other traffic in the low-latency queue by ejecting selected packets (or all packets) of these flows.  This document is designed for four audiences: a) congestion control designers who need to understand how to keep on the \"good\" side of the algorithm; b) implementers of the algorithm who want to understand it in more depth; c) designers of algorithms with similar goals, perhaps for non-DOCSIS scenarios; and d) researchers interested in evaluating the algorithm.",
-      "status": "Informational",
-      "published": "2026-05-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9956,
-      "name": "rfc9956",
-      "title": "A Non-Queue-Building Per-Hop Behavior (NQB PHB) for Differentiated Services",
-      "abstract": "This document specifies characteristics of a Non-Queue-Building Per-Hop Behavior (NQB PHB).  The NQB PHB provides a shallow-buffered, best-effort service as a complement to a Default deep-buffered, best-effort service for Internet services.  The purpose of this NQB PHB is to provide a separate queue that enables smooth (i.e., non-bursty), low-data-rate, application-limited traffic microflows, to avoid the delay, delay variation and loss that would ordinarily be caused by sharing a queue with bursty, capacity-seeking traffic.  This PHB is implemented without prioritization and can be implemented without rate policing, making it suitable for environments where the use of these features is restricted.  The NQB PHB has been developed primarily for use by access network segments, where queuing delay and queuing loss caused by Queue-Building (QB) protocols are manifested; however, its use is not limited to such segments.  In particular, the application of NQB PHB to cable broadband links, Wi-Fi links, and mobile network radio/core segments are discussed in this document.  This document recommends a specific Differentiated Services Code Point (DSCP) to identify NQB microflows and updates the guidance in RFC 8325 on mapping Differentiated Services (Diffserv or DS) to IEEE 802.11 for this codepoint.",
-      "status": "Proposed Standard",
-      "published": "2026-05-01T00:00:00Z"
     },
     {
       "rfcNumber": 9953,
@@ -146,14 +98,6 @@
       "abstract": "The IETF community will treat people with kindness and grace, but not endless patience. This memo obsoletes RFCs 3683 and 3934, and it updates RFCs 2418 and 9245 by establishing a policy for the moderation of disruptive participation across the IETF's various public contribution channels and discussion fora. It establishes guardrails for moderation and a moderator team. That team will develop a set of moderation procedures and facilitate their consistent implementation with chairs and administrators.",
       "status": "Best Current Practice",
       "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9944,
-      "name": "rfc9944",
-      "title": "Device Schema Extensions to the System for Cross-Domain Identity Management (SCIM) Model",
-      "abstract": "The initial core schema for the System for Cross-domain Identity Management (SCIM) was designed for provisioning users.  This memo specifies schema extensions that enable provisioning of devices using various underlying bootstrapping systems such as Wi-Fi Easy Connect, FIDO device onboarding vouchers, Bluetooth Low Energy (BLE) passcodes, and MAC Authenticated Bypass (MAB).",
-      "status": "Proposed Standard",
-      "published": "2026-05-01T00:00:00Z"
     },
     {
       "rfcNumber": 9941,
@@ -402,6 +346,62 @@
       "abstract": "This document provides guidelines for authors and reviewers of specifications containing YANG data models, including IANA-maintained YANG modules. Recommendations and procedures are defined, which are intended to increase interoperability and usability of Network Configuration Protocol (NETCONF) and RESTCONF protocol implementations that utilize YANG modules. This document obsoletes RFC 8407; it also updates RFC 8126 by providing additional guidelines for writing the IANA considerations for RFCs that specify IANA-maintained YANG modules.",
       "status": "Best Current Practice",
       "published": "2026-03-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9906,
+      "name": "rfc9906",
+      "title": "Deprecate Usage of ECC-GOST within DNSSEC",
+      "abstract": "This document retires the use of GOST R 34.10-2001 (mnemonic \"ECC-GOST\") and GOST R 34.11-94 within DNSSEC. RFC 5933 (Historic) defined the use of GOST R 34.10-2001 and GOST R 34.11-94 algorithms with DNS Security Extensions (DNSSEC). This document updates RFC 5933 by deprecating the use of ECC-GOST.",
+      "status": "Proposed Standard",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9905,
+      "name": "rfc9905",
+      "title": "Deprecating the Use of SHA-1 in DNSSEC Signature Algorithms",
+      "abstract": "This document deprecates the use of the RSASHA1 and\nRSASHA1-NSEC3-SHA1 algorithms for the creation of DNS Public Key\n(DNSKEY) and Resource Record Signature (RRSIG) records. It updates RFCs 4034 and 5155 as it deprecates the use of these\nalgorithms.",
+      "status": "Proposed Standard",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9904,
+      "name": "rfc9904",
+      "title": "DNSSEC Cryptographic Algorithm Recommendation Update Process",
+      "abstract": "The DNSSEC protocol makes use of various cryptographic algorithms to provide authentication of DNS data and proof of nonexistence. To ensure interoperability between DNS resolvers and DNS authoritative servers, it is necessary to specify both a set of algorithm implementation requirements and usage guidelines to ensure that there is at least one algorithm that all implementations support. This document replaces and obsoletes RFC 8624 and moves the canonical source of algorithm implementation requirements and usage guidance for DNSSEC from RFC 8624 to the IANA DNSSEC algorithm registries. This is done to allow the list of requirements to be more easily updated and referenced. Extensions to these registries can be made in future RFCs. This document also updates RFC 9157 and incorporates the revised IANA DNSSEC considerations from that RFC. This document does not change the recommendation status (MUST, MAY, RECOMMENDED, etc.) of the algorithms listed in RFC 8624; that is the work of future documents.",
+      "status": "Proposed Standard",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9903,
+      "name": "rfc9903",
+      "title": "A YANG Data Model for OSPF Segment Routing over the MPLS Data Plane",
+      "abstract": "This document defines a YANG data model that can be used to manage OSPF extensions for Segment Routing over the MPLS data plane.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9902,
+      "name": "rfc9902",
+      "title": "A YANG Data Model for IS-IS Segment Routing over the MPLS Data Plane",
+      "abstract": "This document defines a YANG data model that can be used to manage IS-IS extensions for Segment Routing (SR) over the MPLS data plane.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9901,
+      "name": "rfc9901",
+      "title": "Selective Disclosure for JSON Web Tokens",
+      "abstract": "This specification defines a mechanism for the selective disclosure\nof individual elements of a JSON data structure used as the payload\nof a JSON Web Signature (JWS).  The primary use case is the selective\ndisclosure of JSON Web Token (JWT) claims.",
+      "status": "Proposed Standard",
+      "published": "2025-11-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9900,
+      "name": "rfc9900",
+      "title": "Updates to NETCONF Transport Port Numbers",
+      "abstract": "This document releases IANA-assigned port numbers for services related to the Network Configuration Protocol (NETCONF) that have not been in use in production networks.",
+      "status": "Proposed Standard",
+      "published": "2025-12-01T00:00:00Z"
     }
   ],
   "next": "?limit=50&search=&sort=desc&page=2",
