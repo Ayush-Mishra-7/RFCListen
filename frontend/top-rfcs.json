@@ -1,13 +1,45 @@
 {
-  "count": 9762,
+  "count": 9768,
   "page": 1,
   "limit": 50,
   "rfcs": [
     {
+      "rfcNumber": 9991,
+      "name": "rfc9991",
+      "title": "Domain-Based Message Authentication, Reporting, and Conformance (DMARC) Failure Reporting",
+      "abstract": "Domain-based Message Authentication, Reporting, and Conformance (DMARC) is a mechanism by which a Domain Owner can request feedback about email messages using their domain in the From: address field. This document describes \"failure reports\", or \"failed message reports\", which provide details about individual messages that failed to authenticate according to the DMARC mechanism.\n      This document updates RFC 6591 and obsoletes RFC 7489.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9990,
+      "name": "rfc9990",
+      "title": "Domain-Based Message Authentication, Reporting, and Conformance (DMARC) Aggregate Reporting",
+      "abstract": "Domain-based Message Authentication, Reporting, and Conformance (DMARC) allows for Domain Owners to request aggregate reports from receivers. This report is an XML document and contains extensible elements that allow for other types of data to be specified later. The aggregate reports can be submitted by the receiver to the Domain Owner's specified destination as declared in the associated DNS record.\n      This document obsoletes RFC 7489.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9989,
+      "name": "rfc9989",
+      "title": "Domain-Based Message Authentication, Reporting, and Conformance (DMARC)",
+      "abstract": "This document describes the Domain-based Message Authentication, Reporting, and Conformance (DMARC) protocol.\n      DMARC permits the owner of an email's Author Domain to enable validation of the domain's use to indicate the Domain Owner's or Public Suffix Operator's message handling preference regarding failed validation and to request reports about the use of the domain name. Mail-receiving organizations can use this information when evaluating handling choices for incoming mail.\n      This document obsoletes RFCs 7489 and 9091.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
       "rfcNumber": 9983,
       "name": "rfc9983",
       "title": "OSPFv2 Anycast Property Advertisement",
-      "abstract": "An IP prefix may be configured as anycast and, as such, the same value can be advertised by multiple routers. It is useful for other routers to know that the advertisement is for an anycast prefix. This document defines a new flag in the OSPFv2 Extended Prefix TLV Flags to advertise the anycast property. The document also specifies a companion YANG module for managing this function.",
+      "abstract": "An IP prefix may be configured as anycast and, as such, the same value can be advertised by multiple routers. It is useful for other routers to know that the advertisement is for an anycast prefix.\n      This document defines a new flag in the OSPFv2 Extended Prefix TLV Flags to advertise the anycast property. The document also specifies a companion YANG module for managing this function.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9975,
+      "name": "rfc9975",
+      "title": "Clarifications on CDS/CDNSKEY and CSYNC Consistency",
+      "abstract": "Maintenance of DNS delegations requires occasional changes of the DS and NS record sets on the parent side of the delegation. For the case of DS records, \"Automating DNSSEC Delegation Trust Maintenance\" (RFC 7344) provides automation by allowing the child to publish CDS and/or CDNSKEY records holding the prospective DS parameters that the parent can ingest. Similarly, \"Child-to-Parent Synchronization in DNS\" (RFC 7477) specifies CSYNC records to indicate a desired update of the delegation's NS (and glue) records. Parent-side entities (e.g., Registries and Registrars) can query these records from the child and, after validation, use them to update the parent-side Resource Record Sets (RRsets) of the delegation.\n      This document specifies under which conditions the target states expressed via CDS/CDNSKEY and CSYNC records are considered \"consistent\". Parent-side entities accepting such records from the child have to ensure that update requests retrieved from different authoritative nameservers satisfy these consistency requirements before taking any action based on them.\n      This document updates RFCs 7344 and 7477.",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
     },
@@ -23,7 +55,7 @@
       "rfcNumber": 9969,
       "name": "rfc9969",
       "title": "Report from the IAB Workshop on AI-CONTROL",
-      "abstract": "The AI-CONTROL Workshop was convened by the Internet Architecture Board (IAB) in September 2024. This report summarizes its significant points of discussion and identifies topics that may warrant further consideration and work. Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB views and positions.",
+      "abstract": "The AI-CONTROL Workshop was convened by the Internet Architecture Board (IAB) in September 2024. This report summarizes its significant points of discussion and identifies topics that may warrant further consideration and work.\n      Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB views and positions.",
       "status": "Informational",
       "published": "2026-05-01T00:00:00Z"
     },
@@ -31,7 +63,7 @@
       "rfcNumber": 9968,
       "name": "rfc9968",
       "title": "Report from the IAB Workshop on the Next Era of Network Management Operations (NEMOPS)",
-      "abstract": "The \"Next Era of Network Management Operations (NEMOPS)\" workshop was convened by the Internet Architecture Board (IAB) from December 3-5, 2024 as a three-day online meeting. It builds on a previous 2002 workshop, the outcome of which was documented in RFC 3535, identifying 14 operator requirements for consideration in future network management protocol design and related data models, along with some recommendations for the IETF. Much has changed in the Internet's operation and technological foundations since then. The NEMOPS workshop reviewed the past outcomes and discussed any operational barriers that prevented these technologies from being widely implemented. With the industry, network operators and protocol engineers working in collaboration, the workshop developed a suggested plan of action and network management recommendations for the IETF and IRTF. Building on RFC 3535, this document provides the report of the follow-up IAB workshop on network management. Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB views and positions.",
+      "abstract": "The \"Next Era of Network Management Operations (NEMOPS)\" workshop was convened by the Internet Architecture Board (IAB) from December 3-5, 2024 as a three-day online meeting. It builds on a previous 2002 workshop, the outcome of which was documented in RFC 3535, identifying 14 operator requirements for consideration in future network management protocol design and related data models, along with some recommendations for the IETF. Much has changed in the Internet's operation and technological foundations since then. The NEMOPS workshop reviewed the past outcomes and discussed any operational barriers that prevented these technologies from being widely implemented. With the industry, network operators and protocol engineers working in collaboration, the workshop developed a suggested plan of action and network management recommendations for the IETF and IRTF. Building on RFC 3535, this document provides the report of the follow-up IAB workshop on network management.\n      Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB views and positions.",
       "status": "Informational",
       "published": "2026-05-01T00:00:00Z"
     },
@@ -39,7 +71,15 @@
       "rfcNumber": 9967,
       "name": "rfc9967",
       "title": "System for Cross-Domain Identity Management (SCIM) Profile for Security Event Tokens (SETs)",
-      "abstract": "This specification defines a set of System for Cross-domain Identity Management (SCIM) Security Events using the Security Event Token (SET) specification (RFC 8417) to enable the asynchronous exchange of messages between SCIM service providers and receivers. This specification updates RFC 7643 by defining additional attributes for the \"urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig\" schema, and it updates RFC 7644 with an optional new asynchronous SCIM request capability.",
+      "abstract": "This specification defines a set of System for Cross-domain Identity Management (SCIM) Security Events using the Security Event Token (SET) specification (RFC 8417) to enable the asynchronous exchange of messages between SCIM service providers and receivers.\n      This specification updates RFC 7643 by defining additional attributes for the \"urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig\" schema, and it updates RFC 7644 with an optional new asynchronous SCIM request capability.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9966,
+      "name": "rfc9966",
+      "title": "Bootstrapped TLS Authentication with Proof of Knowledge",
+      "abstract": "This document defines a mechanism that enables a bootstrapping device to establish trust and mutually authenticate against a TLS server. Bootstrapping devices have a public/private key pair; this mechanism enables a TLS server to prove to the device that it knows the public key and enables the device to prove to the TLS server that it knows the private key. The mechanism leverages existing Device Provisioning Profile (DPP) and TLS standards and can be used in an Extensible Authentication Protocol (EAP) exchange with an EAP server.",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
     },
@@ -47,7 +87,15 @@
       "rfcNumber": 9965,
       "name": "rfc9965",
       "title": "The eap.arpa. Domain and Extensible Authentication Protocol (EAP) Provisioning",
-      "abstract": "This document defines the eap.arpa. domain for use only in Network Access Identifiers (NAIs) as a way for Extensible Authentication Protocol (EAP) peers to signal to EAP servers that they wish to obtain limited, and unauthenticated, network access. EAP peers signal which kind of access is required via certain predefined identifiers that use the NAI format of RFC 7542. A table of identifiers and meanings is defined, which includes entries for RFC 9140. This document updates RFCs 5216 and 9190 to define an unauthenticated provisioning method. Those specifications suggest that such a method is possible, but they do not define how it would be done. This document also updates RFC 9140 to deprecate \"eap-noob.arpa\" and replace it with \"@noob.eap.arpa\".",
+      "abstract": "This document defines the eap.arpa. domain for use only in Network Access Identifiers (NAIs) as a way for Extensible Authentication Protocol (EAP) peers to signal to EAP servers that they wish to obtain limited, and unauthenticated, network access. EAP peers signal which kind of access is required via certain predefined identifiers that use the NAI format of RFC 7542. A table of identifiers and meanings is defined, which includes entries for RFC 9140.\n      This document updates RFCs 5216 and 9190 to define an unauthenticated provisioning method. Those specifications suggest that such a method is possible, but they do not define how it would be done. This document also updates RFC 9140 to deprecate \"eap-noob.arpa\" and replace it with \"@noob.eap.arpa\".",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9964,
+      "name": "rfc9964",
+      "title": "ML-DSA for JSON Object Signing and Encryption (JOSE) and CBOR Object Signing and Encryption (COSE)",
+      "abstract": "This document specifies JSON Object Signing and Encryption (JOSE) and CBOR Object Signing and Encryption (COSE) serializations for the Module-Lattice-Based Digital Signature Standard (ML-DSA), a Post-Quantum Cryptography (PQC) digital signature scheme defined in US NIST FIPS 204.",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
     },
@@ -71,7 +119,7 @@
       "rfcNumber": 9961,
       "name": "rfc9961",
       "title": "MPLS Segment Routing Point-to-Multipoint (P2MP) Policy Ping",
-      "abstract": "Segment Routing (SR) Point-to-Multipoint (P2MP) Policies are used to define and manage explicit P2MP paths within a network. These policies are typically calculated via a controller-based mechanism and installed via, e.g., a Path Computation Element (PCE). In other cases, these policies can be installed using the Network Configuration Protocol (NETCONF) / YANG or a Command Line Interface (CLI). They are used to steer Multicast traffic along optimized paths from a Root to a set of Leaf routers. This document defines extensions to ping and traceroute mechanisms for an SR P2MP Policy with MPLS encapsulation to provide Operations, Administration, and Maintenance (OAM) capabilities. The extensions enable operators to verify connectivity, diagnose failures, and troubleshoot forwarding issues within SR P2MP Policy Multicast trees. By introducing new mechanisms for detecting failures and validating path integrity, this document enhances the operational robustness of P2MP Multicast deployments. Additionally, it ensures that existing MPLS and SR-based OAM tools can be effectively applied to networks utilizing SR P2MP Policies.",
+      "abstract": "Segment Routing (SR) Point-to-Multipoint (P2MP) Policies are used to define and manage explicit P2MP paths within a network. These policies are typically calculated via a controller-based mechanism and installed via, e.g., a Path Computation Element (PCE). In other cases, these policies can be installed using the Network Configuration Protocol (NETCONF) / YANG or a Command Line Interface (CLI). They are used to steer Multicast traffic along optimized paths from a Root to a set of Leaf routers.\n      This document defines extensions to ping and traceroute mechanisms for an SR P2MP Policy with MPLS encapsulation to provide Operations, Administration, and Maintenance (OAM) capabilities. The extensions enable operators to verify connectivity, diagnose failures, and troubleshoot forwarding issues within SR P2MP Policy Multicast trees.\n      By introducing new mechanisms for detecting failures and validating path integrity, this document enhances the operational robustness of P2MP Multicast deployments. Additionally, it ensures that existing MPLS and SR-based OAM tools can be effectively applied to networks utilizing SR P2MP Policies.",
       "status": "Proposed Standard",
       "published": "2026-04-01T00:00:00Z"
     },
@@ -87,7 +135,7 @@
       "rfcNumber": 9959,
       "name": "rfc9959",
       "title": "Careful Resume: Convergence of Congestion Control from Retained State",
-      "abstract": "This document specifies a cautious method for Internet transports that enables fast startup of Congestion Control (CC) for a wide range of connections, known as \"Careful Resume\". It reuses a set of computed CC parameters that are based on previously observed path characteristics between the same pair of transport endpoints. These parameters are saved, allowing them to be later used to modify the CC behaviour of a subsequent connection. This document describes the assumptions and defines the requirements for how a sender utilises these parameters to provide opportunities for a connection to more rapidly get up to speed and utilise available capacity. It discusses how the use of this method impacts the capacity at a shared network bottleneck and the safe response that is needed after any indication that the new rate is inappropriate.",
+      "abstract": "This document specifies a cautious method for Internet transports that enables fast startup of Congestion Control (CC) for a wide range of connections, known as \"Careful Resume\". It reuses a set of computed CC parameters that are based on previously observed path characteristics between the same pair of transport endpoints. These parameters are saved, allowing them to be later used to modify the CC behaviour of a subsequent connection.\n      This document describes the assumptions and defines the requirements for how a sender utilises these parameters to provide opportunities for a connection to more rapidly get up to speed and utilise available capacity. It discusses how the use of this method impacts the capacity at a shared network bottleneck and the safe response that is needed after any indication that the new rate is inappropriate.",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
     },
@@ -135,7 +183,7 @@
       "rfcNumber": 9950,
       "name": "rfc9950",
       "title": "A YANG Data Model for Terminal Access Controller Access-Control System Plus (TACACS+)",
-      "abstract": "This document defines a Terminal Access Controller Access-Control\nSystem Plus (TACACS+) client YANG module that augments the System\nManagement data model, defined in RFC 7317, to allow devices to make\nuse of TACACS+ servers for centralized Authentication, Authorization,\nand Accounting (AAA). Specifically, the TACACS+ YANG module can be\nused to manage TACACS+ over TLS. This document obsoletes RFC 9105.",
+      "abstract": "This document defines a Terminal Access Controller Access-Control\nSystem Plus (TACACS+) client YANG module that augments the System\nManagement data model, defined in RFC 7317, to allow devices to make\nuse of TACACS+ servers for centralized Authentication, Authorization,\nand Accounting (AAA). Specifically, the TACACS+ YANG module can be\nused to manage TACACS+ over TLS.\n      This document obsoletes RFC 9105.",
       "status": "Proposed Standard",
       "published": "2026-03-01T00:00:00Z"
     },
@@ -143,7 +191,7 @@
       "rfcNumber": 9949,
       "name": "rfc9949",
       "title": "BUSA-TLS: Mandatory Audio Component (MAC) Pre-Shared Key (PSK) Derivation for TLS 1.3 Using 2 Live Crew's \"Banned in the U.S.A.\"",
-      "abstract": "TLS 1.3 (RFC 8446) eliminates null cipher suites entirely. However, one vestigial zero remains in the key schedule: when no Pre-Shared Key (PSK) is used, the Input Keying Material (IKM) for the initial HKDF-Extract operation is a string of zero bytes. This document specifies that this zero-byte IKM MUST be replaced with the SHA-256 digest of the raw PCM audio data of \"Banned in the U.S.A.\" by 2 Live Crew (from the album \"Banned in the U.S.A.\", 1990), hereafter referred to as the Mandatory Audio Component (MAC). Implementations that omit the MAC are non-conformant with BUSA-TLS and also have questionable taste in music. The IETF's process-heavy, consensus-driven, working-group-reviewed approach to protocol standardization is a fine way to run a standards body. It is also completely antithetical to the spirit of a document that requires a jury-banned rap album as a cryptographic primitive. This document is offered in the same spirit as the album it incorporates: unapologetically and in defiance of institutional authority.",
+      "abstract": "TLS 1.3 (RFC 8446) eliminates null cipher suites entirely. However, one vestigial zero remains in the key schedule: when no Pre-Shared Key (PSK) is used, the Input Keying Material (IKM) for the initial HKDF-Extract operation is a string of zero bytes. This document specifies that this zero-byte IKM MUST be replaced with the SHA-256 digest of the raw PCM audio data of \"Banned in the U.S.A.\" by 2 Live Crew (from the album \"Banned in the U.S.A.\", 1990), hereafter referred to as the Mandatory Audio Component (MAC). Implementations that omit the MAC are non-conformant with BUSA-TLS and also have questionable taste in music.\n      The IETF's process-heavy, consensus-driven, working-group-reviewed approach to protocol standardization is a fine way to run a standards body. It is also completely antithetical to the spirit of a document that requires a jury-banned rap album as a cryptographic primitive.\n      This document is offered in the same spirit as the album it incorporates: unapologetically and in defiance of institutional authority.",
       "status": "Informational",
       "published": "2026-04-01T00:00:00Z"
     },
@@ -159,7 +207,7 @@
       "rfcNumber": 9947,
       "name": "rfc9947",
       "title": "Application of the Alternate-Marking Method to the Segment Routing Header",
-      "abstract": "This document describes an alternative experimental approach for the application of the Alternate-Marking Method to Segment Routing for IPv6 (SRv6). It uses an experimental TLV in the Segment Routing Header (SRH); thus, participation in this experiment should be between coordinating parties in a controlled domain. This approach has potential scaling and simplification benefits over the technique described in RFC 9343, and the scope of the experiment is to determine whether those are significant and attractive to the community. This protocol extension has been developed outside the IETF as an alternative to the IETF's Standards Track specification RFC 9343 and it does not have IETF consensus. It is published here to guide experimental implementation and ensure interoperability among implementations to better determine the value of this approach. Researchers are invited to submit their evaluations of this work to the Independent Submissions Editor or to the IETF SPRING Working Group as Internet-Drafts.",
+      "abstract": "This document describes an alternative experimental approach for the application of the Alternate-Marking Method to Segment Routing for IPv6 (SRv6). It uses an experimental TLV in the Segment Routing Header (SRH); thus, participation in this experiment should be between coordinating parties in a controlled domain. This approach has potential scaling and simplification benefits over the technique described in RFC 9343, and the scope of the experiment is to determine whether those are significant and attractive to the community.\n      This protocol extension has been developed outside the IETF as an alternative to the IETF's Standards Track specification RFC 9343 and it does not have IETF consensus. It is published here to guide experimental implementation and ensure interoperability among implementations to better determine the value of this approach. Researchers are invited to submit their evaluations of this work to the Independent Submissions Editor or to the IETF SPRING Working Group as Internet-Drafts.",
       "status": "Experimental",
       "published": "2026-03-01T00:00:00Z"
     },
@@ -175,7 +223,7 @@
       "rfcNumber": 9945,
       "name": "rfc9945",
       "title": "IETF Community Moderation",
-      "abstract": "The IETF community will treat people with kindness and grace, but not endless patience. This memo obsoletes RFCs 3683 and 3934, and it updates RFCs 2418 and 9245 by establishing a policy for the moderation of disruptive participation across the IETF's various public contribution channels and discussion fora. It establishes guardrails for moderation and a moderator team. That team will develop a set of moderation procedures and facilitate their consistent implementation with chairs and administrators.",
+      "abstract": "The IETF community will treat people with kindness and grace, but not endless patience.\n      This memo obsoletes RFCs 3683 and 3934, and it updates RFCs 2418 and 9245 by establishing a policy for the moderation of disruptive participation across the IETF's various public contribution channels and discussion fora. It establishes guardrails for moderation and a moderator team. That team will develop a set of moderation procedures and facilitate their consistent implementation with chairs and administrators.",
       "status": "Best Current Practice",
       "published": "2026-02-01T00:00:00Z"
     },
@@ -199,7 +247,7 @@
       "rfcNumber": 9940,
       "name": "rfc9940",
       "title": "Some Key Terms for Network Fault and Problem Management",
-      "abstract": "This document sets out some terms that are fundamental to a common understanding of network fault and problem management within the IETF. The purpose of this document is to bring clarity to discussions and other work related to network fault and problem management -- in particular, to YANG data models and management protocols that report, make visible, or manage network faults and problems.",
+      "abstract": "This document sets out some terms that are fundamental to a common understanding of network fault and problem management within the IETF.\n      The purpose of this document is to bring clarity to discussions and other work related to network fault and problem management -- in particular, to YANG data models and management protocols that report, make visible, or manage network faults and problems.",
       "status": "Informational",
       "published": "2026-04-01T00:00:00Z"
     },
@@ -255,7 +303,7 @@
       "rfcNumber": 9932,
       "name": "rfc9932",
       "title": "Mutually Authenticating TLS in the Context of Federations",
-      "abstract": "This Informational Independent Submission to the RFC Series describes a means to use TLS 1.3 to perform machine-to-machine mutual authentication within federations. This memo is not a standard. It does not modify the TLS protocol in any way, nor does it require changes to common TLS libraries. TLS is specified and standardized by the IETF's TLS Working Group. The framework enables interoperable trust management for federated machine-to-machine communication. It introduces a centrally managed trust anchor and a controlled metadata publication process, ensuring that only authorized members are identifiable within the federation. These mechanisms support unambiguous entity identification and reduce the risk of impersonation, promoting secure and policy-aligned interaction across organizational boundaries.",
+      "abstract": "This Informational Independent Submission to the RFC Series describes a means to use TLS 1.3 to perform machine-to-machine mutual authentication within federations. This memo is not a standard. It does not modify the TLS protocol in any way, nor does it require changes to common TLS libraries. TLS is specified and standardized by the IETF's TLS Working Group.\n      The framework enables interoperable trust management for federated machine-to-machine communication. It introduces a centrally managed trust anchor and a controlled metadata publication process, ensuring that only authorized members are identifiable within the federation. These mechanisms support unambiguous entity identification and reduce the risk of impersonation, promoting secure and policy-aligned interaction across organizational boundaries.",
       "status": "Informational",
       "published": "2026-04-01T00:00:00Z"
     },
@@ -279,7 +327,7 @@
       "rfcNumber": 9929,
       "name": "rfc9929",
       "title": "IGP Unreachable Prefix Announcement",
-      "abstract": "Summarization is often used in multi-area or multi-domain networks to improve network efficiency and scalability. With summarization in place, there is a need to signal loss of reachability to an individual prefix covered by the summary. This enables fast convergence by steering traffic, when applicable, away from the node which owns the prefix and is no longer reachable. This document specifies protocol mechanisms in IS-IS and OSPF, together with two new flags, to advertise such prefix reachability loss. The term \"OSPF\" in this document is used to refer to both OSPFv2 and OSPFv3.",
+      "abstract": "Summarization is often used in multi-area or multi-domain networks to improve network efficiency and scalability. With summarization in place, there is a need to signal loss of reachability to an individual prefix covered by the summary. This enables fast convergence by steering traffic, when applicable, away from the node which owns the prefix and is no longer reachable.\n      This document specifies protocol mechanisms in IS-IS and OSPF, together with two new flags, to advertise such prefix reachability loss.\n      The term \"OSPF\" in this document is used to refer to both OSPFv2 and OSPFv3.",
       "status": "Proposed Standard",
       "published": "2026-02-01T00:00:00Z"
     },
@@ -351,57 +399,9 @@
       "rfcNumber": 9920,
       "name": "rfc9920",
       "title": "RFC Editor Model (Version 3)",
-      "abstract": "This document specifies version 3 of the RFC Editor Model. The model defines two high-level tasks related to the RFC Series. First, policy definition is the joint responsibility of the RFC Series Working Group (RSWG), which produces policy proposals, and the RFC Series Approval Board (RSAB), which approves such proposals. Second, policy implementation is primarily the responsibility of the RFC Production Center (RPC) as contractually overseen by the IETF Administration Limited Liability Company (IETF LLC). In addition, various responsibilities of the RFC Editor function are now performed alone or in combination by the RSWG, RSAB, RPC, RFC Series Consulting Editor (RSCE), and IETF LLC. Finally, this document specifies the Editorial Stream for publication of future policy definition documents produced through the processes defined herein. Since the publication of RFC 9280, lessons have been learned about implementing this model. This document lists some of those lessons learned and updates RFC 9280 based on that experience. This document obsoletes RFC 9280. This document updates RFCs 7841, 7991, 7992, 7993, 7994, 7995, 7996, 7997, 8729, 8730, and 9720.",
+      "abstract": "This document specifies version 3 of the RFC Editor Model. The model defines two high-level tasks related to the RFC Series. First, policy definition is the joint responsibility of the RFC Series Working Group (RSWG), which produces policy proposals, and the RFC Series Approval Board (RSAB), which approves such proposals. Second, policy implementation is primarily the responsibility of the RFC Production Center (RPC) as contractually overseen by the IETF Administration Limited Liability Company (IETF LLC). In addition, various responsibilities of the RFC Editor function are now performed alone or in combination by the RSWG, RSAB, RPC, RFC Series Consulting Editor (RSCE), and IETF LLC. Finally, this document specifies the Editorial Stream for publication of future policy definition documents produced through the processes defined herein.\n      Since the publication of RFC 9280, lessons have been learned about implementing this model. This document lists some of those lessons learned and updates RFC 9280 based on that experience. This document obsoletes RFC 9280.\n      This document updates RFCs 7841, 7991, 7992, 7993, 7994, 7995, 7996, 7997, 8729, 8730, and 9720.",
       "status": "Informational",
       "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9917,
-      "name": "rfc9917",
-      "title": "IGP Flexible Algorithms Reverse Affinity Constraint",
-      "abstract": "An IGP Flexible Algorithm (Flex-Algorithm) enables the computation of constraint-based paths within an IGP domain, allowing operators to influence path selection according to administrative policies. This document defines an extension to Flex-Algorithm that allows the inclusion or exclusion of links from path computation based on Administrative Groups (also known as link affinities) associated with the reverse direction of the path under computation. This document updates RFCs 9350 and 9843 by introducing the new IANA registry that specifies the ordered set of rules that are used to prune links from the topology during the Flex-Algorithm path computation.",
-      "status": "Proposed Standard",
-      "published": "2026-01-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9915,
-      "name": "rfc9915",
-      "title": "Dynamic Host Configuration Protocol for IPv6 (DHCPv6)",
-      "abstract": "This document specifies the Dynamic Host Configuration Protocol for IPv6 (DHCPv6), an extensible mechanism for configuring nodes with network configuration parameters, IP addresses, and prefixes. Parameters can be provided statelessly or in combination with stateful assignment of one or more IPv6 addresses and/or IPv6 prefixes. DHCPv6 can operate either in place of or in addition to stateless address autoconfiguration (SLAAC). This document obsoletes RFC 8415. It incorporates verified errata and obsoletes the assignment of temporary addresses (the IA_TA option) and the server unicast capability (the Server Unicast option and UseMulticast status code).",
-      "status": "Internet Standard",
-      "published": "2026-01-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9914,
-      "name": "rfc9914",
-      "title": "Root-Initiated Routing State in the Routing Protocol for Low-Power and Lossy Networks (RPL)",
-      "abstract": "The Routing Protocol for Low-Power and Lossy Networks (RPL) (RFC 6550) enables data packet routing along a Destination-Oriented Directed Acyclic Graph (DODAG).  However, the default route establishment mechanism relies on hop-by-hop forwarding along the DODAG, which may not always provide optimal routing efficiency.  This document introduces the concept of Destination Advertisement Object (DAO) Projection, a mechanism that allows a RPL Root or an external controller to install optimized routes within the RPL domain.  DAO Projections enable the creation of optimized unicast or multicast routes that do not strictly follow the DODAG structure, thereby improving routing efficiency, reliability, availability, and resource utilization in the RPL domain.  This document specifies two types of Projected Routes (P-Routes) -- Storing Mode and Non-Storing Mode -- and outlines the signaling procedures necessary to establish, maintain, and remove these routes.  This document updates RFCs 6550, 6553, and 8138.",
-      "status": "Proposed Standard",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9913,
-      "name": "rfc9913",
-      "title": "Reliable and Available Wireless (RAW) Technologies",
-      "abstract": "This document surveys the short- and middle-range radio technologies over which providing Deterministic Networking (DetNet), and more specifically, Reliable and Available Wireless (RAW) service is suitable.  It also presents the characteristics that RAW may leverage and explores the applicability of the technologies to carry deterministic flows, as of the time of publication.  The studied technologies are Wi-Fi 6/7, Time-Slotted Channel Hopping (TSCH), 3GPP 5G, and L-band Digital Aeronautical Communications System (LDACS).",
-      "status": "Informational",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9912,
-      "name": "rfc9912",
-      "title": "Reliable and Available Wireless (RAW) Architecture",
-      "abstract": "Reliable and Available Wireless (RAW) extends the reliability and availability of Deterministic Networking (DetNet) to networks composed of any combination of wired and wireless segments.  The RAW architecture leverages and extends RFC 8655 (\"Deterministic Networking Architecture\") to adapt to challenges that prominently affect the wireless medium, notably intermittent transmission loss.  This document defines a network control loop that optimizes the use of constrained bandwidth and energy while ensuring the expected DetNet services.  The loop involves a new Point of Local Repair (PLR) function in the DetNet Service sub-layer that dynamically selects the DetNet path(s) for packets to route around local connectivity degradation.",
-      "status": "Informational",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9911,
-      "name": "rfc9911",
-      "title": "Common YANG Data Types",
-      "abstract": "This document defines a collection of common data types to be used with the YANG data modeling language.  It includes several new type definitions and obsoletes RFC 6991.",
-      "status": "Proposed Standard",
-      "published": "2025-12-01T00:00:00Z"
     }
   ],
   "next": "?limit=50&search=&sort=desc&page=2",
