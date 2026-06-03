@@ -57347,7 +57347,7 @@
     "rfcNumber": 7344,
     "name": "rfc7344",
     "title": "Automating DNSSEC Delegation Trust Maintenance",
-    "abstract": "This document describes a method to allow DNS Operators to more easily update DNSSEC Key Signing Keys using the DNS as a communication channel.  The technique described is aimed at delegations in which it is currently hard to move information from the Child to Parent.",
+    "abstract": "This document describes a method to allow DNS Operators to more\r\neasily update DNSSEC Key Signing Keys using the DNS as a\r\ncommunication channel.  The technique described is aimed at\r\ndelegations in which it is currently hard to move information from\r\nthe Child to Parent.",
     "status": "Proposed Standard",
     "published": "2014-09-01T00:00:00Z"
   },
@@ -58411,7 +58411,7 @@
     "rfcNumber": 7477,
     "name": "rfc7477",
     "title": "Child-to-Parent Synchronization in DNS",
-    "abstract": "This document specifies how a child zone in the DNS can publish a record to indicate to a parental agent that the parental agent may copy and process certain records from the child zone.  The existence of the record and any change in its value can be monitored by a parental agent and acted on depending on local policy.",
+    "abstract": "This document specifies how a child zone in the DNS can publish a\r\nrecord to indicate to a parental agent that the parental agent may\r\ncopy and process certain records from the child zone.  The existence\r\nof the record and any change in its value can be monitored by a\r\nparental agent and acted on depending on local policy.",
     "status": "Proposed Standard",
     "published": "2015-03-01T00:00:00Z"
   },
@@ -78128,10 +78128,50 @@
     "published": "2026-05-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9977,
+    "name": "rfc9977",
+    "title": "Publishing End-Site Prefix Lengths",
+    "abstract": "This document specifies how to augment the Routing Policy Specification Language (RPSL) inetnum: class to refer specifically to prefixlen files, which are Comma-Separated Values (CSV) files used to specify end-site prefix lengths. This document also describes an optional mechanism that uses the Resource Public Key Infrastructure (RPKI) to authenticate the prefixlen files.",
+    "status": "Proposed Standard",
+    "published": "2026-05-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9979,
+    "name": "rfc9979",
+    "title": "Registration of Further IMAP/JMAP Keywords and Mailbox Name Attributes",
+    "abstract": "This document defines a number of keywords and mailbox name\r\n   attributes that have been in use across different server and client\r\n   implementations.  It defines the intended use of these keywords and\r\n   mailbox name attributes.  This document registers all of these with\r\n   IANA to avoid name collisions.",
+    "status": "Informational",
+    "published": "2026-05-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9981,
+    "name": "rfc9981",
+    "title": "Resource Public Key Infrastructure (RPKI) Manifest Number Handling",
+    "abstract": "The Resource Public Key Infrastructure (RPKI) makes use of signed objects called \"manifests\", each of which includes a \"manifest number\". This document updates RFC 9286 by specifying issuer and Relying Party (RP) behaviour when a manifest number reaches the largest possible value, a situation not considered in RFC 9286.",
+    "status": "Proposed Standard",
+    "published": "2026-05-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9982,
+    "name": "rfc9982",
+    "title": "JSContact Version 2.0: A JSON Representation of Contact Data",
+    "abstract": "This document defines version \"2.0\" of JSContact. It defines the uid property of a Card object to be optional, rather than mandatory, as defined previously in version \"1.0\". All other definitions of JSContact version \"1.0\" remain as defined in RFC 9553. This document updates RFC 9555 by redefining how to convert the now optional uid property from and to vCard. It also registers the vCard JSCOMPS parameter at IANA, which was defined but not registered in RFC 9555.",
+    "status": "Proposed Standard",
+    "published": "2026-05-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9983,
     "name": "rfc9983",
     "title": "OSPFv2 Anycast Property Advertisement",
     "abstract": "An IP prefix may be configured as anycast and, as such, the same value can be advertised by multiple routers. It is useful for other routers to know that the advertisement is for an anycast prefix.\n      This document defines a new flag in the OSPFv2 Extended Prefix TLV Flags to advertise the anycast property. The document also specifies a companion YANG module for managing this function.",
+    "status": "Proposed Standard",
+    "published": "2026-05-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9987,
+    "name": "rfc9987",
+    "title": "Secure Shell (SSH) Agent Protocol",
+    "abstract": "This document specifies a key agent protocol for use in the Secure Shell (SSH) protocol.",
     "status": "Proposed Standard",
     "published": "2026-05-01T00:00:00Z"
   },
@@ -78156,6 +78196,14 @@
     "name": "rfc9991",
     "title": "Domain-Based Message Authentication, Reporting, and Conformance (DMARC) Failure Reporting",
     "abstract": "Domain-based Message Authentication, Reporting, and Conformance (DMARC) is a mechanism by which a Domain Owner can request feedback about email messages using their domain in the From: address field. This document describes \"failure reports\", or \"failed message reports\", which provide details about individual messages that failed to authenticate according to the DMARC mechanism.\n      This document updates RFC 6591 and obsoletes RFC 7489.",
+    "status": "Proposed Standard",
+    "published": "2026-05-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9993,
+    "name": "rfc9993",
+    "title": "RTP Payload Format for Haptics",
+    "abstract": "This memo specifies an RTP payload format for MPEG-I haptic data. A haptic media stream is composed of MPEG-I Haptic Stream (MIHS) units including a MIHS unit header and zero or more MIHS packets. The RTP payload header format allows for packetization of a MIHS unit in an RTP packet payload as well as fragmentation of a MIHS unit into multiple RTP packets. The original subtype registration for 'haptics/hmpg' (RFC 9695) did not include any required or optional parameters. This memo updates RFC 9695 and the 'haptics/hmpg' registration to add optional parameters. It also provides Session Description Protocol (SDP) usage information for the 'haptics' media type.",
     "status": "Proposed Standard",
     "published": "2026-05-01T00:00:00Z"
   }

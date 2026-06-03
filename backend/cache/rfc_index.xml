@@ -257740,7 +257740,11 @@ interworking with the Public Switched Telephone Network (PSTN).</p>
       <kw>DNS</kw>
     </keywords>
     <abstract>
-      <p>This document describes a method to allow DNS Operators to more easily update DNSSEC Key Signing Keys using the DNS as a communication channel.  The technique described is aimed at delegations in which it is currently hard to move information from the Child to Parent.</p>
+      <p>This document describes a method to allow DNS Operators to more&#13;
+easily update DNSSEC Key Signing Keys using the DNS as a&#13;
+communication channel.  The technique described is aimed at&#13;
+delegations in which it is currently hard to move information from&#13;
+the Child to Parent.</p>
     </abstract>
     <draft>draft-ietf-dnsop-delegation-trust-maintainance-14</draft>
     <updated-by>
@@ -262783,8 +262787,15 @@ interworking with the Public Switched Telephone Network (PSTN).</p>
       <file-format>HTML</file-format>
     </format>
     <page-count>15</page-count>
+    <keywords>
+      <kw></kw>
+    </keywords>
     <abstract>
-      <p>This document specifies how a child zone in the DNS can publish a record to indicate to a parental agent that the parental agent may copy and process certain records from the child zone.  The existence of the record and any change in its value can be monitored by a parental agent and acted on depending on local policy.</p>
+      <p>This document specifies how a child zone in the DNS can publish a&#13;
+record to indicate to a parental agent that the parental agent may&#13;
+copy and process certain records from the child zone.  The existence&#13;
+of the record and any change in its value can be monitored by a&#13;
+parental agent and acted on depending on local policy.</p>
     </abstract>
     <draft>draft-ietf-dnsop-child-syncronization-07</draft>
     <updated-by>
@@ -334599,6 +334610,9 @@ with the Network Management Datastore Architecture (NMDA).</p>
     <obsoletes>
       <doc-id>RFC6486</doc-id>
     </obsoletes>
+    <updated-by>
+      <doc-id>RFC9981</doc-id>
+    </updated-by>
     <current-status>PROPOSED STANDARD</current-status>
     <publication-status>PROPOSED STANDARD</publication-status>
     <stream>IETF</stream>
@@ -337086,6 +337100,7 @@ with the Network Management Datastore Architecture (NMDA).</p>
     <stream>IETF</stream>
     <area>int</area>
     <wg_acronym>6man</wg_acronym>
+    <errata-url>https://www.rfc-editor.org/errata/rfc9343</errata-url>
     <doi>10.17487/RFC9343</doi>
   </rfc-entry>
   <rfc-entry>
@@ -345827,6 +345842,9 @@ with its defined SLOs.</p>
     <updates>
       <doc-id>RFC6350</doc-id>
     </updates>
+    <updated-by>
+      <doc-id>RFC9982</doc-id>
+    </updated-by>
     <current-status>PROPOSED STANDARD</current-status>
     <publication-status>PROPOSED STANDARD</publication-status>
     <stream>IETF</stream>
@@ -351532,6 +351550,9 @@ been incorporated into this document. This document obsoletes RFC
       <p>This memo registers and documents the 'haptics' top-level media type, under which subtypes for representation formats for haptics may be registered.  This document also serves as a registration for a set of subtypes, which are representative of some existing subtypes already in use.</p>
     </abstract>
     <draft>draft-ietf-mediaman-haptics-05</draft>
+    <updated-by>
+      <doc-id>RFC9993</doc-id>
+    </updated-by>
     <current-status>PROPOSED STANDARD</current-status>
     <publication-status>PROPOSED STANDARD</publication-status>
     <stream>IETF</stream>
@@ -362424,6 +362445,161 @@ implementations to interoperate with each other.</p>
     <doi>10.17487/RFC9975</doi>
   </rfc-entry>
   <rfc-entry>
+    <doc-id>RFC9977</doc-id>
+    <title>Publishing End-Site Prefix Lengths</title>
+    <author>
+      <name>O. Gasser</name>
+    </author>
+    <author>
+      <name>R. Bush</name>
+    </author>
+    <author>
+      <name>M. Candela</name>
+    </author>
+    <author>
+      <name>R. Housley</name>
+    </author>
+    <date>
+      <month>May</month>
+      <year>2026</year>
+    </date>
+    <format>
+      <file-format>HTML</file-format>
+      <file-format>TXT</file-format>
+      <file-format>PDF</file-format>
+      <file-format>XML</file-format>
+    </format>
+    <page-count>26</page-count>
+    <keywords>
+      <kw>prefix</kw>
+      <kw>allocation</kw>
+      <kw>RPSL</kw>
+      <kw>inetnum</kw>
+    </keywords>
+    <abstract>
+      <p>This document specifies how to augment the Routing Policy Specification Language (RPSL) inetnum: class to refer specifically to prefixlen files, which are Comma-Separated Values (CSV) files used to specify end-site prefix lengths. This document also describes an optional mechanism that uses the Resource Public Key Infrastructure (RPKI) to authenticate the prefixlen files.</p>
+    </abstract>
+    <draft>draft-ietf-opsawg-prefix-lengths-14</draft>
+    <current-status>PROPOSED STANDARD</current-status>
+    <publication-status>PROPOSED STANDARD</publication-status>
+    <stream>IETF</stream>
+    <area>ops</area>
+    <wg_acronym>opsawg</wg_acronym>
+    <doi>10.17487/RFC9977</doi>
+  </rfc-entry>
+  <rfc-entry>
+    <doc-id>RFC9979</doc-id>
+    <title>Registration of Further IMAP/JMAP Keywords and Mailbox Name Attributes</title>
+    <author>
+      <name>N. Jenkins</name>
+    </author>
+    <author>
+      <name>D. Eggert</name>
+    </author>
+    <date>
+      <month>May</month>
+      <year>2026</year>
+    </date>
+    <format>
+      <file-format>HTML</file-format>
+      <file-format>TXT</file-format>
+      <file-format>PDF</file-format>
+      <file-format>XML</file-format>
+    </format>
+    <page-count>24</page-count>
+    <keywords>
+      <kw>IMAP</kw>
+      <kw>JMAP</kw>
+    </keywords>
+    <abstract>
+      <p>This document defines a number of keywords and mailbox name&#13;
+   attributes that have been in use across different server and client&#13;
+   implementations.  It defines the intended use of these keywords and&#13;
+   mailbox name attributes.  This document registers all of these with&#13;
+   IANA to avoid name collisions.</p>
+    </abstract>
+    <draft>draft-ietf-mailmaint-messageflag-mailboxattribute-14</draft>
+    <current-status>INFORMATIONAL</current-status>
+    <publication-status>INFORMATIONAL</publication-status>
+    <stream>IETF</stream>
+    <area>art</area>
+    <wg_acronym>mailmaint</wg_acronym>
+    <doi>10.17487/RFC9979</doi>
+  </rfc-entry>
+  <rfc-entry>
+    <doc-id>RFC9981</doc-id>
+    <title>Resource Public Key Infrastructure (RPKI) Manifest Number Handling</title>
+    <author>
+      <name>T. Harrison</name>
+    </author>
+    <author>
+      <name>G. Michaelson</name>
+    </author>
+    <author>
+      <name>J. Snijders</name>
+    </author>
+    <date>
+      <month>May</month>
+      <year>2026</year>
+    </date>
+    <format>
+      <file-format>HTML</file-format>
+      <file-format>TXT</file-format>
+      <file-format>PDF</file-format>
+      <file-format>XML</file-format>
+    </format>
+    <page-count>7</page-count>
+    <keywords>
+      <kw>RPKI</kw>
+      <kw>Routing Security</kw>
+      <kw>X.509</kw>
+    </keywords>
+    <abstract>
+      <p>The Resource Public Key Infrastructure (RPKI) makes use of signed objects called "manifests", each of which includes a "manifest number". This document updates RFC 9286 by specifying issuer and Relying Party (RP) behaviour when a manifest number reaches the largest possible value, a situation not considered in RFC 9286.</p>
+    </abstract>
+    <draft>draft-ietf-sidrops-manifest-numbers-09</draft>
+    <updates>
+      <doc-id>RFC9286</doc-id>
+    </updates>
+    <current-status>PROPOSED STANDARD</current-status>
+    <publication-status>PROPOSED STANDARD</publication-status>
+    <stream>IETF</stream>
+    <area>ops</area>
+    <wg_acronym>sidrops</wg_acronym>
+    <doi>10.17487/RFC9981</doi>
+  </rfc-entry>
+  <rfc-entry>
+    <doc-id>RFC9982</doc-id>
+    <title>JSContact Version 2.0: A JSON Representation of Contact Data</title>
+    <author>
+      <name>R. Stepanek</name>
+    </author>
+    <date>
+      <month>May</month>
+      <year>2026</year>
+    </date>
+    <format>
+      <file-format>HTML</file-format>
+      <file-format>TXT</file-format>
+      <file-format>PDF</file-format>
+      <file-format>XML</file-format>
+    </format>
+    <page-count>7</page-count>
+    <abstract>
+      <p>This document defines version "2.0" of JSContact. It defines the uid property of a Card object to be optional, rather than mandatory, as defined previously in version "1.0". All other definitions of JSContact version "1.0" remain as defined in RFC 9553. This document updates RFC 9555 by redefining how to convert the now optional uid property from and to vCard. It also registers the vCard JSCOMPS parameter at IANA, which was defined but not registered in RFC 9555.</p>
+    </abstract>
+    <draft>draft-ietf-calext-jscontact-uid-08</draft>
+    <updates>
+      <doc-id>RFC9555</doc-id>
+    </updates>
+    <current-status>PROPOSED STANDARD</current-status>
+    <publication-status>PROPOSED STANDARD</publication-status>
+    <stream>IETF</stream>
+    <area>art</area>
+    <wg_acronym>calext</wg_acronym>
+    <doi>10.17487/RFC9982</doi>
+  </rfc-entry>
+  <rfc-entry>
     <doc-id>RFC9983</doc-id>
     <title>OSPFv2 Anycast Property Advertisement</title>
     <author>
@@ -362468,6 +362644,39 @@ implementations to interoperate with each other.</p>
     <area>rtg</area>
     <wg_acronym>lsr</wg_acronym>
     <doi>10.17487/RFC9983</doi>
+  </rfc-entry>
+  <rfc-entry>
+    <doc-id>RFC9987</doc-id>
+    <title>Secure Shell (SSH) Agent Protocol</title>
+    <author>
+      <name>D. Miller</name>
+    </author>
+    <date>
+      <month>May</month>
+      <year>2026</year>
+    </date>
+    <format>
+      <file-format>HTML</file-format>
+      <file-format>TXT</file-format>
+      <file-format>PDF</file-format>
+      <file-format>XML</file-format>
+    </format>
+    <page-count>31</page-count>
+    <keywords>
+      <kw>ssh</kw>
+      <kw>agent</kw>
+      <kw>ssh-agent</kw>
+    </keywords>
+    <abstract>
+      <p>This document specifies a key agent protocol for use in the Secure Shell (SSH) protocol.</p>
+    </abstract>
+    <draft>draft-ietf-sshm-ssh-agent-16</draft>
+    <current-status>PROPOSED STANDARD</current-status>
+    <publication-status>PROPOSED STANDARD</publication-status>
+    <stream>IETF</stream>
+    <area>sec</area>
+    <wg_acronym>sshm</wg_acronym>
+    <doi>10.17487/RFC9987</doi>
   </rfc-entry>
   <rfc-entry>
     <doc-id>RFC9989</doc-id>
@@ -362588,6 +362797,46 @@ implementations to interoperate with each other.</p>
     <area>art</area>
     <wg_acronym>dmarc</wg_acronym>
     <doi>10.17487/RFC9991</doi>
+  </rfc-entry>
+  <rfc-entry>
+    <doc-id>RFC9993</doc-id>
+    <title>RTP Payload Format for Haptics</title>
+    <author>
+      <name>HS Yang</name>
+    </author>
+    <author>
+      <name>X. de Foy</name>
+    </author>
+    <date>
+      <month>May</month>
+      <year>2026</year>
+    </date>
+    <format>
+      <file-format>HTML</file-format>
+      <file-format>TXT</file-format>
+      <file-format>PDF</file-format>
+      <file-format>XML</file-format>
+    </format>
+    <page-count>22</page-count>
+    <keywords>
+      <kw>touch</kw>
+      <kw>tactile</kw>
+      <kw>vibrotactile</kw>
+      <kw>kinesthetic</kw>
+    </keywords>
+    <abstract>
+      <p>This memo specifies an RTP payload format for MPEG-I haptic data. A haptic media stream is composed of MPEG-I Haptic Stream (MIHS) units including a MIHS unit header and zero or more MIHS packets. The RTP payload header format allows for packetization of a MIHS unit in an RTP packet payload as well as fragmentation of a MIHS unit into multiple RTP packets. The original subtype registration for 'haptics/hmpg' (RFC 9695) did not include any required or optional parameters. This memo updates RFC 9695 and the 'haptics/hmpg' registration to add optional parameters. It also provides Session Description Protocol (SDP) usage information for the 'haptics' media type.</p>
+    </abstract>
+    <draft>draft-ietf-avtcore-rtp-haptics-14</draft>
+    <updates>
+      <doc-id>RFC9695</doc-id>
+    </updates>
+    <current-status>PROPOSED STANDARD</current-status>
+    <publication-status>PROPOSED STANDARD</publication-status>
+    <stream>IETF</stream>
+    <area>wit</area>
+    <wg_acronym>avtcore</wg_acronym>
+    <doi>10.17487/RFC9993</doi>
   </rfc-entry>
   <std-entry>
     <doc-id>STD3</doc-id>

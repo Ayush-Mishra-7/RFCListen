@@ -1,8 +1,16 @@
 {
-  "count": 9768,
+  "count": 9774,
   "page": 1,
   "limit": 50,
   "rfcs": [
+    {
+      "rfcNumber": 9993,
+      "name": "rfc9993",
+      "title": "RTP Payload Format for Haptics",
+      "abstract": "This memo specifies an RTP payload format for MPEG-I haptic data. A haptic media stream is composed of MPEG-I Haptic Stream (MIHS) units including a MIHS unit header and zero or more MIHS packets. The RTP payload header format allows for packetization of a MIHS unit in an RTP packet payload as well as fragmentation of a MIHS unit into multiple RTP packets. The original subtype registration for 'haptics/hmpg' (RFC 9695) did not include any required or optional parameters. This memo updates RFC 9695 and the 'haptics/hmpg' registration to add optional parameters. It also provides Session Description Protocol (SDP) usage information for the 'haptics' media type.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
     {
       "rfcNumber": 9991,
       "name": "rfc9991",
@@ -28,10 +36,50 @@
       "published": "2026-05-01T00:00:00Z"
     },
     {
+      "rfcNumber": 9987,
+      "name": "rfc9987",
+      "title": "Secure Shell (SSH) Agent Protocol",
+      "abstract": "This document specifies a key agent protocol for use in the Secure Shell (SSH) protocol.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
       "rfcNumber": 9983,
       "name": "rfc9983",
       "title": "OSPFv2 Anycast Property Advertisement",
       "abstract": "An IP prefix may be configured as anycast and, as such, the same value can be advertised by multiple routers. It is useful for other routers to know that the advertisement is for an anycast prefix.\n      This document defines a new flag in the OSPFv2 Extended Prefix TLV Flags to advertise the anycast property. The document also specifies a companion YANG module for managing this function.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9982,
+      "name": "rfc9982",
+      "title": "JSContact Version 2.0: A JSON Representation of Contact Data",
+      "abstract": "This document defines version \"2.0\" of JSContact. It defines the uid property of a Card object to be optional, rather than mandatory, as defined previously in version \"1.0\". All other definitions of JSContact version \"1.0\" remain as defined in RFC 9553. This document updates RFC 9555 by redefining how to convert the now optional uid property from and to vCard. It also registers the vCard JSCOMPS parameter at IANA, which was defined but not registered in RFC 9555.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9981,
+      "name": "rfc9981",
+      "title": "Resource Public Key Infrastructure (RPKI) Manifest Number Handling",
+      "abstract": "The Resource Public Key Infrastructure (RPKI) makes use of signed objects called \"manifests\", each of which includes a \"manifest number\". This document updates RFC 9286 by specifying issuer and Relying Party (RP) behaviour when a manifest number reaches the largest possible value, a situation not considered in RFC 9286.",
+      "status": "Proposed Standard",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9979,
+      "name": "rfc9979",
+      "title": "Registration of Further IMAP/JMAP Keywords and Mailbox Name Attributes",
+      "abstract": "This document defines a number of keywords and mailbox name\r\n   attributes that have been in use across different server and client\r\n   implementations.  It defines the intended use of these keywords and\r\n   mailbox name attributes.  This document registers all of these with\r\n   IANA to avoid name collisions.",
+      "status": "Informational",
+      "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9977,
+      "name": "rfc9977",
+      "title": "Publishing End-Site Prefix Lengths",
+      "abstract": "This document specifies how to augment the Routing Policy Specification Language (RPSL) inetnum: class to refer specifically to prefixlen files, which are Comma-Separated Values (CSV) files used to specify end-site prefix lengths. This document also describes an optional mechanism that uses the Resource Public Key Infrastructure (RPKI) to authenticate the prefixlen files.",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
     },
@@ -353,54 +401,6 @@
       "title": "Prefix Registration for IPv6 Neighbor Discovery",
       "abstract": "This document updates IPv6 Neighbor Discovery (RFC 4861) and IPv6 Subnet Neighbor Discovery (RFC 8505, RFC 8928) to enable a node that owns or is directly connected to a prefix to register that prefix to neighbor routers.  The registration indicates that the registered prefix can be reached via the advertising node without a loop.  The unicast prefix registration allows the node to request one or more neighbor routers to redistribute the prefix in another routing domain regardless of the routing protocol used in that domain.  This document updates the Routing Protocol for Low-Power and Lossy Networks (RPL), as specified in RFCs 6550 and 9010, to enable a 6LoWPAN Router (6LR) to inject the registered prefix in RPL.",
       "status": "Proposed Standard",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9925,
-      "name": "rfc9925",
-      "title": "Unsigned X.509 Certificates",
-      "abstract": "This document defines a placeholder X.509 signature algorithm that may be used in contexts where the consumer of the certificate is not expected to verify the signature.  As part of this, it updates RFC 5280.",
-      "status": "Proposed Standard",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9924,
-      "name": "rfc9924",
-      "title": "Advanced Professional Video",
-      "abstract": "This document describes the bitstream format of Advanced Professional Video (APV) and its decoding process.  APV is a professional video codec providing visually lossless compression mainly for recording and post production.",
-      "status": "Informational",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9923,
-      "name": "rfc9923",
-      "title": "The FNV Non-Cryptographic Hash Algorithm",
-      "abstract": "FNV (Fowler/Noll/Vo) is a fast, non-cryptographic hash algorithm with good dispersion that has been widely used and is referenced in a number of standards documents.  The purpose of this document is to make information on FNV and open-source code performing all specified sizes of FNV conveniently available to the Internet community.",
-      "status": "Informational",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9922,
-      "name": "rfc9922",
-      "title": "A Common YANG Data Model for Scheduling",
-      "abstract": "This document defines common types and groupings that are meant to be used for scheduling purposes, such as events, policies, services, or resources based on date and time.  For the sake of better modularity, the YANG module includes a set of recurrence-related groupings with varying levels of representation (i.e., from basic to advanced) to accommodate a variety of requirements.  It also defines groupings for validating requested schedules and reporting scheduling statuses.",
-      "status": "Proposed Standard",
-      "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9921,
-      "name": "rfc9921",
-      "title": "CBOR Object Signing and Encryption (COSE) Header Parameter for Timestamp Tokens as Defined in RFC 3161",
-      "abstract": "This document defines two CBOR Object Signing and Encryption (COSE) header parameters for incorporating timestamping based on RFC 3161 into COSE message structures (COSE_Sign and COSE_Sign1).  This enables the use of established timestamping infrastructure per RFC 3161 in COSE-based protocols.",
-      "status": "Proposed Standard",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9920,
-      "name": "rfc9920",
-      "title": "RFC Editor Model (Version 3)",
-      "abstract": "This document specifies version 3 of the RFC Editor Model. The model defines two high-level tasks related to the RFC Series. First, policy definition is the joint responsibility of the RFC Series Working Group (RSWG), which produces policy proposals, and the RFC Series Approval Board (RSAB), which approves such proposals. Second, policy implementation is primarily the responsibility of the RFC Production Center (RPC) as contractually overseen by the IETF Administration Limited Liability Company (IETF LLC). In addition, various responsibilities of the RFC Editor function are now performed alone or in combination by the RSWG, RSAB, RPC, RFC Series Consulting Editor (RSCE), and IETF LLC. Finally, this document specifies the Editorial Stream for publication of future policy definition documents produced through the processes defined herein.\n      Since the publication of RFC 9280, lessons have been learned about implementing this model. This document lists some of those lessons learned and updates RFC 9280 based on that experience. This document obsoletes RFC 9280.\n      This document updates RFCs 7841, 7991, 7992, 7993, 7994, 7995, 7996, 7997, 8729, 8730, and 9720.",
-      "status": "Informational",
       "published": "2026-02-01T00:00:00Z"
     }
   ],
