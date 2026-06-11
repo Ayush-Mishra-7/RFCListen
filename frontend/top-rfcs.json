@@ -1,5 +1,5 @@
 {
-  "count": 9774,
+  "count": 9775,
   "page": 1,
   "limit": 50,
   "rfcs": [
@@ -10,6 +10,14 @@
       "abstract": "This memo specifies an RTP payload format for MPEG-I haptic data. A haptic media stream is composed of MPEG-I Haptic Stream (MIHS) units including a MIHS unit header and zero or more MIHS packets. The RTP payload header format allows for packetization of a MIHS unit in an RTP packet payload as well as fragmentation of a MIHS unit into multiple RTP packets. The original subtype registration for 'haptics/hmpg' (RFC 9695) did not include any required or optional parameters. This memo updates RFC 9695 and the 'haptics/hmpg' registration to add optional parameters. It also provides Session Description Protocol (SDP) usage information for the 'haptics' media type.",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9992,
+      "name": "rfc9992",
+      "title": "Routing in Fat Trees (RIFT) Key/Value Topology Information Elements Structure and Processing",
+      "abstract": "The Routing in Fat Trees (RIFT) protocol allows for key/value pairs to be advertised within Key-Value Topology Information Elements (KV TIEs). The data contained within these KV TIEs can be used for any imaginable purpose.\n      This document specifies behavior for the various Key Types (i.e., Well-Known, Organizationally Unique Identifier (OUI), and Experimental) and a method to structure corresponding values. It also defines a Well-Known Key Sub-Type used for testing tie-breaking behavior.",
+      "status": "Proposed Standard",
+      "published": "2026-06-01T00:00:00Z"
     },
     {
       "rfcNumber": 9991,
@@ -392,14 +400,6 @@
       "name": "rfc9927",
       "title": "Fixing the C-Flag in the Extended Address Registration Option (EARO)",
       "abstract": "This document updates \"Address-Protected Neighbor Discovery for Low-Power and Lossy Networks\" (RFC 8928) by changing the position of the C-flag in the Extended Address Registration Option (EARO) and registering it with IANA.",
-      "status": "Proposed Standard",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9926,
-      "name": "rfc9926",
-      "title": "Prefix Registration for IPv6 Neighbor Discovery",
-      "abstract": "This document updates IPv6 Neighbor Discovery (RFC 4861) and IPv6 Subnet Neighbor Discovery (RFC 8505, RFC 8928) to enable a node that owns or is directly connected to a prefix to register that prefix to neighbor routers.  The registration indicates that the registered prefix can be reached via the advertising node without a loop.  The unicast prefix registration allows the node to request one or more neighbor routers to redistribute the prefix in another routing domain regardless of the routing protocol used in that domain.  This document updates the Routing Protocol for Low-Power and Lossy Networks (RPL), as specified in RFCs 6550 and 9010, to enable a 6LoWPAN Router (6LR) to inject the registered prefix in RPL.",
       "status": "Proposed Standard",
       "published": "2026-02-01T00:00:00Z"
     }

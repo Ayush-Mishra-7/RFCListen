@@ -78200,6 +78200,14 @@
     "published": "2026-05-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9992,
+    "name": "rfc9992",
+    "title": "Routing in Fat Trees (RIFT) Key/Value Topology Information Elements Structure and Processing",
+    "abstract": "The Routing in Fat Trees (RIFT) protocol allows for key/value pairs to be advertised within Key-Value Topology Information Elements (KV TIEs). The data contained within these KV TIEs can be used for any imaginable purpose.\n      This document specifies behavior for the various Key Types (i.e., Well-Known, Organizationally Unique Identifier (OUI), and Experimental) and a method to structure corresponding values. It also defines a Well-Known Key Sub-Type used for testing tie-breaking behavior.",
+    "status": "Proposed Standard",
+    "published": "2026-06-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9993,
     "name": "rfc9993",
     "title": "RTP Payload Format for Haptics",
