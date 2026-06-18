@@ -327464,6 +327464,7 @@ with the Network Management Datastore Architecture (NMDA).</p>
     <stream>IETF</stream>
     <area>wit</area>
     <wg_acronym>httpbis</wg_acronym>
+    <errata-url>https://www.rfc-editor.org/errata/rfc9111</errata-url>
     <doi>10.17487/RFC9111</doi>
   </rfc-entry>
   <rfc-entry>
@@ -352633,6 +352634,7 @@ traffic.</p>
     <stream>IETF</stream>
     <area>rtg</area>
     <wg_acronym>bess</wg_acronym>
+    <errata-url>https://www.rfc-editor.org/errata/rfc9721</errata-url>
     <doi>10.17487/RFC9721</doi>
   </rfc-entry>
   <rfc-entry>
@@ -362649,6 +362651,44 @@ implementations to interoperate with each other.</p>
     <doi>10.17487/RFC9983</doi>
   </rfc-entry>
   <rfc-entry>
+    <doc-id>RFC9984</doc-id>
+    <title>YANG Groupings for UDP Clients and UDP Servers</title>
+    <author>
+      <name>A. Huang-Feng</name>
+    </author>
+    <author>
+      <name>P. Francois</name>
+    </author>
+    <author>
+      <name>K. Watsen</name>
+    </author>
+    <date>
+      <month>June</month>
+      <year>2026</year>
+    </date>
+    <format>
+      <file-format>HTML</file-format>
+      <file-format>TXT</file-format>
+      <file-format>PDF</file-format>
+      <file-format>XML</file-format>
+    </format>
+    <page-count>15</page-count>
+    <keywords>
+      <kw>UDP client</kw>
+      <kw>UDP server</kw>
+    </keywords>
+    <abstract>
+      <p>This document presents two YANG 1.1 modules with reusable groupings for managing UDP clients and UDP servers.</p>
+    </abstract>
+    <draft>draft-ietf-netconf-udp-client-server-10</draft>
+    <current-status>PROPOSED STANDARD</current-status>
+    <publication-status>PROPOSED STANDARD</publication-status>
+    <stream>IETF</stream>
+    <area>ops</area>
+    <wg_acronym>netconf</wg_acronym>
+    <doi>10.17487/RFC9984</doi>
+  </rfc-entry>
+  <rfc-entry>
     <doc-id>RFC9987</doc-id>
     <title>Secure Shell (SSH) Agent Protocol</title>
     <author>
@@ -362878,6 +362918,79 @@ implementations to interoperate with each other.</p>
     <area>wit</area>
     <wg_acronym>avtcore</wg_acronym>
     <doi>10.17487/RFC9993</doi>
+  </rfc-entry>
+  <rfc-entry>
+    <doc-id>RFC9998</doc-id>
+    <title>Report from the IAB/W3C Workshop on Age-Based Restrictions on Content Access</title>
+    <author>
+      <name>M. Nottingham</name>
+    </author>
+    <author>
+      <name>M. Thomson</name>
+    </author>
+    <date>
+      <month>June</month>
+      <year>2026</year>
+    </date>
+    <format>
+      <file-format>HTML</file-format>
+      <file-format>TXT</file-format>
+      <file-format>PDF</file-format>
+      <file-format>XML</file-format>
+    </format>
+    <page-count>23</page-count>
+    <keywords>
+      <kw>IAB workshop</kw>
+      <kw>age gate</kw>
+    </keywords>
+    <abstract>
+      <p>The Workshop on Age-Based Restrictions on Content Access was convened by the Internet Architecture Board (IAB) and World Wide Web Consortium (W3C) in October 2025. This report summarizes the significant points of discussion and identifies topics that may warrant further consideration and work.</p>
+      <p>Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB or W3C views and positions.</p>
+    </abstract>
+    <draft>draft-iab-agews-report-03</draft>
+    <current-status>INFORMATIONAL</current-status>
+    <publication-status>INFORMATIONAL</publication-status>
+    <stream>IAB</stream>
+    <doi>10.17487/RFC9998</doi>
+  </rfc-entry>
+  <rfc-entry>
+    <doc-id>RFC10008</doc-id>
+    <title>The HTTP QUERY Method</title>
+    <author>
+      <name>J. Reschke</name>
+    </author>
+    <author>
+      <name>J.M. Snell</name>
+    </author>
+    <author>
+      <name>M. Bishop</name>
+    </author>
+    <date>
+      <month>June</month>
+      <year>2026</year>
+    </date>
+    <format>
+      <file-format>HTML</file-format>
+      <file-format>TXT</file-format>
+      <file-format>PDF</file-format>
+      <file-format>XML</file-format>
+    </format>
+    <page-count>24</page-count>
+    <keywords>
+      <kw>http</kw>
+      <kw>query</kw>
+      <kw>method</kw>
+    </keywords>
+    <abstract>
+      <p>This specification defines the QUERY method for HTTP. A QUERY requests that the request target process the enclosed content in a safe and idempotent manner and then respond with the result of that processing. This is similar to POST requests, but QUERY requests can be automatically repeated or restarted without concern for partial state changes.</p>
+    </abstract>
+    <draft>draft-ietf-httpbis-safe-method-w-body-14</draft>
+    <current-status>PROPOSED STANDARD</current-status>
+    <publication-status>PROPOSED STANDARD</publication-status>
+    <stream>IETF</stream>
+    <area>wit</area>
+    <wg_acronym>httpbis</wg_acronym>
+    <doi>10.17487/RFC10008</doi>
   </rfc-entry>
   <std-entry>
     <doc-id>STD3</doc-id>

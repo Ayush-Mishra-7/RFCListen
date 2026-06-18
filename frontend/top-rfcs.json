@@ -1,8 +1,24 @@
 {
-  "count": 9775,
+  "count": 9778,
   "page": 1,
   "limit": 50,
   "rfcs": [
+    {
+      "rfcNumber": 10008,
+      "name": "rfc10008",
+      "title": "The HTTP QUERY Method",
+      "abstract": "This specification defines the QUERY method for HTTP. A QUERY requests that the request target process the enclosed content in a safe and idempotent manner and then respond with the result of that processing. This is similar to POST requests, but QUERY requests can be automatically repeated or restarted without concern for partial state changes.",
+      "status": "Proposed Standard",
+      "published": "2026-06-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9998,
+      "name": "rfc9998",
+      "title": "Report from the IAB/W3C Workshop on Age-Based Restrictions on Content Access",
+      "abstract": "The Workshop on Age-Based Restrictions on Content Access was convened by the Internet Architecture Board (IAB) and World Wide Web Consortium (W3C) in October 2025. This report summarizes the significant points of discussion and identifies topics that may warrant further consideration and work.\n      Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB or W3C views and positions.",
+      "status": "Informational",
+      "published": "2026-06-01T00:00:00Z"
+    },
     {
       "rfcNumber": 9993,
       "name": "rfc9993",
@@ -50,6 +66,14 @@
       "abstract": "This document specifies a key agent protocol for use in the Secure Shell (SSH) protocol.",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9984,
+      "name": "rfc9984",
+      "title": "YANG Groupings for UDP Clients and UDP Servers",
+      "abstract": "This document presents two YANG 1.1 modules with reusable groupings for managing UDP clients and UDP servers.",
+      "status": "Proposed Standard",
+      "published": "2026-06-01T00:00:00Z"
     },
     {
       "rfcNumber": 9983,
@@ -376,30 +400,6 @@
       "name": "rfc9930",
       "title": "Tunnel Extensible Authentication Protocol (TEAP) Version 1",
       "abstract": "This document defines the Tunnel Extensible Authentication Protocol (TEAP) version 1.  TEAP is a tunnel-based EAP method that enables secure communication between a peer and a server by using the Transport Layer Security (TLS) protocol to establish a mutually authenticated tunnel.  Within the tunnel, TLV objects are used to convey authentication-related data between the EAP peer and the EAP server.  This document obsoletes RFC 7170 and updates RFC 9427 by moving all TEAP specifications from those documents to this one.",
-      "status": "Proposed Standard",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9929,
-      "name": "rfc9929",
-      "title": "IGP Unreachable Prefix Announcement",
-      "abstract": "Summarization is often used in multi-area or multi-domain networks to improve network efficiency and scalability. With summarization in place, there is a need to signal loss of reachability to an individual prefix covered by the summary. This enables fast convergence by steering traffic, when applicable, away from the node which owns the prefix and is no longer reachable.\n      This document specifies protocol mechanisms in IS-IS and OSPF, together with two new flags, to advertise such prefix reachability loss.\n      The term \"OSPF\" in this document is used to refer to both OSPFv2 and OSPFv3.",
-      "status": "Proposed Standard",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9928,
-      "name": "rfc9928",
-      "title": "DHCPv4 over DHCPv6 with Relay Agent Support",
-      "abstract": "This document describes a mechanism for networks with legacy IPv4-only clients to use services provided by DHCPv4 over DHCPv6 in a Relay Agent.  RFC 7341 specifies the use of DHCPv4 over DHCPv6 in the client only.  This document specifies an approach based on RFC 7341 that allows a Relay Agent to implement the DHCPv4-over-DHCPv6 encapsulation and decapsulation of DHCPv4 messages in DHCPv6 messages on behalf of a DHCPv4 client.",
-      "status": "Proposed Standard",
-      "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9927,
-      "name": "rfc9927",
-      "title": "Fixing the C-Flag in the Extended Address Registration Option (EARO)",
-      "abstract": "This document updates \"Address-Protected Neighbor Discovery for Low-Power and Lossy Networks\" (RFC 8928) by changing the position of the C-flag in the Extended Address Registration Option (EARO) and registering it with IANA.",
       "status": "Proposed Standard",
       "published": "2026-02-01T00:00:00Z"
     }

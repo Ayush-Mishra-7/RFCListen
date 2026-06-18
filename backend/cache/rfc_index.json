@@ -78168,6 +78168,14 @@
     "published": "2026-05-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9984,
+    "name": "rfc9984",
+    "title": "YANG Groupings for UDP Clients and UDP Servers",
+    "abstract": "This document presents two YANG 1.1 modules with reusable groupings for managing UDP clients and UDP servers.",
+    "status": "Proposed Standard",
+    "published": "2026-06-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9987,
     "name": "rfc9987",
     "title": "Secure Shell (SSH) Agent Protocol",
@@ -78214,5 +78222,21 @@
     "abstract": "This memo specifies an RTP payload format for MPEG-I haptic data. A haptic media stream is composed of MPEG-I Haptic Stream (MIHS) units including a MIHS unit header and zero or more MIHS packets. The RTP payload header format allows for packetization of a MIHS unit in an RTP packet payload as well as fragmentation of a MIHS unit into multiple RTP packets. The original subtype registration for 'haptics/hmpg' (RFC 9695) did not include any required or optional parameters. This memo updates RFC 9695 and the 'haptics/hmpg' registration to add optional parameters. It also provides Session Description Protocol (SDP) usage information for the 'haptics' media type.",
     "status": "Proposed Standard",
     "published": "2026-05-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9998,
+    "name": "rfc9998",
+    "title": "Report from the IAB/W3C Workshop on Age-Based Restrictions on Content Access",
+    "abstract": "The Workshop on Age-Based Restrictions on Content Access was convened by the Internet Architecture Board (IAB) and World Wide Web Consortium (W3C) in October 2025. This report summarizes the significant points of discussion and identifies topics that may warrant further consideration and work.\n      Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB or W3C views and positions.",
+    "status": "Informational",
+    "published": "2026-06-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 10008,
+    "name": "rfc10008",
+    "title": "The HTTP QUERY Method",
+    "abstract": "This specification defines the QUERY method for HTTP. A QUERY requests that the request target process the enclosed content in a safe and idempotent manner and then respond with the result of that processing. This is similar to POST requests, but QUERY requests can be automatically repeated or restarted without concern for partial state changes.",
+    "status": "Proposed Standard",
+    "published": "2026-06-01T00:00:00Z"
   }
 ]
