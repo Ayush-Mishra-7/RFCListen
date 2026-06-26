@@ -1,5 +1,5 @@
 {
-  "count": 9778,
+  "count": 9782,
   "page": 1,
   "limit": 50,
   "rfcs": [
@@ -66,6 +66,22 @@
       "abstract": "This document specifies a key agent protocol for use in the Secure Shell (SSH) protocol.",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9986,
+      "name": "rfc9986",
+      "title": "Meticulous Keyed ISAAC for Bidirectional Forwarding Detection (BFD) Optimized Authentication",
+      "abstract": "This document describes a Bidirectional Forwarding Detection (BFD) Optimized Authentication Mode known as Meticulous Keyed ISAAC Authentication. This mode can be used to authenticate some BFD packets with less CPU time cost than using MD5 or SHA-1 with the trade-off of decreased security. This mechanism cannot be used to signal state changes, but it can be used to maintain a session in the Up state.",
+      "status": "Experimental",
+      "published": "2026-06-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9985,
+      "name": "rfc9985",
+      "title": "Optimizing Bidirectional Forwarding Detection (BFD) Authentication",
+      "abstract": "This document describes an experimental optimization to Bidirectional Forwarding Detection (BFD) Authentication. This optimization enables BFD to scale better when there is a desire to use authentication where applying the same authentication mechanism to every BFD Control Packet may adversely impact performance. This optimization partitions BFD Authentication into a more computationally intensive (MCI) mechanism that is applied to BFD significant changes and a less computationally intensive (LCI) mechanism that is applied to the majority of BFD Control Packets.",
+      "status": "Experimental",
+      "published": "2026-06-01T00:00:00Z"
     },
     {
       "rfcNumber": 9984,
@@ -218,6 +234,14 @@
       "abstract": "This document specifies a cautious method for Internet transports that enables fast startup of Congestion Control (CC) for a wide range of connections, known as \"Careful Resume\". It reuses a set of computed CC parameters that are based on previously observed path characteristics between the same pair of transport endpoints. These parameters are saved, allowing them to be later used to modify the CC behaviour of a subsequent connection.\n      This document describes the assumptions and defines the requirements for how a sender utilises these parameters to provide opportunities for a connection to more rapidly get up to speed and utilise available capacity. It discusses how the use of this method impacts the capacity at a shared network bottleneck and the safe response that is needed after any indication that the new rate is inappropriate.",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9958,
+      "name": "rfc9958",
+      "title": "Post-Quantum Cryptography for Engineers",
+      "abstract": "The advent of a cryptographically relevant quantum computer (CRQC) would render state-of-the-art, traditional public key algorithms deployed today obsolete, as the mathematical assumptions underpinning their security would no longer hold. To address this, protocols and infrastructure must transition to post-quantum algorithms, which are designed to resist both traditional and quantum attacks. This document explains why engineers need to be aware of and understand post-quantum cryptography (PQC), and it details the impact of CRQCs on existing systems and the challenges involved in transitioning to post-quantum algorithms. Unlike previous cryptographic updates, this shift may require significant protocol redesign due to the unique properties of post-quantum algorithms.",
+      "status": "Informational",
+      "published": "2026-06-01T00:00:00Z"
     },
     {
       "rfcNumber": 9957,
@@ -378,30 +402,6 @@
       "abstract": "Encrypted ClientHello (ECH) key pairs need to be configured into TLS servers, which can be built using different TLS libraries.  This document specifies a standard file format for this purpose, similar to how RFC 7468 defines other Privacy-Enhanced Mail (PEM) file formats.",
       "status": "Proposed Standard",
       "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9932,
-      "name": "rfc9932",
-      "title": "Mutually Authenticating TLS in the Context of Federations",
-      "abstract": "This Informational Independent Submission to the RFC Series describes a means to use TLS 1.3 to perform machine-to-machine mutual authentication within federations. This memo is not a standard. It does not modify the TLS protocol in any way, nor does it require changes to common TLS libraries. TLS is specified and standardized by the IETF's TLS Working Group.\n      The framework enables interoperable trust management for federated machine-to-machine communication. It introduces a centrally managed trust anchor and a controlled metadata publication process, ensuring that only authorized members are identifiable within the federation. These mechanisms support unambiguous entity identification and reduce the risk of impersonation, promoting secure and policy-aligned interaction across organizational boundaries.",
-      "status": "Informational",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9931,
-      "name": "rfc9931",
-      "title": "Security Considerations for Optimistic Protocol Transitions in HTTP/1.1",
-      "abstract": "In HTTP/1.1, the client can request a change to a new protocol on the existing connection.  This document discusses the security considerations that apply to data sent by the client before this request is confirmed and adds new requirements to RFCs 9112 and 9298 to avoid related security issues.",
-      "status": "Proposed Standard",
-      "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9930,
-      "name": "rfc9930",
-      "title": "Tunnel Extensible Authentication Protocol (TEAP) Version 1",
-      "abstract": "This document defines the Tunnel Extensible Authentication Protocol (TEAP) version 1.  TEAP is a tunnel-based EAP method that enables secure communication between a peer and a server by using the Transport Layer Security (TLS) protocol to establish a mutually authenticated tunnel.  Within the tunnel, TLV objects are used to convey authentication-related data between the EAP peer and the EAP server.  This document obsoletes RFC 7170 and updates RFC 9427 by moving all TEAP specifications from those documents to this one.",
-      "status": "Proposed Standard",
-      "published": "2026-02-01T00:00:00Z"
     }
   ],
   "next": "?limit=50&search=&sort=desc&page=2",

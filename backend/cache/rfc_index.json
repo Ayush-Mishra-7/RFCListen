@@ -77536,6 +77536,14 @@
     "published": "2025-12-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9888,
+    "name": "rfc9888",
+    "title": "Out-of-Band Secure Telephone Identity Revisited (STIR) for Service Providers",
+    "abstract": "The Secure Telephone Identity Revisited (STIR) framework defines means of carrying its Personal Assertion Tokens (PASSporTs) either in-band, within the headers of a Session Initiation Protocol (SIP) request, or out-of-band, through a service that stores PASSporTs for retrieval by relying parties. This specification defines a way that the out-of-band conveyance of PASSporTs can be used to support large service providers for cases in which in-band STIR conveyance is not universally available.",
+    "status": "Proposed Standard",
+    "published": "2026-06-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9889,
     "name": "rfc9889",
     "title": "A Realization of Network Slices for 5G Networks Using Current IP/MPLS Technologies",
@@ -78024,6 +78032,14 @@
     "published": "2026-05-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9958,
+    "name": "rfc9958",
+    "title": "Post-Quantum Cryptography for Engineers",
+    "abstract": "The advent of a cryptographically relevant quantum computer (CRQC) would render state-of-the-art, traditional public key algorithms deployed today obsolete, as the mathematical assumptions underpinning their security would no longer hold. To address this, protocols and infrastructure must transition to post-quantum algorithms, which are designed to resist both traditional and quantum attacks. This document explains why engineers need to be aware of and understand post-quantum cryptography (PQC), and it details the impact of CRQCs on existing systems and the challenges involved in transitioning to post-quantum algorithms. Unlike previous cryptographic updates, this shift may require significant protocol redesign due to the unique properties of post-quantum algorithms.",
+    "status": "Informational",
+    "published": "2026-06-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9959,
     "name": "rfc9959",
     "title": "Careful Resume: Convergence of Congestion Control from Retained State",
@@ -78173,6 +78189,22 @@
     "title": "YANG Groupings for UDP Clients and UDP Servers",
     "abstract": "This document presents two YANG 1.1 modules with reusable groupings for managing UDP clients and UDP servers.",
     "status": "Proposed Standard",
+    "published": "2026-06-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9985,
+    "name": "rfc9985",
+    "title": "Optimizing Bidirectional Forwarding Detection (BFD) Authentication",
+    "abstract": "This document describes an experimental optimization to Bidirectional Forwarding Detection (BFD) Authentication. This optimization enables BFD to scale better when there is a desire to use authentication where applying the same authentication mechanism to every BFD Control Packet may adversely impact performance. This optimization partitions BFD Authentication into a more computationally intensive (MCI) mechanism that is applied to BFD significant changes and a less computationally intensive (LCI) mechanism that is applied to the majority of BFD Control Packets.",
+    "status": "Experimental",
+    "published": "2026-06-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 9986,
+    "name": "rfc9986",
+    "title": "Meticulous Keyed ISAAC for Bidirectional Forwarding Detection (BFD) Optimized Authentication",
+    "abstract": "This document describes a Bidirectional Forwarding Detection (BFD) Optimized Authentication Mode known as Meticulous Keyed ISAAC Authentication. This mode can be used to authenticate some BFD packets with less CPU time cost than using MD5 or SHA-1 with the trade-off of decreased security. This mechanism cannot be used to signal state changes, but it can be used to maintain a session in the Up state.",
+    "status": "Experimental",
     "published": "2026-06-01T00:00:00Z"
   },
   {
