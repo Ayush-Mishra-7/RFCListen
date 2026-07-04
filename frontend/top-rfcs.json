@@ -1,8 +1,16 @@
 {
-  "count": 9782,
+  "count": 9792,
   "page": 1,
   "limit": 50,
   "rfcs": [
+    {
+      "rfcNumber": 10014,
+      "name": "rfc10014",
+      "title": "Guidelines for Characterizing the Term \"OAM\"",
+      "abstract": "As the IETF continues to produce and standardize different Operations, Administration, and Maintenance (OAM) protocols and technologies, various qualifiers and modifiers are prepended to the OAM abbreviation. While, at first glance, the most used qualifiers appear to be well understood, the same qualifier may be interpreted differently in different contexts. A case in point is the qualifiers \"in-band\" and \"out-of-band\", which have their origins in the radio lexicon, and which have been extrapolated into other communication networks. This document recommends not to use these two terms when referring to OAM.\n      This document considers some common qualifiers and modifiers that are prepended, within the context of packet networks, to the OAM abbreviation and lays out guidelines for their use in IETF documents.\n      This document extends RFC 6291 by adding to the guidelines for the use of the term \"OAM\" with qualifiers. It does not modify any part of RFC 6291.",
+      "status": "Best Current Practice",
+      "published": "2026-06-01T00:00:00Z"
+    },
     {
       "rfcNumber": 10008,
       "name": "rfc10008",
@@ -12,11 +20,35 @@
       "published": "2026-06-01T00:00:00Z"
     },
     {
+      "rfcNumber": 10007,
+      "name": "rfc10007",
+      "title": "Clarification to Processing Key Usage Values During Certificate Revocation List (CRL) Validation",
+      "abstract": "RFC 5280 defines the profile of X.509 certificates and Certificate Revocation Lists (CRLs) for use in the Internet. Section 4.2.1.3 of RFC 5280 requires CRL issuer certificates to contain the",
+      "status": "Proposed Standard",
+      "published": "2026-06-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 10005,
+      "name": "rfc10005",
+      "title": "BGP Link Bandwidth Extended Community",
+      "abstract": "This document defines a BGP extended community, the Link Bandwidth Extended Community, which carries bandwidth information to enable weighted load-balancing in multipath scenarios. It specifies the format and processing rules for this extended community type.",
+      "status": "Proposed Standard",
+      "published": "2026-06-01T00:00:00Z"
+    },
+    {
       "rfcNumber": 9998,
       "name": "rfc9998",
       "title": "Report from the IAB/W3C Workshop on Age-Based Restrictions on Content Access",
       "abstract": "The Workshop on Age-Based Restrictions on Content Access was convened by the Internet Architecture Board (IAB) and World Wide Web Consortium (W3C) in October 2025. This report summarizes the significant points of discussion and identifies topics that may warrant further consideration and work.\n      Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB or W3C views and positions.",
       "status": "Informational",
+      "published": "2026-06-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9994,
+      "name": "rfc9994",
+      "title": "MPLS Network Action (MNA) Sub-Stack Specification Including In-Stack Network Actions and Data",
+      "abstract": "This document specifies the MPLS Network Action (MNA) Sub-Stack for carrying network actions and Ancillary Data (AD) in the MPLS label stack. MNA can be used to influence packet-forwarding decisions, carry additional Operations, Administration, and Maintenance (OAM) information in the MPLS packet, or perform user-defined operations.\n      This document updates RFC 9789 to refine the list of pieces of information that must be included in any document that defines an MNA.",
+      "status": "Proposed Standard",
       "published": "2026-06-01T00:00:00Z"
     },
     {
@@ -116,12 +148,28 @@
       "published": "2026-05-01T00:00:00Z"
     },
     {
+      "rfcNumber": 9980,
+      "name": "rfc9980",
+      "title": "Post-Quantum Cryptography in OpenPGP",
+      "abstract": "This document defines a post-quantum public key algorithm extension for the OpenPGP protocol, extending RFC 9580. Given the generally assumed threat of a cryptographically relevant quantum computer, this extension provides a basis for long-term secure OpenPGP signatures and ciphertexts. Specifically, it defines composite public key encryption based on ML-KEM (formerly CRYSTALS-Kyber), composite public key signatures based on ML-DSA (formerly CRYSTALS-Dilithium), both in combination with Elliptic Curve Cryptography (ECC), and SLH-DSA (formerly SPHINCS+) as a standalone public key signature scheme.",
+      "status": "Proposed Standard",
+      "published": "2026-06-01T00:00:00Z"
+    },
+    {
       "rfcNumber": 9979,
       "name": "rfc9979",
       "title": "Registration of Further IMAP/JMAP Keywords and Mailbox Name Attributes",
       "abstract": "This document defines a number of keywords and mailbox name\r\n   attributes that have been in use across different server and client\r\n   implementations.  It defines the intended use of these keywords and\r\n   mailbox name attributes.  This document registers all of these with\r\n   IANA to avoid name collisions.",
       "status": "Informational",
       "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9978,
+      "name": "rfc9978",
+      "title": "Bidirectional Forwarding Detection (BFD) Stability",
+      "abstract": "This document describes extensions to the Bidirectional Forwarding Detection (BFD) protocol to measure BFD Stability. Specifically, it describes a mechanism for the detection of BFD packet loss.",
+      "status": "Experimental",
+      "published": "2026-06-01T00:00:00Z"
     },
     {
       "rfcNumber": 9977,
@@ -140,12 +188,28 @@
       "published": "2026-05-01T00:00:00Z"
     },
     {
+      "rfcNumber": 9974,
+      "name": "rfc9974",
+      "title": "Operations, Administration, and Maintenance (OAM) Requirements for the Bit Index Explicit Replication (BIER) Layer",
+      "abstract": "This document specifies a list of functional requirements for\r\n   Operations, Administration, and Maintenance mechanisms, protocols,\r\n   and tools that support operations in the Bit Index Explicit\r\n   Replication layer of a network.",
+      "status": "Informational",
+      "published": "2026-06-01T00:00:00Z"
+    },
+    {
       "rfcNumber": 9972,
       "name": "rfc9972",
       "title": "Advanced BGP Monitoring Protocol (BMP) Statistics Types",
       "abstract": "The BGP Monitoring Protocol (BMP) described in RFC 7854 defines statistics message types to observe events that occur on a monitored router.  This document defines new statistics types to monitor BMP Adj-RIB-In and Adj-RIB-Out Routing Information Bases (RIBs).",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9970,
+      "name": "rfc9970",
+      "title": "Connected Identity for Secure Telephone Identity Revisited (STIR)",
+      "abstract": "The Session Initiation Protocol (SIP) Identity header field conveys cryptographic identity information about the originators of SIP requests. However, the Secure Telephone Identity Revisited (STIR) framework provides no means for determining the identity of the called party in a conventional telephone-calling scenario. This document updates prior guidance on the \"connected identity\" problem to reflect the changes to SIP identity that accompanied STIR. It also considers a revised problem space for connected identity as a means of detecting calls that have been retargeted to a party impersonating the intended destination and preventing the spoofing of mid-dialog or dialog-terminating events by intermediaries or third parties.",
+      "status": "Proposed Standard",
+      "published": "2026-06-01T00:00:00Z"
     },
     {
       "rfcNumber": 9969,
@@ -338,70 +402,6 @@
       "abstract": "The initial core schema for the System for Cross-domain Identity Management (SCIM) was designed for provisioning users.  This memo specifies schema extensions that enable provisioning of devices using various underlying bootstrapping systems such as Wi-Fi Easy Connect, FIDO device onboarding vouchers, Bluetooth Low Energy (BLE) passcodes, and MAC Authenticated Bypass (MAB).",
       "status": "Proposed Standard",
       "published": "2026-05-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9941,
-      "name": "rfc9941",
-      "title": "Secure Shell (SSH) Key Exchange Method Using Hybrid Streamlined NTRU Prime sntrup761 and X25519 with SHA-512: sntrup761x25519-sha512",
-      "abstract": "This document describes a widely deployed hybrid key exchange method in the Secure Shell (SSH) protocol that is based on Streamlined NTRU Prime sntrup761 and X25519 with SHA-512.",
-      "status": "Informational",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9940,
-      "name": "rfc9940",
-      "title": "Some Key Terms for Network Fault and Problem Management",
-      "abstract": "This document sets out some terms that are fundamental to a common understanding of network fault and problem management within the IETF.\n      The purpose of this document is to bring clarity to discussions and other work related to network fault and problem management -- in particular, to YANG data models and management protocols that report, make visible, or manage network faults and problems.",
-      "status": "Informational",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9939,
-      "name": "rfc9939",
-      "title": "PKCS #8: Private-Key Information Content Types",
-      "abstract": "This document defines PKCS #8 content types for use with PrivateKeyInfo and EncryptedPrivateKeyInfo as specified in RFC 5958.",
-      "status": "Proposed Standard",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9938,
-      "name": "rfc9938",
-      "title": "A Framework for the Deterministic Networking (DetNet) Controller Plane",
-      "abstract": "This document provides a framework overview for the Deterministic Networking (DetNet) Controller Plane.  It discusses concepts and requirements for the DetNet Controller Plane, which could be the basis for a future solution specification.",
-      "status": "Informational",
-      "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9937,
-      "name": "rfc9937",
-      "title": "Proportional Rate Reduction (PRR)",
-      "abstract": "This document specifies a Standards Track version of the Proportional Rate Reduction (PRR) algorithm that obsoletes the Experimental version described in RFC 6937.  PRR regulates the amount of data sent by TCP or other transport protocols during fast recovery.  PRR accurately regulates the actual flight size through recovery such that at the end of recovery it will be as close as possible to the slow start threshold (ssthresh), as determined by the congestion control algorithm.",
-      "status": "Proposed Standard",
-      "published": "2025-12-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9936,
-      "name": "rfc9936",
-      "title": "Use of ML-KEM in the Cryptographic Message Syntax (CMS)",
-      "abstract": "Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM) is a quantum-resistant Key Encapsulation Mechanism (KEM).  Three parameter sets for the ML-KEM algorithm are specified by the US National Institute of Standards and Technology (NIST) in FIPS 203.  In order of increasing security strength (and decreasing performance), these parameter sets are ML-KEM-512, ML-KEM-768, and ML-KEM-1024.  This document specifies the conventions for using ML-KEM with the Cryptographic Message Syntax (CMS) using the KEMRecipientInfo structure defined in \"Using Key Encapsulation Mechanism (KEM) Algorithms in the Cryptographic Message Syntax (CMS)\" (RFC 9629).",
-      "status": "Proposed Standard",
-      "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9935,
-      "name": "rfc9935",
-      "title": "Internet X.509 Public Key Infrastructure - Algorithm Identifiers for the Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM)",
-      "abstract": "The Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM) is a quantum-resistant Key Encapsulation Mechanism.  This document specifies the conventions for using the ML-KEM in X.509 Public Key Infrastructure.  The conventions for the subject public keys and private keys are also specified.",
-      "status": "Proposed Standard",
-      "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9934,
-      "name": "rfc9934",
-      "title": "Privacy-Enhanced Mail (PEM) File Format for Encrypted ClientHello (ECH)",
-      "abstract": "Encrypted ClientHello (ECH) key pairs need to be configured into TLS servers, which can be built using different TLS libraries.  This document specifies a standard file format for this purpose, similar to how RFC 7468 defines other Privacy-Enhanced Mail (PEM) file formats.",
-      "status": "Proposed Standard",
-      "published": "2026-03-01T00:00:00Z"
     }
   ],
   "next": "?limit=50&search=&sort=desc&page=2",
