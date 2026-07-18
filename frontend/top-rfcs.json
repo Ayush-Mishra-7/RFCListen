@@ -1,8 +1,16 @@
 {
-  "count": 9792,
+  "count": 9809,
   "page": 1,
   "limit": 50,
   "rfcs": [
+    {
+      "rfcNumber": 10015,
+      "name": "rfc10015",
+      "title": "Deprecating Obsolete Key Exchange Methods in TLS 1.2 and DTLS 1.2",
+      "abstract": "For (D)TLS 1.2, this document deprecates the use of two key exchanges, namely Diffie-Hellman (DH) over a finite field and RSA. It also discourages the use of static Elliptic Curve Diffie-Hellman (ECDH) cipher suites.\n      These prescriptions apply only to (D)TLS 1.2, since (D)TLS 1.0 and TLS 1.1 are deprecated by RFC 8996 and (D)TLS 1.3 either does not use the affected algorithms or does not share the relevant configuration options. (There is no DTLS version 1.1.)\n      This document updates RFCs 4162, 4279, 4346, 4785, 5246, 5288, 5289, 5469, 5487, 5932, 6209, 6347, 6367, 6655, 7905, 8422, and 9325 to either deprecate or discourage the use of cipher suites using the above key exchange methods in (D)TLS 1.2 connections.",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
+    },
     {
       "rfcNumber": 10014,
       "name": "rfc10014",
@@ -36,12 +44,52 @@
       "published": "2026-06-01T00:00:00Z"
     },
     {
+      "rfcNumber": 10004,
+      "name": "rfc10004",
+      "title": "Certificate Management over CMS (CMC): Compliance Requirements",
+      "abstract": "This document provides a set of compliance statements about the Certificate Management over CMS (CMC) enrollment protocol. The ASN.1 structures and the transport mechanisms for the CMC enrollment protocol are covered in other documents (RFCs 10002 and 10003). This document provides the information needed to make a compliant version of CMC.\n      This document obsoletes RFCs 5274 and 6402.",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 10003,
+      "name": "rfc10003",
+      "title": "Certificate Management over CMS (CMC): Transport Protocols",
+      "abstract": "This document defines a number of transport mechanisms that are used to move Certificate Management over CMS (CMC) messages. The transport mechanisms described in this document are HTTP, file, mail, and TCP.\n      This document obsoletes RFCs 5273 and 6402.",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 10002,
+      "name": "rfc10002",
+      "title": "Certificate Management over CMS (CMC)",
+      "abstract": "This document defines the base syntax for CMC, a Certificate Management protocol using the Cryptographic Message Syntax (CMS). This protocol addresses two immediate needs within the Internet Public Key Infrastructure (PKI) community:\n      CMC also requires the use of the transport document (RFC 10003) and the requirements usage document (RFC 10004) along with this document for a full definition.\n      This document obsoletes RFCs 5272 and 6402.",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9999,
+      "name": "rfc9999",
+      "title": "Remote ATtestation procedureS (RATS) Conceptual Message Wrapper (CMW)",
+      "abstract": "The conceptual messages introduced by the Remote ATtestation procedureS (RATS) architecture (RFC 9334) are protocol-agnostic data units that are conveyed between RATS roles during RATS interactions. Conceptual messages describe the meaning and function of such data units within RATS data flows without specifying a wire format, encoding, transport mechanism, or processing details. The initial set of conceptual messages is defined in Section 8 of RFC 9334 and includes Evidence, Attestation Results, Endorsements, Reference Values, and Appraisal Policies.\n      This document introduces the Conceptual Message Wrapper (CMW) that provides a common structure to encapsulate these messages. It defines a dedicated Concise Binary Object Representation (CBOR) tag, corresponding JSON Web Token (JWT) and CBOR Web Token (CWT) claims, and an X.509 extension.\n      Together, these mechanisms allow CMWs to be used in CBOR-based protocols, web APIs using JWTs and CWTs, and PKIX artifacts such as X.509 certificates. Additionally, this document defines media types and CoAP Content-Formats that may be used to identify CMWs when transported over protocols such as HTTP, MIME, and CoAP.\n      The goal is to improve the interoperability and flexibility of remote attestation protocols. Introducing a shared message format such as CMW enables consistent support for different attestation message types, enables the evolution of message serialization formats without breaking compatibility, and avoids the need to redefine how messages are handled within each protocol.",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
       "rfcNumber": 9998,
       "name": "rfc9998",
       "title": "Report from the IAB/W3C Workshop on Age-Based Restrictions on Content Access",
       "abstract": "The Workshop on Age-Based Restrictions on Content Access was convened by the Internet Architecture Board (IAB) and World Wide Web Consortium (W3C) in October 2025. This report summarizes the significant points of discussion and identifies topics that may warrant further consideration and work.\n      Note that this document is a report on the proceedings of the workshop. The views and positions documented in this report are those of the workshop participants and do not necessarily reflect IAB or W3C views and positions.",
       "status": "Informational",
       "published": "2026-06-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9995,
+      "name": "rfc9995",
+      "title": "CBOR Object Signing and Encryption (COSE) Hash Envelope",
+      "abstract": "This document defines new CBOR Object Signing and Encryption (COSE) header parameters for signaling a payload as an output of a hash function. This mechanism enables faster validation, as access to the original payload is not required for signature validation. Additionally, hints of the hashed payload's content format and availability are defined, providing references to optional discovery mechanisms that can help to find the original payload content.",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
     },
     {
       "rfcNumber": 9994,
@@ -196,6 +244,14 @@
       "published": "2026-06-01T00:00:00Z"
     },
     {
+      "rfcNumber": 9973,
+      "name": "rfc9973",
+      "title": "TLS 1.3 Extension for Using Certificates with an External Pre-Shared Key",
+      "abstract": "This document specifies a TLS 1.3 extension that allows TLS clients and servers to authenticate with certificates and provide confidentiality based on encryption with a symmetric key from the usual key agreement algorithm and an external pre-shared key (PSK). This Standards Track RFC obsoletes RFC 8773, which was an Experimental RFC.",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
       "rfcNumber": 9972,
       "name": "rfc9972",
       "title": "Advanced BGP Monitoring Protocol (BMP) Statistics Types",
@@ -324,84 +380,28 @@
       "published": "2026-05-01T00:00:00Z"
     },
     {
+      "rfcNumber": 9955,
+      "name": "rfc9955",
+      "title": "Hybrid Signature Spectrums",
+      "abstract": "This document describes classification of design goals and security considerations for hybrid digital signature schemes, including proof composability, non-separability of the component signatures given a hybrid signature, backwards and forwards compatibility, hybrid generality, and Simultaneous Verification (SV).",
+      "status": "Informational",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9954,
+      "name": "rfc9954",
+      "title": "Hybrid Key Exchange in TLS 1.3",
+      "abstract": "Hybrid key exchange refers to using multiple key exchange algorithms simultaneously and combining the result with the goal of providing security even if a way is found to defeat the encryption for all but one of the component algorithms. It is motivated by the transition to post-quantum cryptography. This document provides a construction for hybrid key exchange in the Transport Layer Security (TLS) protocol version 1.3.",
+      "status": "Informational",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
       "rfcNumber": 9953,
       "name": "rfc9953",
       "title": "DNS over CoAP (DoC)",
       "abstract": "This document defines a protocol for exchanging DNS queries (OPCODE 0) over the Constrained Application Protocol (CoAP).  These CoAP messages can be protected by (D)TLS-Secured CoAP or Object Security for Constrained RESTful Environments (OSCORE) to provide encrypted DNS message exchange for constrained devices in the Internet of Things (IoT).",
       "status": "Proposed Standard",
       "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9952,
-      "name": "rfc9952",
-      "title": "Application-Layer Protocol Negotiation (ALPN) ID for CoAP over DTLS",
-      "abstract": "This document specifies an Application-Layer Protocol Negotiation (ALPN) ID for Constrained Application Protocol (CoAP) services that are secured by DTLS.",
-      "status": "Informational",
-      "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9951,
-      "name": "rfc9951",
-      "title": "Export of Delay Performance Metrics in IP Flow Information Export (IPFIX)",
-      "abstract": "This document specifies new IP Flow Information Export (IPFIX) Information Elements to export the On-Path delay at each Operations, Administration, and Maintenance (OAM) transit and decapsulating nodes.  The On-Path delay is defined as the delay between the OAM header encapsulating node and each OAM header transit and OAM header decapsulating nodes.  This delay measurement is computed by an On-Path Telemetry protocol and is exported by the IPFIX process.",
-      "status": "Proposed Standard",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9950,
-      "name": "rfc9950",
-      "title": "A YANG Data Model for Terminal Access Controller Access-Control System Plus (TACACS+)",
-      "abstract": "This document defines a Terminal Access Controller Access-Control\nSystem Plus (TACACS+) client YANG module that augments the System\nManagement data model, defined in RFC 7317, to allow devices to make\nuse of TACACS+ servers for centralized Authentication, Authorization,\nand Accounting (AAA). Specifically, the TACACS+ YANG module can be\nused to manage TACACS+ over TLS.\n      This document obsoletes RFC 9105.",
-      "status": "Proposed Standard",
-      "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9949,
-      "name": "rfc9949",
-      "title": "BUSA-TLS: Mandatory Audio Component (MAC) Pre-Shared Key (PSK) Derivation for TLS 1.3 Using 2 Live Crew's \"Banned in the U.S.A.\"",
-      "abstract": "TLS 1.3 (RFC 8446) eliminates null cipher suites entirely. However, one vestigial zero remains in the key schedule: when no Pre-Shared Key (PSK) is used, the Input Keying Material (IKM) for the initial HKDF-Extract operation is a string of zero bytes. This document specifies that this zero-byte IKM MUST be replaced with the SHA-256 digest of the raw PCM audio data of \"Banned in the U.S.A.\" by 2 Live Crew (from the album \"Banned in the U.S.A.\", 1990), hereafter referred to as the Mandatory Audio Component (MAC). Implementations that omit the MAC are non-conformant with BUSA-TLS and also have questionable taste in music.\n      The IETF's process-heavy, consensus-driven, working-group-reviewed approach to protocol standardization is a fine way to run a standards body. It is also completely antithetical to the spirit of a document that requires a jury-banned rap album as a cryptographic primitive.\n      This document is offered in the same spirit as the album it incorporates: unapologetically and in defiance of institutional authority.",
-      "status": "Informational",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9948,
-      "name": "rfc9948",
-      "title": "Internet Protocol Police (IPP) - Schedule of Punishments",
-      "abstract": "The Internet Protocol Police (IPP) is in charge of punishing willful infractions of the Collected Wisdom of the IETF community.  This document sets out the schedule of punishments for such infractions.",
-      "status": "Informational",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9947,
-      "name": "rfc9947",
-      "title": "Application of the Alternate-Marking Method to the Segment Routing Header",
-      "abstract": "This document describes an alternative experimental approach for the application of the Alternate-Marking Method to Segment Routing for IPv6 (SRv6). It uses an experimental TLV in the Segment Routing Header (SRH); thus, participation in this experiment should be between coordinating parties in a controlled domain. This approach has potential scaling and simplification benefits over the technique described in RFC 9343, and the scope of the experiment is to determine whether those are significant and attractive to the community.\n      This protocol extension has been developed outside the IETF as an alternative to the IETF's Standards Track specification RFC 9343 and it does not have IETF consensus. It is published here to guide experimental implementation and ensure interoperability among implementations to better determine the value of this approach. Researchers are invited to submit their evaluations of this work to the Independent Submissions Editor or to the IETF SPRING Working Group as Internet-Drafts.",
-      "status": "Experimental",
-      "published": "2026-03-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9946,
-      "name": "rfc9946",
-      "title": "The UDP Speed Test Protocol (UDPSTP) for One-Way IP Capacity Metric Measurement",
-      "abstract": "This document addresses the problem of protocol support for measuring One-Way IP Capacity metrics specified by RFC 9097.  The Method of Measurement discussed in that RFC requires a feedback channel from the receiver to control the sender's transmission rate in near real-time.  This document defines the UDP Speed Test Protocol (UDPSTP) for conducting measurements as described in RFC 9097 and other related measurements.",
-      "status": "Proposed Standard",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9945,
-      "name": "rfc9945",
-      "title": "IETF Community Moderation",
-      "abstract": "The IETF community will treat people with kindness and grace, but not endless patience.\n      This memo obsoletes RFCs 3683 and 3934, and it updates RFCs 2418 and 9245 by establishing a policy for the moderation of disruptive participation across the IETF's various public contribution channels and discussion fora. It establishes guardrails for moderation and a moderator team. That team will develop a set of moderation procedures and facilitate their consistent implementation with chairs and administrators.",
-      "status": "Best Current Practice",
-      "published": "2026-02-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9944,
-      "name": "rfc9944",
-      "title": "Device Schema Extensions to the System for Cross-Domain Identity Management (SCIM) Model",
-      "abstract": "The initial core schema for the System for Cross-domain Identity Management (SCIM) was designed for provisioning users.  This memo specifies schema extensions that enable provisioning of devices using various underlying bootstrapping systems such as Wi-Fi Easy Connect, FIDO device onboarding vouchers, Bluetooth Low Energy (BLE) passcodes, and MAC Authenticated Bypass (MAB).",
-      "status": "Proposed Standard",
-      "published": "2026-05-01T00:00:00Z"
     }
   ],
   "next": "?limit=50&search=&sort=desc&page=2",
