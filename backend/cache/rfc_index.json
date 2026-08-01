@@ -78408,6 +78408,14 @@
     "published": "2026-07-01T00:00:00Z"
   },
   {
+    "rfcNumber": 9996,
+    "name": "rfc9996",
+    "title": "Media Types for Protocol Buffers",
+    "abstract": "This document registers media types for Protocol Buffers, a common\r\n   extensible mechanism for serializing structured data.",
+    "status": "Informational",
+    "published": "2026-07-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 9997,
     "name": "rfc9997",
     "title": "YANG-CBOR: Allocating SID Ranges for Private Enterprise Number (PEN) Holders",
@@ -78480,6 +78488,14 @@
     "published": "2026-06-01T00:00:00Z"
   },
   {
+    "rfcNumber": 10013,
+    "name": "rfc10013",
+    "title": "Entity Attestation Token (EAT) Measured Component",
+    "abstract": "The term \"measured component\" refers to an object within the attester's target environment whose state can be sampled and typically digested using a cryptographic hash function. Examples of measured components include firmware stored in flash memory, software loaded into memory at start time, data stored in a file system, or values in a CPU register. This document provides the information model for the measured component and two associated data models. This separation is intentional: The JSON and Concise Binary Object Representation (CBOR) serializations, coupled with the media types and associated Constrained Application Protocol (CoAP) Content-Formats, enable the immediate use of the semantics within the Entity Attestation Token (EAT) framework. Meanwhile, the information model can be reused in future specifications to provide additional serializations, for example, using ASN.1.",
+    "status": "Proposed Standard",
+    "published": "2026-07-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 10014,
     "name": "rfc10014",
     "title": "Guidelines for Characterizing the Term \"OAM\"",
@@ -78496,11 +78512,43 @@
     "published": "2026-07-01T00:00:00Z"
   },
   {
+    "rfcNumber": 10019,
+    "name": "rfc10019",
+    "title": "Zeroconf Multicast Address Allocation Problem Statement and Requirements",
+    "abstract": "This document surveys current problems with existing protocols for automatically assigning multicast IP addresses in zero-configuration (zeroconf) networking environments. It addresses key challenges, such as link-layer address collisions, hardware limitations, multicast snooping inefficiencies, and the need to avoid manual configuration. Based on these challenges, it derives requirements for a lightweight, decentralized solution for dynamically allocating unique multicast group addresses without central coordination.\n      The document presents explicit requirements covering discovery, allocation, conflict detection and resolution, and lease management. It also evaluates considerations specific to IPv6 and IPv4 multicast address ranges, and identifies approaches that are unsuited for zeroconf deployment. This foundation serves as a reference for developing future solutions for multicast address allocation that operate autonomously within local networks.",
+    "status": "Informational",
+    "published": "2026-07-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 10022,
+    "name": "rfc10022",
+    "title": "IMAP UIDBATCHES Extension",
+    "abstract": "The UIDBATCHES extension of the Internet Message Access Protocol (IMAP) allows clients to retrieve Unique Identifier (UID) ranges that partition a mailbox's messages into equally sized batches. This enables clients to perform operations such as FETCH, SEARCH, and STORE on specific message batches, providing better control over resource usage and response sizes. The extension is particularly useful with the UIDONLY mode where sequence numbers are unavailable.",
+    "status": "Proposed Standard",
+    "published": "2026-07-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 10023,
+    "name": "rfc10023",
+    "title": "The \"_for-sale\" Underscored and Globally Scoped DNS Node Name",
+    "abstract": "This document defines an operational convention that uses the\r\n   reserved underscored DNS leaf node name \"_for-sale\" to indicate the\r\n   parent domain name is available for purchase.\r\n\r\n   The convention can be deployed without disrupting existing\r\n   operations, and it may be applied even when the domain name is still\r\n   actively in use.",
+    "status": "Informational",
+    "published": "2026-07-01T00:00:00Z"
+  },
+  {
     "rfcNumber": 10026,
     "name": "rfc10026",
     "title": "Operational Recommendations for DNSSEC Delegation Signer (DS) Automation",
     "abstract": "Enabling support for automatic acceptance of DNSSEC Delegation Signer (DS) parameters from the Child DNS operator (via RFCs 7344, 8078, and 9615) requires the Parental Agent, often a registry or registrar, to make a number of technical decisions around acceptance checks, error and success reporting, and multi-party issues such as concurrent updates. This document describes recommendations about how these points are best addressed in practice.",
     "status": "Best Current Practice",
+    "published": "2026-07-01T00:00:00Z"
+  },
+  {
+    "rfcNumber": 10029,
+    "name": "rfc10029",
+    "title": "DNS Multiple QTYPEs",
+    "abstract": "This document specifies a method for a DNS client to request additional DNS record types to be delivered alongside the primary record type specified in the Question section of a DNS QUERY (OpCode=0).",
+    "status": "Proposed Standard",
     "published": "2026-07-01T00:00:00Z"
   }
 ]

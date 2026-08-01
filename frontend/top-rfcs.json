@@ -1,14 +1,46 @@
 {
-  "count": 9811,
+  "count": 9817,
   "page": 1,
   "limit": 50,
   "rfcs": [
+    {
+      "rfcNumber": 10029,
+      "name": "rfc10029",
+      "title": "DNS Multiple QTYPEs",
+      "abstract": "This document specifies a method for a DNS client to request additional DNS record types to be delivered alongside the primary record type specified in the Question section of a DNS QUERY (OpCode=0).",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
+    },
     {
       "rfcNumber": 10026,
       "name": "rfc10026",
       "title": "Operational Recommendations for DNSSEC Delegation Signer (DS) Automation",
       "abstract": "Enabling support for automatic acceptance of DNSSEC Delegation Signer (DS) parameters from the Child DNS operator (via RFCs 7344, 8078, and 9615) requires the Parental Agent, often a registry or registrar, to make a number of technical decisions around acceptance checks, error and success reporting, and multi-party issues such as concurrent updates. This document describes recommendations about how these points are best addressed in practice.",
       "status": "Best Current Practice",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 10023,
+      "name": "rfc10023",
+      "title": "The \"_for-sale\" Underscored and Globally Scoped DNS Node Name",
+      "abstract": "This document defines an operational convention that uses the\r\n   reserved underscored DNS leaf node name \"_for-sale\" to indicate the\r\n   parent domain name is available for purchase.\r\n\r\n   The convention can be deployed without disrupting existing\r\n   operations, and it may be applied even when the domain name is still\r\n   actively in use.",
+      "status": "Informational",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 10022,
+      "name": "rfc10022",
+      "title": "IMAP UIDBATCHES Extension",
+      "abstract": "The UIDBATCHES extension of the Internet Message Access Protocol (IMAP) allows clients to retrieve Unique Identifier (UID) ranges that partition a mailbox's messages into equally sized batches. This enables clients to perform operations such as FETCH, SEARCH, and STORE on specific message batches, providing better control over resource usage and response sizes. The extension is particularly useful with the UIDONLY mode where sequence numbers are unavailable.",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 10019,
+      "name": "rfc10019",
+      "title": "Zeroconf Multicast Address Allocation Problem Statement and Requirements",
+      "abstract": "This document surveys current problems with existing protocols for automatically assigning multicast IP addresses in zero-configuration (zeroconf) networking environments. It addresses key challenges, such as link-layer address collisions, hardware limitations, multicast snooping inefficiencies, and the need to avoid manual configuration. Based on these challenges, it derives requirements for a lightweight, decentralized solution for dynamically allocating unique multicast group addresses without central coordination.\n      The document presents explicit requirements covering discovery, allocation, conflict detection and resolution, and lease management. It also evaluates considerations specific to IPv6 and IPv4 multicast address ranges, and identifies approaches that are unsuited for zeroconf deployment. This foundation serves as a reference for developing future solutions for multicast address allocation that operate autonomously within local networks.",
+      "status": "Informational",
       "published": "2026-07-01T00:00:00Z"
     },
     {
@@ -26,6 +58,14 @@
       "abstract": "As the IETF continues to produce and standardize different Operations, Administration, and Maintenance (OAM) protocols and technologies, various qualifiers and modifiers are prepended to the OAM abbreviation. While, at first glance, the most used qualifiers appear to be well understood, the same qualifier may be interpreted differently in different contexts. A case in point is the qualifiers \"in-band\" and \"out-of-band\", which have their origins in the radio lexicon, and which have been extrapolated into other communication networks. This document recommends not to use these two terms when referring to OAM.\n      This document considers some common qualifiers and modifiers that are prepended, within the context of packet networks, to the OAM abbreviation and lays out guidelines for their use in IETF documents.\n      This document extends RFC 6291 by adding to the guidelines for the use of the term \"OAM\" with qualifiers. It does not modify any part of RFC 6291.",
       "status": "Best Current Practice",
       "published": "2026-06-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 10013,
+      "name": "rfc10013",
+      "title": "Entity Attestation Token (EAT) Measured Component",
+      "abstract": "The term \"measured component\" refers to an object within the attester's target environment whose state can be sampled and typically digested using a cryptographic hash function. Examples of measured components include firmware stored in flash memory, software loaded into memory at start time, data stored in a file system, or values in a CPU register. This document provides the information model for the measured component and two associated data models. This separation is intentional: The JSON and Concise Binary Object Representation (CBOR) serializations, coupled with the media types and associated Constrained Application Protocol (CoAP) Content-Formats, enable the immediate use of the semantics within the Entity Attestation Token (EAT) framework. Meanwhile, the information model can be reused in future specifications to provide additional serializations, for example, using ASN.1.",
+      "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
     },
     {
       "rfcNumber": 10008,
@@ -97,6 +137,14 @@
       "title": "YANG-CBOR: Allocating SID Ranges for Private Enterprise Number (PEN) Holders",
       "abstract": "YANG-CBOR (RFC 9254, \"Encoding of Data Modeled with YANG in the Concise Binary Object Representation (CBOR)\") defines YANG Schema Item iDentifiers (YANG SIDs), globally unique 63-bit unsigned integers used to identify YANG items. RFC 9595 (\"YANG Schema Item iDentifier (YANG SID)\") defines ways to allocate these SIDs using IANA registries.\n      The present specification employs these SID allocation mechanisms to allocate ranges of 100 000 SIDs (representation size 64 bits) to each holder of an IANA Private Enterprise Number (PEN) of a value below 1 000 000. Holders of PENs of values smaller than 100 000 are also allocated ranges of 10 000 SIDs (representation size 32 bits).",
       "status": "Proposed Standard",
+      "published": "2026-07-01T00:00:00Z"
+    },
+    {
+      "rfcNumber": 9996,
+      "name": "rfc9996",
+      "title": "Media Types for Protocol Buffers",
+      "abstract": "This document registers media types for Protocol Buffers, a common\r\n   extensible mechanism for serializing structured data.",
+      "status": "Informational",
       "published": "2026-07-01T00:00:00Z"
     },
     {
@@ -354,54 +402,6 @@
       "abstract": "Segment Routing (SR) Point-to-Multipoint (P2MP) Policies are used to define and manage explicit P2MP paths within a network. These policies are typically calculated via a controller-based mechanism and installed via, e.g., a Path Computation Element (PCE). In other cases, these policies can be installed using the Network Configuration Protocol (NETCONF) / YANG or a Command Line Interface (CLI). They are used to steer Multicast traffic along optimized paths from a Root to a set of Leaf routers.\n      This document defines extensions to ping and traceroute mechanisms for an SR P2MP Policy with MPLS encapsulation to provide Operations, Administration, and Maintenance (OAM) capabilities. The extensions enable operators to verify connectivity, diagnose failures, and troubleshoot forwarding issues within SR P2MP Policy Multicast trees.\n      By introducing new mechanisms for detecting failures and validating path integrity, this document enhances the operational robustness of P2MP Multicast deployments. Additionally, it ensures that existing MPLS and SR-based OAM tools can be effectively applied to networks utilizing SR P2MP Policies.",
       "status": "Proposed Standard",
       "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9960,
-      "name": "rfc9960",
-      "title": "Segment Routing Point-to-Multipoint Policy",
-      "abstract": "The Point-to-Multipoint (P2MP) Policy enables creation of P2MP trees for efficient multipoint packet delivery in a Segment Routing (SR) domain.  This document specifies the architecture, signaling, and procedures for SR P2MP Policies with Segment Routing over MPLS (SR-MPLS) and Segment Routing over IPv6 (SRv6).  It defines the SR P2MP Policy construct, candidate paths (CPs) of an SR P2MP Policy, and the instantiation of the P2MP tree instances (PTIs) of a CP using Replication segments.  Additionally, it describes the required extensions for a controller to support P2MP path computation and provisioning.  This document updates RFC 9524.",
-      "status": "Proposed Standard",
-      "published": "2026-04-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9959,
-      "name": "rfc9959",
-      "title": "Careful Resume: Convergence of Congestion Control from Retained State",
-      "abstract": "This document specifies a cautious method for Internet transports that enables fast startup of Congestion Control (CC) for a wide range of connections, known as \"Careful Resume\". It reuses a set of computed CC parameters that are based on previously observed path characteristics between the same pair of transport endpoints. These parameters are saved, allowing them to be later used to modify the CC behaviour of a subsequent connection.\n      This document describes the assumptions and defines the requirements for how a sender utilises these parameters to provide opportunities for a connection to more rapidly get up to speed and utilise available capacity. It discusses how the use of this method impacts the capacity at a shared network bottleneck and the safe response that is needed after any indication that the new rate is inappropriate.",
-      "status": "Proposed Standard",
-      "published": "2026-05-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9958,
-      "name": "rfc9958",
-      "title": "Post-Quantum Cryptography for Engineers",
-      "abstract": "The advent of a cryptographically relevant quantum computer (CRQC) would render state-of-the-art, traditional public key algorithms deployed today obsolete, as the mathematical assumptions underpinning their security would no longer hold. To address this, protocols and infrastructure must transition to post-quantum algorithms, which are designed to resist both traditional and quantum attacks. This document explains why engineers need to be aware of and understand post-quantum cryptography (PQC), and it details the impact of CRQCs on existing systems and the challenges involved in transitioning to post-quantum algorithms. Unlike previous cryptographic updates, this shift may require significant protocol redesign due to the unique properties of post-quantum algorithms.",
-      "status": "Informational",
-      "published": "2026-06-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9957,
-      "name": "rfc9957",
-      "title": "The DOCSIS Queue Protection Algorithm to Preserve Low Latency",
-      "abstract": "This Informational RFC explains the specification of the queue protection algorithm introduced into Data-Over-Cable Service Interface Specification (DOCSIS) technology at version 3.1.  A shared low-latency queue relies on the non-queue-building behaviour of every traffic flow using it.  However, some flows might not take such care, either accidentally or maliciously.  If a queue is about to exceed a threshold level of delay, the Queue Protection algorithm can rapidly detect the flows most likely to be responsible.  It can then prevent harm to other traffic in the low-latency queue by ejecting selected packets (or all packets) of these flows.  This document is designed for four audiences: a) congestion control designers who need to understand how to keep on the \"good\" side of the algorithm; b) implementers of the algorithm who want to understand it in more depth; c) designers of algorithms with similar goals, perhaps for non-DOCSIS scenarios; and d) researchers interested in evaluating the algorithm.",
-      "status": "Informational",
-      "published": "2026-05-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9956,
-      "name": "rfc9956",
-      "title": "A Non-Queue-Building Per-Hop Behavior (NQB PHB) for Differentiated Services",
-      "abstract": "This document specifies characteristics of a Non-Queue-Building Per-Hop Behavior (NQB PHB).  The NQB PHB provides a shallow-buffered, best-effort service as a complement to a Default deep-buffered, best-effort service for Internet services.  The purpose of this NQB PHB is to provide a separate queue that enables smooth (i.e., non-bursty), low-data-rate, application-limited traffic microflows, to avoid the delay, delay variation and loss that would ordinarily be caused by sharing a queue with bursty, capacity-seeking traffic.  This PHB is implemented without prioritization and can be implemented without rate policing, making it suitable for environments where the use of these features is restricted.  The NQB PHB has been developed primarily for use by access network segments, where queuing delay and queuing loss caused by Queue-Building (QB) protocols are manifested; however, its use is not limited to such segments.  In particular, the application of NQB PHB to cable broadband links, Wi-Fi links, and mobile network radio/core segments are discussed in this document.  This document recommends a specific Differentiated Services Code Point (DSCP) to identify NQB microflows and updates the guidance in RFC 8325 on mapping Differentiated Services (Diffserv or DS) to IEEE 802.11 for this codepoint.",
-      "status": "Proposed Standard",
-      "published": "2026-05-01T00:00:00Z"
-    },
-    {
-      "rfcNumber": 9955,
-      "name": "rfc9955",
-      "title": "Hybrid Signature Spectrums",
-      "abstract": "This document describes classification of design goals and security considerations for hybrid digital signature schemes, including proof composability, non-separability of the component signatures given a hybrid signature, backwards and forwards compatibility, hybrid generality, and Simultaneous Verification (SV).",
-      "status": "Informational",
-      "published": "2026-07-01T00:00:00Z"
     }
   ],
   "next": "?limit=50&search=&sort=desc&page=2",
